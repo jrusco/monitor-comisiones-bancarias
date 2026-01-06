@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor de Comisiones y Recursos: Pagos Argentina</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            /* Max width for large screens */
+            height: 350px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .transition-all {
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 300ms;
+        }
+
+        /* Custom scrollbar for data tables */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+    <!-- Chosen Palette: Slate (Backgrounds/Text) + Blue (Primary) + Emerald (Success/Money) -->
+    <!-- Application Structure Plan: 
+         1. Header: Context and objective.
+         2. Market Context (Chart): Visual comparison of "Acquirer" (Banks) vs "Aggregator" (Fintech) fee structures to set expectations.
+         3. Entity Selector (Grid): Interactive cards for the 5 requested entities.
+         4. Resource Detail View (Dynamic): The core informational section. Updates based on selection to show:
+            - Official Fee Page URL.
+            - API/Developer Resource URL.
+            - Summary of typical costs.
+            - Key characteristics (Immediate vs 14 days).
+    -->
+    <!-- Visualization & Content Choices:
+         - Chart.js Bar Chart: Compares "Standard Maximums" (Credit/Debit regulated caps) vs "Aggregator Fees" to explain why MP/Uala rates differ from BNA/Bapro.
+         - Interactive Cards: To act as the navigation menu for the specific entities.
+         - Dynamic DOM Updating: To display the specific "Source Report" data (URLs/APIs) without reloading the page.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+
+<body class="text-slate-800">
+
+    <!-- Navbar -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">
+                        M</div>
+                    <span class="font-semibold text-lg tracking-tight text-slate-900">Monitor de Comisiones AR</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span
+                        class="text-xs font-medium bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full">Actualizado:
+                        2024</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- Intro Section -->
+        <section class="bg-white rounded-xl p-6 shadow-sm border border-slate-100">
+            <h1 class="text-2xl font-bold text-slate-900 mb-2">Recursos de Comisiones y Tasas</h1>
+            <p class="text-slate-600 max-w-3xl">
+                Directorio unificado de enlaces oficiales, documentación de API y estructuras de costos para
+                procesamiento de pagos en Argentina.
+                Seleccione una entidad para acceder a sus fuentes de información actualizadas.
+            </p>
+        </section>
+
+        <!-- Context Visualization -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Chart Column -->
+            <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                <div class="mb-4">
+                    <h2 class="text-lg font-semibold text-slate-900">Comparativa de Modelos de Cobro</h2>
+                    <p class="text-sm text-slate-500">Diferencia estructural entre Bancos (Adquirentes directos) y
+                        Agregadores (Fintechs)</p>
+                </div>
+                <!-- Chart Container -->
+                <div class="chart-container">
+                    <canvas id="feesChart"></canvas>
+                </div>
+                <div class="mt-4 flex gap-4 text-xs text-slate-500 justify-center">
+                    <div class="flex items-center"><span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>Débito
+                    </div>
+                    <div class="flex items-center"><span class="w-3 h-3 bg-indigo-500 rounded-full mr-2"></span>Crédito
+                        (Estándar)</div>
+                    <div class="flex items-center"><span
+                            class="w-3 h-3 bg-emerald-400 rounded-full mr-2"></span>Liquidez Inmediata (Agregadores)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Context Info -->
+            <div class="bg-slate-50 rounded-xl border border-slate-200 p-6 flex flex-col justify-center space-y-4">
+                <h3 class="font-semibold text-slate-900">Entendiendo los Costos</h3>
+                <div class="space-y-3 text-sm">
+                    <div class="p-3 bg-white rounded-lg border border-slate-100">
+                        <span class="font-medium text-blue-700 block mb-1">Bancos (BNA, Bapro)</span>
+                        Generalmente cobran el arancel tope regulado (0.8% Débito / 1.8% Crédito) + costo de terminal.
+                        Los plazos de pago son estándar (8-10 días hábiles crédito).
+                    </div>
+                    <div class="p-3 bg-white rounded-lg border border-slate-100">
+                        <span class="font-medium text-indigo-700 block mb-1">Agregadores (MP, Ualá)</span>
+                        Cobran una "Tasa de Servicio" mayor que incluye el arancel. Ofrecen liquidez inmediata o plazos
+                        cortos a cambio de comisiones más altas (3% - 6% + IVA).
+                    </div>
+                    <div class="p-3 bg-white rounded-lg border border-slate-100">
+                        <span class="font-medium text-slate-700 block mb-1">Procesadores (Fiserv)</span>
+                        Operan la red. Sus costos suelen estar desglosados en Alquiler de POS + Arancel por transacción.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Entity Directory (Interactive Grid) -->
+        <section>
+            <h2 class="text-xl font-bold text-slate-900 mb-4">Directorio de Entidades</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="entityGrid">
+                <!-- Javascript will populate cards here -->
+            </div>
+        </section>
+
+        <!-- Entity Detail View (Dynamic) -->
+        <section id="detailSection" class="hidden transition-all duration-500">
+            <div class="bg-white rounded-xl shadow-lg border border-blue-100 overflow-hidden">
+                <div class="p-0">
+                    <!-- Dynamic Header -->
+                    <div id="detailHeader" class="bg-slate-900 text-white p-6 flex justify-between items-start">
+                        <div>
+                            <h2 id="detailTitle" class="text-2xl font-bold">Nombre Entidad</h2>
+                            <span id="detailType"
+                                class="inline-block mt-2 px-3 py-1 bg-white/20 rounded-full text-xs font-medium backdrop-blur-sm">Tipo</span>
+                        </div>
+                        <button onclick="closeDetail()"
+                            class="text-white/70 hover:text-white transition-colors text-2xl font-bold">&times;</button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-0">
+                        <!-- Left: Resources -->
+                        <div class="p-8 border-r border-slate-100">
+                            <h3 class="text-lg font-semibold text-slate-900 mb-6 flex items-center">
+                                <span
+                                    class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3 font-bold text-sm">1</span>
+                                Fuentes Oficiales
+                            </h3>
+
+                            <div class="space-y-6">
+                                <div>
+                                    <label
+                                        class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Link
+                                        a Tabla de Comisiones</label>
+                                    <div class="flex items-center gap-2 group">
+                                        <input type="text" id="detailFeeUrl" readonly
+                                            class="w-full bg-slate-50 border border-slate-200 text-slate-600 text-sm rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none font-mono">
+                                        <button onclick="copyToClipboard('detailFeeUrl')"
+                                            class="p-3 text-slate-400 hover:text-blue-600 bg-white border border-slate-200 rounded-lg transition-colors"
+                                            title="Copiar URL">
+                                            &#x2398;
+                                        </button>
+                                        <a id="detailFeeLink" href="#" target="_blank"
+                                            class="p-3 text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors font-bold text-sm whitespace-nowrap">
+                                            Ir al sitio &rarr;
+                                        </a>
+                                    </div>
+                                    <p class="mt-2 text-xs text-slate-400">Página oficial donde se publican los PDFs o
+                                        tablas actualizadas.</p>
+                                </div>
+
+                                <div id="apiSection">
+                                    <label
+                                        class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Recurso
+                                        para Desarrolladores (API)</label>
+                                    <div class="bg-slate-900 rounded-lg p-4 relative group">
+                                        <code id="detailApiUrl"
+                                            class="text-emerald-400 font-mono text-xs break-all"></code>
+                                        <div
+                                            class="mt-2 pt-2 border-t border-slate-700 flex justify-between items-center">
+                                            <span class="text-slate-400 text-xs">Endpoint Referencia</span>
+                                            <a id="detailApiLink" href="#" target="_blank"
+                                                class="text-xs text-white hover:text-emerald-400 underline decoration-emerald-400/50">Ver
+                                                Documentación</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Data Snapshot -->
+                        <div class="p-8 bg-slate-50">
+                            <h3 class="text-lg font-semibold text-slate-900 mb-6 flex items-center">
+                                <span
+                                    class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mr-3 font-bold text-sm">2</span>
+                                Estructura de Costos Típica
+                            </h3>
+                            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                                <div class="overflow-x-auto custom-scroll">
+                                    <table class="w-full text-sm text-left">
+                                        <thead
+                                            class="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200">
+                                            <tr>
+                                                <th class="px-4 py-3">Concepto</th>
+                                                <th class="px-4 py-3">Plazo</th>
+                                                <th class="px-4 py-3 text-right">Tasa Estimada*</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="detailTableBody" class="divide-y divide-slate-100">
+                                            <!-- JS populated -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="p-3 bg-yellow-50 border-t border-yellow-100 text-xs text-yellow-800">
+                                    * Las tasas son referenciales y no incluyen IVA ni retenciones impositivas (IIBB,
+                                    Ganancias). Verifique siempre en la fuente oficial.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-12 mt-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="mb-4">Monitor de Recursos Financieros Argentina</p>
+            <p class="text-xs text-slate-500 max-w-2xl mx-auto">
+                Esta herramienta es un directorio de recursos. No tiene afiliación con las entidades bancarias
+                mencionadas.
+                Las tasas mostradas son ejemplos estructurales y no constituyen una oferta comercial vigente.
+                Consulte siempre los enlaces oficiales provistos.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // --- Data Source ---
+        const entities = [
+            {
+                id: 'bna',
+                name: 'Banco Nación',
+                type: 'Banco (Adquirente)',
+                color: 'bg-blue-600',
+                textColor: 'text-blue-600',
+                logo: 'BN',
+                feeUrl: 'https://www.bna.com.ar/Personas/TarjetasDeCredito', // General section often linking to fees
+                apiUrl: 'N/A - Integración vía Procesadores (Fiserv/Payway)',
+                hasApi: false,
+                fees: [
+                    { concept: 'Débito', term: '48 hs', rate: '0.8% (Regulado)' },
+                    { concept: 'Crédito', term: '8-10 días hábiles', rate: '1.8% (Regulado)' },
+                    { concept: 'Mantenimiento Terminal', term: 'Mensual', rate: 'Bonificado o Variable' }
+                ]
+            },
+            {
+                id: 'bapro',
+                name: 'Banco Provincia',
+                type: 'Banco (Adquirente)',
+                color: 'bg-emerald-600',
+                textColor: 'text-emerald-600',
+                logo: 'BP',
+                feeUrl: 'https://www.bancoprovincia.com.ar/web/comisiones',
+                apiUrl: 'N/A - Integración vía Procesadores',
+                hasApi: false,
+                fees: [
+                    { concept: 'Débito', term: '48 hs', rate: '0.8% (Regulado)' },
+                    { concept: 'Crédito', term: '8-10 días hábiles', rate: '1.8% (Regulado)' },
+                    { concept: 'Cuenta DNI (QR)', term: 'Inmediato', rate: '0.6% - 0.8%' }
+                ]
+            },
+            {
+                id: 'mercadopago',
+                name: 'Mercado Pago',
+                type: 'Agregador (Fintech)',
+                color: 'bg-sky-500',
+                textColor: 'text-sky-500',
+                logo: 'MP',
+                feeUrl: 'https://www.mercadopago.com.ar/ayuda/costos-cobrar-point_220',
+                apiUrl: 'https://api.mercadopago.com/v1/payment_methods',
+                apiDocs: 'https://www.mercadopago.com.ar/developers/es/docs/your-integrations',
+                hasApi: true,
+                fees: [
+                    { concept: 'Point - Débito', term: 'En el momento', rate: '3.39% + IVA' },
+                    { concept: 'Point - Crédito', term: 'En el momento', rate: '6.99% + IVA' },
+                    { concept: 'Point - Crédito', term: '14 días', rate: '3.79% + IVA' },
+                    { concept: 'QR', term: 'En el momento', rate: '0.8% - 5.99% (según medio)' }
+                ]
+            },
+            {
+                id: 'uala',
+                name: 'Ualá (Bis)',
+                type: 'Agregador (Fintech)',
+                color: 'bg-pink-500',
+                textColor: 'text-pink-500',
+                logo: 'UA',
+                feeUrl: 'https://www.ualabis.com.ar/costos',
+                apiUrl: 'https://api.uala.com.ar/merchant/v1/fees (Requiere Auth)',
+                apiDocs: 'https://desarrolladores.uala.com.ar/',
+                hasApi: true,
+                fees: [
+                    { concept: 'mPOS - Débito', term: 'En el momento', rate: '2.9% + IVA' },
+                    { concept: 'mPOS - Crédito', term: 'En el momento', rate: '4.4% + IVA' },
+                    { concept: 'Link de Pago', term: 'En el momento', rate: '4.4% + IVA' }
+                ]
+            },
+            {
+                id: 'fiserv',
+                name: 'Fiserv / Posnet',
+                type: 'Procesador / Adquirente',
+                color: 'bg-orange-500',
+                textColor: 'text-orange-500',
+                logo: 'FI',
+                feeUrl: 'https://www.fiserv.com/es-ar/merchant-services.html', // Often requires login for specific table
+                apiUrl: 'https://docs.fiserv.dev/public/docs/global-payment-gateway-api',
+                apiDocs: 'https://www.fiserv.com/es-ar/developers.html',
+                hasApi: true,
+                fees: [
+                    { concept: 'Terminal POS', term: 'Mensual', rate: 'Costo de Alquiler' },
+                    { concept: 'Transacción Débito', term: '48 hs', rate: '0.8% (Pass-through)' },
+                    { concept: 'Transacción Crédito', term: 'Según Plan', rate: '1.8% (Pass-through)' }
+                ]
+            }
+        ];
+
+        // --- Core Functions ---
+
+        function initApp() {
+            renderChart();
+            renderEntityGrid();
+        }
+
+        function renderEntityGrid() {
+            const grid = document.getElementById('entityGrid');
+            grid.innerHTML = entities.map(entity => `
+                <button onclick="showEntityDetail('${entity.id}')" 
+                        class="card-hover bg-white rounded-xl border border-slate-200 p-6 flex flex-col items-center justify-center text-center space-y-3 transition-all h-full group">
+                    <div class="w-12 h-12 rounded-full ${entity.color} text-white flex items-center justify-center font-bold text-lg shadow-md group-hover:scale-110 transition-transform">
+                        ${entity.logo}
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm leading-tight">${entity.name}</h3>
+                        <p class="text-xs text-slate-500 mt-1">${entity.type}</p>
+                    </div>
+                    <div class="mt-2 text-xs font-semibold ${entity.textColor} bg-slate-50 px-2 py-1 rounded">
+                        Ver Recursos &rarr;
+                    </div>
+                </button>
+            `).join('');
+        }
+
+        function showEntityDetail(id) {
+            const entity = entities.find(e => e.id === id);
+            if (!entity) return;
+
+            // Update Header
+            document.getElementById('detailTitle').textContent = entity.name;
+            document.getElementById('detailType').textContent = entity.type;
+
+            // Update Resources
+            const feeInput = document.getElementById('detailFeeUrl');
+            feeInput.value = entity.feeUrl;
+
+            const feeLink = document.getElementById('detailFeeLink');
+            feeLink.href = entity.feeUrl;
+
+            // API Section
+            const apiSection = document.getElementById('apiSection');
+            if (entity.hasApi) {
+                apiSection.style.display = 'block';
+                document.getElementById('detailApiUrl').textContent = entity.apiUrl;
+                document.getElementById('detailApiLink').href = entity.apiDocs || '#';
+            } else {
+                apiSection.style.display = 'none';
+            }
+
+            // Update Table
+            const tableBody = document.getElementById('detailTableBody');
+            tableBody.innerHTML = entity.fees.map(fee => `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-4 py-3 font-medium text-slate-700">${fee.concept}</td>
+                    <td class="px-4 py-3 text-slate-500">${fee.term}</td>
+                    <td class="px-4 py-3 text-right font-mono text-slate-800 font-bold">${fee.rate}</td>
+                </tr>
+            `).join('');
+
+            // Show Section
+            const section = document.getElementById('detailSection');
+            section.classList.remove('hidden');
+            section.classList.add('block');
+
+            // Scroll to detail
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function closeDetail() {
+            const section = document.getElementById('detailSection');
+            section.classList.add('hidden');
+            section.classList.remove('block');
+        }
+
+        function copyToClipboard(elementId) {
+            const copyText = document.getElementById(elementId);
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            document.execCommand("copy");
+
+            // Visual feedback (could be improved with a toast)
+            const originalBg = copyText.style.backgroundColor;
+            copyText.style.backgroundColor = '#d1fae5'; // Light green
+            setTimeout(() => {
+                copyText.style.backgroundColor = originalBg;
+            }, 500);
+        }
+
+        // --- Visualization Logic ---
+        function renderChart() {
+            const ctx = document.getElementById('feesChart').getContext('2d');
+
+            // Data representing Typical Max Fees (Not exact, illustrative for comparison)
+            // Banks follow regulations. Fintechs add service fees for speed/tech.
+            const labels = ['Bancos (BNA/Bapro)', 'Fiserv (Procesador)', 'Mercado Pago (Fintech)', 'Ualá (Fintech)'];
+
+            const debitData = [0.8, 0.8, 3.39, 2.9]; // Debit is cheaper in banks
+            const creditStdData = [1.8, 1.8, 3.79, 4.4]; // 14 days credit
+            const creditInstantData = [null, null, 6.99, 6.4]; // Instant liquidity (Only fintechs)
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Débito (Estándar)',
+                            data: debitData,
+                            backgroundColor: '#3b82f6', // blue-500
+                            borderRadius: 4,
+                            barPercentage: 0.6
+                        },
+                        {
+                            label: 'Crédito (10-14 días)',
+                            data: creditStdData,
+                            backgroundColor: '#6366f1', // indigo-500
+                            borderRadius: 4,
+                            barPercentage: 0.6
+                        },
+                        {
+                            label: 'Crédito (Inmediato)',
+                            data: creditInstantData,
+                            backgroundColor: '#34d399', // emerald-400
+                            borderRadius: 4,
+                            barPercentage: 0.6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return context.dataset.label + ': ' + context.raw + '% (+ IVA)';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Comisión % Estimada' },
+                            grid: { color: '#f1f5f9' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', initApp);
+
+    </script>
+</body>
+
+</html>
