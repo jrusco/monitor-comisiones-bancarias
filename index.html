@@ -281,101 +281,32 @@
 
     <script>
         // --- Data Source ---
-        const entities = [
-            {
-                id: 'bna',
-                name: 'Banco Nación',
-                type: 'Banco (Adquirente)',
-                color: 'bg-blue-600',
-                textColor: 'text-blue-600',
-                logo: 'BN',
-                feeUrl: 'https://www.bna.com.ar/Personas/TarjetasDeCredito', // General section often linking to fees
-                apiUrl: 'N/A - Integración vía Procesadores (Fiserv/Payway)',
-                hasApi: false,
-                fees: [
-                    { concept: 'Débito', term: '48 hs', rate: '0.8% (Regulado)' },
-                    { concept: 'Crédito', term: '8-10 días hábiles', rate: '1.8% (Regulado)' },
-                    { concept: 'Mantenimiento Terminal', term: 'Mensual', rate: 'Bonificado o Variable' }
-                ]
-            },
-            {
-                id: 'bapro',
-                name: 'Banco Provincia',
-                type: 'Banco (Adquirente)',
-                color: 'bg-emerald-600',
-                textColor: 'text-emerald-600',
-                logo: 'BP',
-                feeUrl: 'https://www.bancoprovincia.com.ar/web/comisiones',
-                apiUrl: 'N/A - Integración vía Procesadores',
-                hasApi: false,
-                fees: [
-                    { concept: 'Débito', term: '48 hs', rate: '0.8% (Regulado)' },
-                    { concept: 'Crédito', term: '8-10 días hábiles', rate: '1.8% (Regulado)' },
-                    { concept: 'Cuenta DNI (QR)', term: 'Inmediato', rate: '0.6% - 0.8%' }
-                ]
-            },
-            {
-                id: 'mercadopago',
-                name: 'Mercado Pago',
-                type: 'Agregador (Fintech)',
-                color: 'bg-sky-500',
-                textColor: 'text-sky-500',
-                logo: 'MP',
-                feeUrl: 'https://www.mercadopago.com.ar/ayuda/costos-cobrar-point_220',
-                apiUrl: 'https://api.mercadopago.com/v1/payment_methods',
-                apiDocs: 'https://www.mercadopago.com.ar/developers/es/docs/your-integrations',
-                hasApi: true,
-                fees: [
-                    { concept: 'Point - Débito', term: 'En el momento', rate: '3.39% + IVA' },
-                    { concept: 'Point - Crédito', term: 'En el momento', rate: '6.99% + IVA' },
-                    { concept: 'Point - Crédito', term: '14 días', rate: '3.79% + IVA' },
-                    { concept: 'QR', term: 'En el momento', rate: '0.8% - 5.99% (según medio)' }
-                ]
-            },
-            {
-                id: 'uala',
-                name: 'Ualá (Bis)',
-                type: 'Agregador (Fintech)',
-                color: 'bg-pink-500',
-                textColor: 'text-pink-500',
-                logo: 'UA',
-                feeUrl: 'https://www.ualabis.com.ar/costos',
-                apiUrl: 'https://api.uala.com.ar/merchant/v1/fees (Requiere Auth)',
-                apiDocs: 'https://desarrolladores.uala.com.ar/',
-                hasApi: true,
-                fees: [
-                    { concept: 'mPOS - Débito', term: 'En el momento', rate: '2.9% + IVA' },
-                    { concept: 'mPOS - Crédito', term: 'En el momento', rate: '4.4% + IVA' },
-                    { concept: 'Link de Pago', term: 'En el momento', rate: '4.4% + IVA' }
-                ]
-            },
-            {
-                id: 'fiserv',
-                name: 'Fiserv / Posnet',
-                type: 'Procesador / Adquirente',
-                color: 'bg-orange-500',
-                textColor: 'text-orange-500',
-                logo: 'FI',
-                feeUrl: 'https://www.fiserv.com/es-ar/merchant-services.html', // Often requires login for specific table
-                apiUrl: 'https://docs.fiserv.dev/public/docs/global-payment-gateway-api',
-                apiDocs: 'https://www.fiserv.com/es-ar/developers.html',
-                hasApi: true,
-                fees: [
-                    { concept: 'Terminal POS', term: 'Mensual', rate: 'Costo de Alquiler' },
-                    { concept: 'Transacción Débito', term: '48 hs', rate: '0.8% (Pass-through)' },
-                    { concept: 'Transacción Crédito', term: 'Según Plan', rate: '1.8% (Pass-through)' }
-                ]
-            }
-        ];
+        // Data is now loaded dynamically from data.json
 
         // --- Core Functions ---
 
-        function initApp() {
-            renderChart();
-            renderEntityGrid();
+        async function initApp() {
+            try {
+                const response = await fetch('data.json?t=' + new Date().getTime());
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const entities = await response.json();
+
+                renderChart(entities);
+                renderEntityGrid(entities);
+                
+                // Make entities available globally for button clicks
+                window.appData = { entities };
+
+            } catch (error) {
+                console.error("Failed to load entity data:", error);
+                const grid = document.getElementById('entityGrid');
+                grid.innerHTML = `<p class="text-red-500 col-span-full">Error: No se pudieron cargar los datos de las entidades. Por favor, intente de nuevo más tarde.</p>`;
+            }
         }
 
-        function renderEntityGrid() {
+        function renderEntityGrid(entities) {
             const grid = document.getElementById('entityGrid');
             grid.innerHTML = entities.map(entity => `
                 <button onclick="showEntityDetail('${entity.id}')" 
@@ -395,6 +326,7 @@
         }
 
         function showEntityDetail(id) {
+            const entities = window.appData.entities;
             const entity = entities.find(e => e.id === id);
             if (!entity) return;
 
@@ -459,16 +391,42 @@
         }
 
         // --- Visualization Logic ---
-        function renderChart() {
+        function renderChart(entities) {
             const ctx = document.getElementById('feesChart').getContext('2d');
 
             // Data representing Typical Max Fees (Not exact, illustrative for comparison)
             // Banks follow regulations. Fintechs add service fees for speed/tech.
             const labels = ['Bancos (BNA/Bapro)', 'Fiserv (Procesador)', 'Mercado Pago (Fintech)', 'Ualá (Fintech)'];
 
-            const debitData = [0.8, 0.8, 3.39, 2.9]; // Debit is cheaper in banks
-            const creditStdData = [1.8, 1.8, 3.79, 4.4]; // 14 days credit
-            const creditInstantData = [null, null, 6.99, 6.4]; // Instant liquidity (Only fintechs)
+            // Helper to find a specific fee rate, returns null if not found
+            const getRate = (entityId, concept, term) => {
+                const entity = entities.find(e => e.id === entityId);
+                if (!entity) return null;
+                const fee = entity.fees.find(f => f.concept.includes(concept) && f.term.includes(term));
+                // Extract the first number found in the rate string
+                const rateMatch = fee ? fee.rate.match(/(\d+[\.,]?\d*)/) : null;
+                return rateMatch ? parseFloat(rateMatch[0].replace(',', '.')) : null;
+            };
+
+            const debitData = [
+                getRate('bna', 'Débito', ''),
+                getRate('fiserv', 'Débito', ''),
+                getRate('mercadopago', 'Débito', 'En el momento'),
+                getRate('uala', 'Débito', 'En el momento')
+            ];
+            const creditStdData = [
+                getRate('bna', 'Crédito', 'días hábiles'),
+                getRate('fiserv', 'Crédito', ''),
+                getRate('mercadopago', 'Crédito', '14 días'),
+                getRate('uala', 'Crédito', 'En el momento') // Uala only has instant
+            ]; 
+            const creditInstantData = [
+                null, 
+                null, 
+                getRate('mercadopago', 'Crédito', 'En el momento'),
+                getRate('uala', 'Crédito', 'En el momento')
+            ];
+
 
             new Chart(ctx, {
                 type: 'bar',
@@ -506,7 +464,18 @@
                         tooltip: {
                             callbacks: {
                                 label: function (context) {
-                                    return context.dataset.label + ': ' + context.raw + '% (+ IVA)';
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y + '%';
+                                    }
+                                    // Add a note for non-null values
+                                    if (context.raw !== null) {
+                                        label += ' (+IVA aprox.)'
+                                    }
+                                    return label;
                                 }
                             }
                         }

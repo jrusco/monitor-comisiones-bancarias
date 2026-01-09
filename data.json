@@ -1,0 +1,150 @@
+[
+    {
+        "id": "bna",
+        "name": "Banco Nación",
+        "type": "Banco (Adquirente)",
+        "color": "bg-blue-600",
+        "textColor": "text-blue-600",
+        "logo": "BN",
+        "feeUrl": "https://www.bna.com.ar/Personas/TarjetasDeCredito",
+        "apiUrl": "N/A - Integración vía Procesadores (Fiserv/Payway)",
+        "hasApi": false,
+        "fees": [
+            {
+                "concept": "Débito",
+                "term": "48 hs",
+                "rate": "0.8% (Regulado)"
+            },
+            {
+                "concept": "Crédito",
+                "term": "8-10 días hábiles",
+                "rate": "1.8% (Regulado)"
+            },
+            {
+                "concept": "Mantenimiento Terminal",
+                "term": "Mensual",
+                "rate": "Bonificado o Variable"
+            }
+        ]
+    },
+    {
+        "id": "bapro",
+        "name": "Banco Provincia",
+        "type": "Banco (Adquirente)",
+        "color": "bg-emerald-600",
+        "textColor": "text-emerald-600",
+        "logo": "BP",
+        "feeUrl": "https://www.bancoprovincia.com.ar/web/comisiones",
+        "apiUrl": "N/A - Integración vía Procesadores",
+        "hasApi": false,
+        "fees": [
+            {
+                "concept": "Débito",
+                "term": "48 hs",
+                "rate": "0.8% (Regulado)"
+            },
+            {
+                "concept": "Crédito",
+                "term": "8-10 días hábiles",
+                "rate": "1.8% (Regulado)"
+            },
+            {
+                "concept": "Cuenta DNI (QR)",
+                "term": "Inmediato",
+                "rate": "0.6% - 0.8%"
+            }
+        ]
+    },
+    {
+        "id": "mercadopago",
+        "name": "Mercado Pago",
+        "type": "Agregador (Fintech)",
+        "color": "bg-sky-500",
+        "textColor": "text-sky-500",
+        "logo": "MP",
+        "feeUrl": "https://www.mercadopago.com.ar/ayuda/costos-cobrar-point_220",
+        "apiUrl": "https://api.mercadopago.com/v1/payment_methods",
+        "apiDocs": "https://www.mercadopago.com.ar/developers/es/docs/your-integrations",
+        "hasApi": true,
+        "fees": [
+            {
+                "concept": "Point - Débito",
+                "term": "En el momento",
+                "rate": "3,25% + IVA"
+            },
+            {
+                "concept": "Point - Crédito",
+                "term": "En el momento",
+                "rate": "6,29% + IVA"
+            },
+            {
+                "concept": "Point - Crédito",
+                "term": "14 días",
+                "rate": "4,39% + IVA"
+            },
+            {
+                "concept": "QR",
+                "term": "En el momento",
+                "rate": "0.8% - 5.99% (según medio)"
+            }
+        ]
+    },
+    {
+        "id": "uala",
+        "name": "Ualá (Bis)",
+        "type": "Agregador (Fintech)",
+        "color": "bg-pink-500",
+        "textColor": "text-pink-500",
+        "logo": "UA",
+        "feeUrl": "https://www.ualabis.com.ar/costos",
+        "apiUrl": "https://api.uala.com.ar/merchant/v1/fees (Requiere Auth)",
+        "apiDocs": "https://desarrolladores.uala.com.ar/",
+        "hasApi": true,
+        "fees": [
+            {
+                "concept": "mPOS - Débito",
+                "term": "En el momento",
+                "rate": "2.9% + IVA"
+            },
+            {
+                "concept": "mPOS - Crédito",
+                "term": "En el momento",
+                "rate": "4.4% + IVA"
+            },
+            {
+                "concept": "Link de Pago",
+                "term": "En el momento",
+                "rate": "4.4% + IVA"
+            }
+        ]
+    },
+    {
+        "id": "fiserv",
+        "name": "Fiserv / Posnet",
+        "type": "Procesador / Adquirente",
+        "color": "bg-orange-500",
+        "textColor": "text-orange-500",
+        "logo": "FI",
+        "feeUrl": "https://www.fiserv.com/es-ar/merchant-services.html",
+        "apiUrl": "https://docs.fiserv.dev/public/docs/global-payment-gateway-api",
+        "apiDocs": "https://www.fiserv.com/es-ar/developers.html",
+        "hasApi": true,
+        "fees": [
+            {
+                "concept": "Terminal POS",
+                "term": "Mensual",
+                "rate": "Costo de Alquiler"
+            },
+            {
+                "concept": "Transacción Débito",
+                "term": "48 hs",
+                "rate": "0.8% (Pass-through)"
+            },
+            {
+                "concept": "Transacción Crédito",
+                "term": "Según Plan",
+                "rate": "1.8% (Pass-through)"
+            }
+        ]
+    }
+]
