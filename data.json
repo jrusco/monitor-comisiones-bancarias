@@ -6,7 +6,7 @@
         "color": "bg-blue-600",
         "textColor": "text-blue-600",
         "logo": "BN",
-        "feeUrl": "https://www.bna.com.ar/Personas/TarjetasDeCredito",
+        "feeUrl": "https://www.bna.com.ar/Downloads/ComisionesYCargosComercial.pdf",
         "apiUrl": "N/A - Integración vía Procesadores (Fiserv/Payway)",
         "hasApi": false,
         "fees": [
