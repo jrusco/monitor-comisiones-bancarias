@@ -1,8 +1,11 @@
 import json
 import requests
 from bs4 import BeautifulSoup
+import re
+from datetime import datetime
 
 DATA_FILE = 'data.json'
+INDEX_FILE = 'index.html'
 MP_ID = 'mercadopago'
 # This is the specific page for Point fees, not the generic one.
 FEE_URL = 'https://www.mercadopago.com.ar/ayuda/2779'
@@ -122,6 +125,52 @@ def update_fees_in_data(data, scraped_fees):
     return data if something_was_updated else None
 
 
+def update_date_in_html():
+    """
+    Updates the "Actualizado" date stamp in index.html to the current date.
+
+    Returns:
+        True if the date was updated, False otherwise
+    """
+    try:
+        print(f"Updating date stamp in {INDEX_FILE}...")
+
+        with open(INDEX_FILE, 'r', encoding='utf-8') as f:
+            html_content = f.read()
+
+        # Get current date in DD/MM/YY format
+        current_date = datetime.now().strftime('%d/%m/%y')
+
+        # Pattern to match: Actualizado: DD/MM/YY
+        date_pattern = r'(Actualizado:\s*)\d{2}/\d{2}/\d{2}'
+        replacement = rf'\g<1>{current_date}'
+
+        # Check if pattern exists
+        if not re.search(date_pattern, html_content):
+            print(f"Warning: Could not find date pattern in {INDEX_FILE}")
+            return False
+
+        # Replace the date
+        updated_html = re.sub(date_pattern, replacement, html_content)
+
+        # Only write if something changed
+        if updated_html != html_content:
+            with open(INDEX_FILE, 'w', encoding='utf-8') as f:
+                f.write(updated_html)
+            print(f"Updated date stamp to: {current_date}")
+            return True
+        else:
+            print(f"Date stamp already current: {current_date}")
+            return False
+
+    except FileNotFoundError:
+        print(f"Warning: {INDEX_FILE} not found, skipping date update")
+        return False
+    except Exception as e:
+        print(f"Warning: Failed to update date in {INDEX_FILE}: {e}")
+        return False
+
+
 if __name__ == "__main__":
     print("Starting Mercado Pago fee update...")
     
@@ -149,6 +198,10 @@ if __name__ == "__main__":
             print("data.json has been successfully updated.")
         else:
             print("No fee changes detected. data.json remains unchanged.")
+
+        # Update date stamp in HTML (always update to reflect when script was run)
+        print()
+        update_date_in_html()
 
     except requests.exceptions.RequestException as e:
         print(f"ERROR: Failed to fetch URL {FEE_URL}. Reason: {e}")
