@@ -37,6 +37,6 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           show_full_output: true
           
-          # Allow Claude to run necessary commands
+          # Allow Claude to run Python and git commands
           claude_args: |
-            --allowedTools "Bash(python*),Bash(pip*),Bash(source*),Bash(npm*)"
+            --allowedTools "Bash(python*),Bash(pip*),Bash(source*),Bash(venv*),Bash(git add*),Bash(git commit*),Bash(git push*),Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git rm*)"
