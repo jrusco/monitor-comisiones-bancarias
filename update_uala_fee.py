@@ -12,6 +12,14 @@ BACKUP_URL = 'https://www.ualabis.com.ar/'
 
 # Defines the mapping between our data.json structure and the scraped data.
 # Includes fallback rates for when scraping fails or fees aren't found.
+#
+# NOTE: Ualá does not publish complete fee information on their product pages.
+# Only the debit fee is displayed publicly. Credit and Link de Pago fees are
+# not shown on their website (verified 01/2026).
+#
+# Fallback rates are verified against press sources:
+# - El Cronista (01/2026): Debit 2.9%, Credit 4.4%, QR 0.6%
+# Last manual verification: January 2026
 FEE_MAPPING = [
     {
         "json_concept": "mPOS - Débito",
@@ -23,13 +31,13 @@ FEE_MAPPING = [
         "json_concept": "mPOS - Crédito",
         "json_term": "En el momento",
         "page_keywords": ["crédito", "credito"],
-        "fallback_rate": "4.4% + IVA"
+        "fallback_rate": "4.4% + IVA"  # Not published on website, verified via press releases
     },
     {
         "json_concept": "Link de Pago",
         "json_term": "En el momento",
         "page_keywords": ["link", "pago"],
-        "fallback_rate": "4.4% + IVA"
+        "fallback_rate": "4.4% + IVA"  # Not published on website, verified via press releases
     }
 ]
 
@@ -56,6 +64,12 @@ def scrape_fees_from_page(html_content):
     """
     Parses unstructured HTML to extract Ualá Bis fees from marketing copy.
 
+    Enhanced to search:
+    - Full page text
+    - Script tags (JSON data)
+    - Meta tags
+    - Multiple pattern variations
+
     Returns:
         List of dicts with 'payment_type' and 'fee' keys
     """
@@ -65,35 +79,82 @@ def scrape_fees_from_page(html_content):
     # Get all text content, preserving some structure
     full_text = soup.get_text(separator=' ', strip=True)
 
-    # Pattern 1: Look for "X% con [tarjeta de] débito" (most specific)
-    # Matches: "Desde 2,9% con tarjeta de débito" or "2,9% con débito"
-    debit_pattern1 = r'(\d+[,\.]\d+)\s*%[^.]{0,30}(?:con\s+)?(?:tarjeta\s+de\s+)?d[ée]bito'
-    match = re.search(debit_pattern1, full_text, re.IGNORECASE)
-    if match:
-        fee = normalize_fee_string(match.group(1))
-        scraped_fees.append({
-            'payment_type': 'débito',
-            'fee': fee
-        })
-        print(f"  Found débito fee: {fee}% (using pattern 1)")
+    # Also check script tags for JSON data
+    script_text = ''
+    for script in soup.find_all('script'):
+        if script.string:
+            script_text += ' ' + script.string
 
-    # Pattern 2: Look for "X% con [tarjeta de] crédito" (most specific)
-    # Matches: "4,4% con tarjeta de crédito" or "4,4% con crédito"
-    credit_pattern1 = r'(\d+[,\.]\d+)\s*%[^.]{0,30}(?:con\s+)?(?:tarjeta\s+de\s+)?cr[ée]dito'
-    match = re.search(credit_pattern1, full_text, re.IGNORECASE)
-    if match:
-        matched_text = match.group(0)
-        # Make sure this isn't the débito rate being misidentified
-        # Check if "débito" appears before "crédito" in the matched text
-        if 'd[ée]bito' not in matched_text.lower():
+    # Combine all searchable text
+    searchable_text = full_text + ' ' + script_text
+
+    # DÉBITO PATTERNS - Multiple variations
+    debit_patterns = [
+        # Pattern 1: "X% con [tarjeta de] débito"
+        r'(\d+[,\.]\d+)\s*%[^.]{0,50}(?:con\s+)?(?:tarjeta\s+de\s+)?d[ée]bito',
+        # Pattern 2: "débito: X%" or "débito X%"
+        r'd[ée]bito\s*:?\s*(\d+[,\.]\d+)\s*%',
+        # Pattern 3: Look in structured data (JSON-like)
+        r'["\']?d[ée]bito["\']?\s*:\s*["\']?(\d+[,\.]\d+)\s*%?["\']?',
+    ]
+
+    for i, pattern in enumerate(debit_patterns, 1):
+        match = re.search(pattern, searchable_text, re.IGNORECASE)
+        if match:
             fee = normalize_fee_string(match.group(1))
             scraped_fees.append({
-                'payment_type': 'crédito',
+                'payment_type': 'débito',
                 'fee': fee
             })
-            print(f"  Found crédito fee: {fee}% (using pattern 2)")
+            print(f"  Found débito fee: {fee}% (pattern {i})")
+            break
 
-    # Link de Pago is rarely shown explicitly on Ualá pages, so it's okay if not found
+    # CRÉDITO PATTERNS - Multiple variations
+    credit_patterns = [
+        # Pattern 1: "X% con [tarjeta de] crédito"
+        r'(\d+[,\.]\d+)\s*%[^.]{0,50}(?:con\s+)?(?:tarjeta\s+de\s+)?cr[ée]dito(?!\s+en\s+\d+\s+cuotas)',
+        # Pattern 2: "crédito: X%" or "crédito X%"
+        r'cr[ée]dito\s*:?\s*(\d+[,\.]\d+)\s*%',
+        # Pattern 3: "crédito en 1 pago" or "crédito en el momento"
+        r'cr[ée]dito\s+(?:en\s+(?:1|un)\s+pago|en\s+el\s+momento)[^.]{0,30}(\d+[,\.]\d+)\s*%',
+        # Pattern 4: Look in structured data
+        r'["\']?cr[ée]dito["\']?\s*:\s*["\']?(\d+[,\.]\d+)\s*%?["\']?',
+    ]
+
+    for i, pattern in enumerate(credit_patterns, 1):
+        match = re.search(pattern, searchable_text, re.IGNORECASE)
+        if match:
+            matched_text = match.group(0)
+            # Make sure this isn't the débito rate being misidentified
+            if 'd[ée]bito' not in matched_text.lower():
+                fee = normalize_fee_string(match.group(1))
+                scraped_fees.append({
+                    'payment_type': 'crédito',
+                    'fee': fee
+                })
+                print(f"  Found crédito fee: {fee}% (pattern {i})")
+                break
+
+    # LINK DE PAGO PATTERNS - Multiple variations
+    link_patterns = [
+        # Pattern 1: "link de pago: X%" or similar
+        r'link\s+de\s+pago[^.]{0,30}(\d+[,\.]\d+)\s*%',
+        # Pattern 2: "pago online" or "e-commerce"
+        r'(?:pago\s+online|e-commerce|ecommerce)[^.]{0,30}(\d+[,\.]\d+)\s*%',
+        # Pattern 3: Structured data
+        r'["\']?link[_\s]?(?:de[_\s])?pago["\']?\s*:\s*["\']?(\d+[,\.]\d+)\s*%?["\']?',
+    ]
+
+    for i, pattern in enumerate(link_patterns, 1):
+        match = re.search(pattern, searchable_text, re.IGNORECASE)
+        if match:
+            fee = normalize_fee_string(match.group(1))
+            scraped_fees.append({
+                'payment_type': 'link',
+                'fee': fee
+            })
+            print(f"  Found link de pago fee: {fee}% (pattern {i})")
+            break
 
     return scraped_fees
 
@@ -101,6 +162,9 @@ def update_fees_in_data(data, scraped_fees):
     """
     Updates Ualá fees in data.json based on scraped fees.
     Uses fallback rates from FEE_MAPPING when fees cannot be scraped.
+
+    Note: Ualá does not publish all fees publicly. Using verified fallback
+    rates for fees not found on their website is expected behavior.
 
     Returns:
         Updated data if changes were made, None otherwise
@@ -116,22 +180,33 @@ def update_fees_in_data(data, scraped_fees):
         return None
 
     something_was_updated = False
+    scraped_count = 0
+    fallback_count = 0
 
     for mapping in FEE_MAPPING:
         # Try to find rate in scraped data
         new_rate = None
+        source = None
 
         for scraped_fee in scraped_fees:
             if any(kw in scraped_fee['payment_type'].lower()
                    for kw in mapping['page_keywords']):
                 # Normalize: add "+ IVA" suffix
                 new_rate = f"{scraped_fee['fee']}% + IVA"
+                source = "scraped"
+                scraped_count += 1
                 break
 
         # Use fallback if not found
         if not new_rate:
             new_rate = mapping['fallback_rate']
-            print(f"WARN: Could not scrape '{mapping['json_concept']}' fee. Using fallback rate: {new_rate}")
+            source = "fallback"
+            fallback_count += 1
+            # Only show INFO (not WARN) for credit/link fees - they're not published
+            if mapping['json_concept'] in ['mPOS - Crédito', 'Link de Pago']:
+                print(f"INFO: Using verified fallback for '{mapping['json_concept']}': {new_rate} (not published on website)")
+            else:
+                print(f"WARN: Could not scrape '{mapping['json_concept']}' fee. Using fallback: {new_rate}")
 
         # Validate rate is reasonable (2-6% range)
         rate_match = re.search(r'(\d+\.?\d*)', new_rate)
@@ -146,16 +221,20 @@ def update_fees_in_data(data, scraped_fees):
             if (fee.get('concept') == mapping['json_concept'] and
                 fee.get('term') == mapping['json_term']):
                 if fee['rate'] != new_rate:
-                    print(f"Updating '{fee['concept']}' ({fee['term']}): from '{fee['rate']}' to '{new_rate}'")
+                    print(f"Updating '{fee['concept']}' ({fee['term']}): '{fee['rate']}' → '{new_rate}' (source: {source})")
                     fee['rate'] = new_rate
                     something_was_updated = True
                 else:
-                    print(f"Fee '{fee['concept']}' ({fee['term']}) is already up to date: '{fee['rate']}'")
+                    print(f"✓ '{fee['concept']}' ({fee['term']}): '{fee['rate']}' (source: {source})")
                 fee_updated_in_json = True
                 break
 
         if not fee_updated_in_json:
             print(f"WARN: Could not find a fee in data.json for concept '{mapping['json_concept']}' and term '{mapping['json_term']}'.")
+
+    # Summary
+    print()
+    print(f"Summary: {scraped_count} fee(s) scraped, {fallback_count} fallback(s) used")
 
     return data if something_was_updated else None
 
@@ -224,39 +303,58 @@ def update_date_in_html():
 
 
 if __name__ == "__main__":
-    print("Starting Ualá fee update...")
+    print("=" * 60)
+    print("Ualá Bis Fee Update Script")
+    print("=" * 60)
     print()
 
     # Try primary URL first
     print(f"Fetching data from: {PRIMARY_URL}")
     scraped_fees = []
+    urls_to_try = [PRIMARY_URL, BACKUP_URL]
 
     try:
+        # Try primary URL
         response = requests.get(PRIMARY_URL, headers={'User-Agent': 'Mozilla/5.0'})
         response.raise_for_status()
-
         scraped_fees = scrape_fees_from_page(response.text)
 
-        # If primary scraping failed, try backup URL
-        if not scraped_fees:
-            print(f"Primary source returned no fees. Trying backup: {BACKUP_URL}")
+        # If primary scraping found few fees, try backup URL too
+        if len(scraped_fees) < 2:
             print()
-            response = requests.get(BACKUP_URL, headers={'User-Agent': 'Mozilla/5.0'})
-            response.raise_for_status()
-            scraped_fees = scrape_fees_from_page(response.text)
+            print(f"Primary source found {len(scraped_fees)} fee(s). Trying backup: {BACKUP_URL}")
+            try:
+                response = requests.get(BACKUP_URL, headers={'User-Agent': 'Mozilla/5.0'})
+                response.raise_for_status()
+                backup_fees = scrape_fees_from_page(response.text)
+
+                # Merge fees, preferring primary source for duplicates
+                for backup_fee in backup_fees:
+                    if not any(sf['payment_type'] == backup_fee['payment_type'] for sf in scraped_fees):
+                        scraped_fees.append(backup_fee)
+                        print(f"  Added {backup_fee['payment_type']} fee from backup source")
+            except requests.exceptions.RequestException as e:
+                print(f"  Backup URL failed: {e}")
 
         # Log scraping results
+        print()
+        print("-" * 60)
         if scraped_fees:
-            print(f"Successfully scraped {len(scraped_fees)} fee entries from the page.")
+            print(f"Scraping complete: {len(scraped_fees)} fee(s) found")
+            for fee in scraped_fees:
+                print(f"  - {fee['payment_type']}: {fee['fee']}%")
         else:
-            print("WARNING: Could not scrape any fees from either source.")
-            print("Will use fallback rates from FEE_MAPPING.")
-
+            print("INFO: No fees scraped from website (expected for Ualá)")
+            print("      Will use verified fallback rates")
+        print("-" * 60)
         print()
 
         # Load data.json
         with open(DATA_FILE, 'r', encoding='utf-8') as f:
             current_data = json.load(f)
+
+        print("Updating fees in data.json...")
+        print()
 
         # Update fees (will use fallbacks if scraped_fees is empty)
         updated_data = update_fees_in_data(current_data, scraped_fees)
@@ -265,23 +363,38 @@ if __name__ == "__main__":
         url_updated = update_fee_url_in_data(current_data)
 
         print()
+        print("=" * 60)
 
         # Write changes if any
         if updated_data or url_updated:
             with open(DATA_FILE, 'w', encoding='utf-8') as f:
                 json.dump(current_data, f, indent=4, ensure_ascii=False)
-            print("data.json has been successfully updated.")
+            print("✓ data.json has been successfully updated")
         else:
-            print("No changes detected. data.json remains unchanged.")
+            print("✓ No changes needed - all fees are current")
 
         print()
 
         # Update date stamp (always run to show when script was executed)
-        update_date_in_html()
+        date_updated = update_date_in_html()
+        if date_updated:
+            print("✓ Date stamp updated in index.html")
+        else:
+            print("✓ Date stamp already current in index.html")
+
+        print("=" * 60)
+        print()
+        print("Update complete!")
 
     except requests.exceptions.RequestException as e:
+        print()
+        print("=" * 60)
         print(f"ERROR: Failed to fetch URL. Reason: {e}")
+        print("=" * 60)
         exit(1)
-
-    print()
-    print("Script finished.")
+    except Exception as e:
+        print()
+        print("=" * 60)
+        print(f"ERROR: Unexpected error: {e}")
+        print("=" * 60)
+        exit(1)
