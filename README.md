@@ -14,8 +14,9 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # Run scrapers
-python update_mercadopago_fee.py  # Updates Mercado Pago Point fees
-python update_bna_fee.py          # Updates BNA fees from official PDFs
+python3 update_mercadopago_fee.py
+python3 update_bna_fee.py
+python3 update_uala_fee.py
 ```
 
 Scrapers will only modify `data.json` if changes are detected.
