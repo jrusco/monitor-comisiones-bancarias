@@ -1,199 +1,54 @@
+"""
+BNA Fee Updater - BCRA Regulated Rates
+
+This script updates BNA (Banco de la Nación Argentina) merchant acquiring fees in data.json.
+
+Unlike other entities, BNA does not publish specific merchant acquiring rate schedules publicly.
+As a government-regulated bank, BNA charges the maximum rates permitted by Argentina's
+Central Bank (BCRA):
+  - Debit cards: 0.8% (maximum regulated rate)
+  - Credit cards: 1.8% (maximum regulated rate)
+
+These rates are hardcoded as they are legally mandated caps that rarely change.
+No PDF scraping is performed - the script simply validates and updates the data structure
+with the correct regulated rates.
+"""
+
 import json
-import requests
-import pdfplumber
 import re
-from io import BytesIO
 from datetime import datetime
 
 DATA_FILE = 'data.json'
 INDEX_FILE = 'index.html'
 BNA_ID = 'bna'
-PDF_URL = 'https://www.bna.com.ar/Downloads/ComisionesYCargosComercial.pdf'
 
-# Defines the mapping between our data.json structure and the PDF content
+# Defines the BCRA-regulated rates for BNA merchant acquiring
+# These are the maximum rates permitted by Argentina's Central Bank
 FEE_MAPPING = [
     {
         "json_concept": "Débito",
         "json_term": "48 hs",
-        "pdf_pattern": r"d[ée]bito",
-        "pdf_section": "ARANCEL DE VENTAS",
-        "fallback_rate": "0.8% (Regulado)",  # Keep if not found in PDF
+        "regulated_rate": "0.8% (Regulado)",
     },
     {
         "json_concept": "Crédito",
         "json_term": "8-10 días hábiles",
-        "pdf_pattern": r"Otros Rubros",  # General merchant category
-        "pdf_section": "ARANCEL DE VENTAS",
-        "fallback_rate": "1.8% (Regulado)",
+        "regulated_rate": "1.8% (Regulado)",
     },
     {
         "json_concept": "Mantenimiento Terminal",
         "json_term": "Mensual",
-        "pdf_pattern": r"Equipos móvil.*?web",
-        "pdf_section": "EQUIPO DE CAPTURA",
-        "fallback_rate": "Bonificado o Variable",
+        "regulated_rate": "Bonificado o Variable",
     }
 ]
 
 
-def download_pdf(url):
+def update_fees_in_data(data):
     """
-    Downloads the PDF from the given URL and returns it as a BytesIO object.
-
-    Args:
-        url: The URL of the PDF to download
-
-    Returns:
-        BytesIO object containing the PDF data
-
-    Raises:
-        requests.exceptions.RequestException: If download fails
-    """
-    print(f"Downloading PDF from: {url}")
-
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-    }
-
-    response = requests.get(url, headers=headers, timeout=30)
-    response.raise_for_status()
-
-    print(f"✓ Successfully downloaded PDF ({len(response.content)} bytes)")
-    return BytesIO(response.content)
-
-
-def normalize_rate(rate_str, concept):
-    """
-    Normalizes rate strings to match data.json format.
-
-    Args:
-        rate_str: Raw rate string extracted from PDF (e.g., "1,8%", "Bonificado")
-        concept: The fee concept (e.g., "Débito", "Crédito")
-
-    Returns:
-        Normalized rate string suitable for data.json
-    """
-    # Convert comma decimals to dots
-    rate_str = rate_str.replace(',', '.')
-
-    # Handle terminal fee variations
-    if any(term in rate_str for term in ["Bonificado", "SIN COSTO", "Importes a determinar"]):
-        return "Bonificado o Variable"
-
-    # Add (Regulado) suffix for debit/credit rates
-    if concept in ["Débito", "Crédito"] and "(Regulado)" not in rate_str:
-        if '%' in rate_str:
-            return f"{rate_str} (Regulado)"
-
-    return rate_str
-
-
-def extract_fees_from_pdf(pdf_bytes):
-    """
-    Parses the PDF to extract fee information.
-
-    The function looks for the "CLIENTE COMERCIO" section in the PDF and extracts
-    rates for different payment types using regex patterns.
-
-    Args:
-        pdf_bytes: BytesIO object containing the PDF data
-
-    Returns:
-        List of dictionaries with 'concept' and 'rate' keys
-    """
-    extracted_fees = []
-
-    print("Parsing PDF content...")
-
-    try:
-        with pdfplumber.open(pdf_bytes) as pdf:
-            full_text = ""
-
-            # Extract text from all pages
-            for page_num, page in enumerate(pdf.pages, 1):
-                page_text = page.extract_text()
-                if page_text:
-                    full_text += f"\n--- Page {page_num} ---\n{page_text}"
-
-            # Check if we found the merchant section
-            if "CLIENTE COMERCIO" not in full_text:
-                print("⚠ Warning: 'CLIENTE COMERCIO' section not found in PDF")
-                print("   Trying alternative section markers...")
-
-                if "ARANCEL DE VENTAS" not in full_text:
-                    print("⚠ Warning: Could not find expected sections in PDF")
-                    print("   PDF structure may have changed. Using fallback rates.")
-                    return extracted_fees
-            else:
-                print("✓ Found 'CLIENTE COMERCIO' section in PDF")
-
-            # Extract "Otros Rubros" rate (general credit card merchant rate)
-            # Pattern: "Otros Rubros" followed by a percentage (1,8% or 1.8%)
-            otros_rubros_pattern = r"Otros\s+Rubros.*?(\d+[,\.]\d+)\s*%"
-            match = re.search(otros_rubros_pattern, full_text, re.IGNORECASE | re.DOTALL)
-
-            if match:
-                rate = match.group(1) + "%"
-                print(f"✓ Extracted 'Otros Rubros' rate: {rate}")
-                extracted_fees.append({
-                    'concept': 'Crédito',
-                    'rate': rate
-                })
-            else:
-                print("⚠ Could not find 'Otros Rubros' rate in PDF")
-
-            # Extract debit rate
-            # Pattern: Look for "débito" or "debito" followed by a percentage
-            debito_pattern = r"d[ée]bito.*?(\d+[,\.]\d+)\s*%"
-            match = re.search(debito_pattern, full_text, re.IGNORECASE | re.DOTALL)
-
-            if match:
-                rate = match.group(1) + "%"
-                print(f"✓ Extracted 'Débito' rate: {rate}")
-                extracted_fees.append({
-                    'concept': 'Débito',
-                    'rate': rate
-                })
-            else:
-                print("⚠ Could not find explicit 'Débito' rate in PDF")
-
-            # Extract terminal equipment fee
-            # Pattern: Look for "Equipos móvil" or similar with fee information
-            terminal_patterns = [
-                r"Equipos\s+m[oó]vil.*?(Bonificado|SIN COSTO|Importes\s+a\s+determinar)",
-                r"Terminal.*?(Bonificado|SIN COSTO|Variable)",
-            ]
-
-            for pattern in terminal_patterns:
-                match = re.search(pattern, full_text, re.IGNORECASE | re.DOTALL)
-                if match:
-                    rate = match.group(1)
-                    print(f"✓ Extracted terminal fee: {rate}")
-                    extracted_fees.append({
-                        'concept': 'Mantenimiento Terminal',
-                        'rate': rate
-                    })
-                    break
-            else:
-                print("⚠ Could not find terminal equipment fee in PDF")
-
-    except Exception as e:
-        print(f"✗ Error parsing PDF: {e}")
-        print("   Using fallback rates...")
-        return extracted_fees
-
-    print(f"✓ Extracted {len(extracted_fees)} fee entries from PDF")
-    return extracted_fees
-
-
-def update_fees_in_data(data, extracted_fees):
-    """
-    Updates BNA fees in the data structure based on extracted fees.
-    Uses fallback rates from FEE_MAPPING when fees are not found in PDF.
+    Updates BNA fees in the data structure with BCRA-regulated rates.
 
     Args:
         data: The full data.json structure
-        extracted_fees: List of extracted fees from PDF
 
     Returns:
         Updated data if changes were made, None otherwise
@@ -212,20 +67,9 @@ def update_fees_in_data(data, extracted_fees):
 
     # Process each mapping
     for mapping in FEE_MAPPING:
-        # Try to find the rate in extracted fees
-        new_rate = None
-
-        for extracted_fee in extracted_fees:
-            if extracted_fee['concept'] == mapping['json_concept']:
-                # Normalize the rate
-                new_rate = normalize_rate(extracted_fee['rate'], mapping['json_concept'])
-                print(f"  Using extracted rate for {mapping['json_concept']}: {new_rate}")
-                break
-
-        # If not found in extracted fees, use fallback
-        if not new_rate:
-            new_rate = mapping['fallback_rate']
-            print(f"  Using fallback rate for {mapping['json_concept']}: {new_rate}")
+        # Use BCRA-regulated rate
+        new_rate = mapping['regulated_rate']
+        print(f"  Using BCRA-regulated rate for {mapping['json_concept']}: {new_rate}")
 
         # Validate regulated rates are within expected range
         if mapping['json_concept'] in ['Débito', 'Crédito']:
@@ -303,59 +147,38 @@ def update_date_in_html():
 
 if __name__ == "__main__":
     print("="*70)
-    print("BNA Fee Updater Script")
+    print("BNA Fee Updater (BCRA Regulated Rates)")
     print("="*70)
     print()
 
     try:
-        # Step 1: Download PDF
-        pdf_bytes = download_pdf(PDF_URL)
-        print()
-
-        # Step 2: Extract fees from PDF
-        extracted_fees = extract_fees_from_pdf(pdf_bytes)
-        print()
-
-        # Step 3: Load current data.json
+        # Step 1: Load current data.json
         print(f"Loading {DATA_FILE}...")
         with open(DATA_FILE, 'r', encoding='utf-8') as f:
             current_data = json.load(f)
         print(f"✓ Successfully loaded {DATA_FILE}")
         print()
 
-        # Step 4: Update fees
-        print("Processing fee updates...")
-        updated_data = update_fees_in_data(current_data, extracted_fees)
+        # Step 2: Update fees with BCRA-regulated rates
+        print("Applying BCRA-regulated rates...")
+        updated_data = update_fees_in_data(current_data)
         print()
 
-        # Step 5: Write changes if any
+        # Step 3: Write changes if any
         if updated_data:
             with open(DATA_FILE, 'w', encoding='utf-8') as f:
                 json.dump(updated_data, f, indent=4, ensure_ascii=False)
             print("="*70)
-            print("✓ SUCCESS: data.json has been updated with new BNA fees")
+            print("✓ SUCCESS: data.json has been updated with BNA fees")
             print("="*70)
         else:
             print("="*70)
             print("✓ No changes needed: All fees are already up to date")
             print("="*70)
 
-        # Step 6: Update date stamp in HTML (always update to reflect when script was run)
+        # Step 4: Update date stamp in HTML (always update to reflect when script was run)
         print()
         update_date_in_html()
-
-    except requests.exceptions.RequestException as e:
-        print()
-        print("="*70)
-        print(f"✗ ERROR: Failed to download PDF from {PDF_URL}")
-        print(f"  Reason: {e}")
-        print("="*70)
-        print()
-        print("Possible solutions:")
-        print("  • Check your internet connection")
-        print("  • Verify the PDF URL is still valid")
-        print("  • Try running the script again later")
-        exit(1)
 
     except FileNotFoundError:
         print()
@@ -382,9 +205,10 @@ if __name__ == "__main__":
 
     print()
     print("IMPORTANT NOTES:")
-    print("  • BNA fees are government-regulated and change infrequently")
+    print("  • BNA rates are set to BCRA-regulated maximums")
     print("  • Regulated rates: Débito 0.8%, Crédito 1.8%")
-    print("  • Terminal fees may vary by service provider")
-    print("  • Manual verification recommended after fee changes")
+    print("  • These are legally mandated caps by Argentina's Central Bank")
+    print("  • Rates rarely change as they are government-controlled")
+    print("  • BNA does not publish specific merchant acquiring rate schedules")
     print()
     print("Script finished successfully.")
