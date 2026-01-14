@@ -76,51 +76,133 @@ def scrape_fees_from_page(html_content):
 
     return scraped_fees
 
+def find_entity_by_id(data, entity_id):
+    """
+    Finds and returns an entity from data by its ID.
+
+    Args:
+        data: List of entity dictionaries
+        entity_id: String ID to search for
+
+    Returns:
+        Entity dictionary if found, None otherwise
+    """
+    for entity in data:
+        if entity.get('id') == entity_id:
+            return entity
+    return None
+
+
+def find_scraped_fee(scraped_fees, payment_type, term):
+    """
+    Finds a matching scraped fee by payment type and term.
+
+    Args:
+        scraped_fees: List of scraped fee dictionaries
+        payment_type: String to match in payment_type field
+        term: Exact term string to match
+
+    Returns:
+        Formatted rate string "{fee} + IVA" if found, None otherwise
+    """
+    for scraped_fee in scraped_fees:
+        if payment_type in scraped_fee['payment_type'] and term == scraped_fee['term']:
+            return f"{scraped_fee['fee']} + IVA"
+    return None
+
+
+def find_fee_in_entity(entity_fees, concept, term):
+    """
+    Finds a specific fee entry in an entity's fees list.
+
+    Args:
+        entity_fees: List of fee dictionaries from entity
+        concept: Exact concept string to match
+        term: Exact term string to match
+
+    Returns:
+        Fee dictionary if found, None otherwise
+    """
+    for fee in entity_fees:
+        if fee.get('concept') == concept and fee.get('term') == term:
+            return fee
+    return None
+
+
+def update_single_fee(fee_dict, new_rate):
+    """
+    Updates a single fee's rate if it differs from the current value.
+
+    Args:
+        fee_dict: Fee dictionary to update
+        new_rate: New rate string to set
+
+    Returns:
+        True if fee was updated, False if already current
+    """
+    if fee_dict['rate'] != new_rate:
+        print(f"Updating '{fee_dict['concept']}' ({fee_dict['term']}): from '{fee_dict['rate']}' to '{new_rate}'")
+        fee_dict['rate'] = new_rate
+        return True
+    else:
+        print(f"Fee '{fee_dict['concept']}' ({fee_dict['term']}) is already up to date: '{fee_dict['rate']}'")
+        return False
+
+
+def process_single_mapping(mapping, scraped_fees, mp_entity):
+    """
+    Processes a single fee mapping: finds scraped fee, finds entity fee, and updates.
+
+    Args:
+        mapping: Single mapping dictionary from FEE_MAPPING
+        scraped_fees: List of all scraped fees
+        mp_entity: Mercado Pago entity dictionary
+
+    Returns:
+        True if any update was made, False otherwise
+    """
+    # Find the new rate from scraped data
+    new_rate = find_scraped_fee(
+        scraped_fees,
+        mapping['page_payment_type'],
+        mapping['page_term']
+    )
+
+    if not new_rate:
+        print(f"WARN: Could not find a matching scraped fee for {mapping['json_concept']} - {mapping['json_term']}. Skipping.")
+        return False
+
+    # Find the corresponding fee in data.json
+    fee_dict = find_fee_in_entity(
+        mp_entity.get('fees', []),
+        mapping['json_concept'],
+        mapping['json_term']
+    )
+
+    if not fee_dict:
+        print(f"WARN: Could not find a fee in data.json for concept '{mapping['json_concept']}' and term '{mapping['json_term']}'.")
+        return False
+
+    # Update the fee if needed
+    return update_single_fee(fee_dict, new_rate)
+
+
 def update_fees_in_data(data, scraped_fees):
     """
     Reads the data file, updates all mapped fees, and returns the modified data.
     Returns None if no updates were made.
     """
-    mp_entity = None
-    for entity in data:
-        if entity.get('id') == MP_ID:
-            mp_entity = entity
-            break
-    
+    # Find Mercado Pago entity
+    mp_entity = find_entity_by_id(data, MP_ID)
     if not mp_entity:
         print(f"ERROR: Entity with id '{MP_ID}' not found in {DATA_FILE}.")
         return None
 
+    # Process each mapping and track if anything was updated
     something_was_updated = False
     for mapping in FEE_MAPPING:
-        # Find the new rate from the scraped data
-        new_rate = None
-        for scraped_fee in scraped_fees:
-            if mapping['page_payment_type'] in scraped_fee['payment_type'] and \
-               mapping['page_term'] == scraped_fee['term']:
-                # Re-add "+ IVA" for format consistency with our data file
-                new_rate = f"{scraped_fee['fee']} + IVA"
-                break
-        
-        if not new_rate:
-            print(f"WARN: Could not find a matching scraped fee for {mapping['json_concept']} - {mapping['json_term']}. Skipping.")
-            continue
-
-        # Find the corresponding fee in our data.json and update it
-        fee_updated_in_json = False
-        for fee in mp_entity.get('fees', []):
-            if fee.get('concept') == mapping['json_concept'] and fee.get('term') == mapping['json_term']:
-                if fee['rate'] != new_rate:
-                    print(f"Updating '{fee['concept']}' ({fee['term']}): from '{fee['rate']}' to '{new_rate}'")
-                    fee['rate'] = new_rate
-                    something_was_updated = True
-                else:
-                    print(f"Fee '{fee['concept']}' ({fee['term']}) is already up to date: '{fee['rate']}'")
-                fee_updated_in_json = True
-                break
-        
-        if not fee_updated_in_json:
-            print(f"WARN: Could not find a fee in data.json for concept '{mapping['json_concept']}' and term '{mapping['json_term']}'.")
+        was_updated = process_single_mapping(mapping, scraped_fees, mp_entity)
+        something_was_updated = something_was_updated or was_updated
 
     return data if something_was_updated else None
 
