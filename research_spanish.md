@@ -118,7 +118,8 @@ La estructura de comisiones de Mercado Pago es dinámica y varía según el disp
 | **Crédito** | 18 días | **3,39%** \+ IVA | Aún no competitivo con bancos. |
 | **Crédito** | 35 días | **1,49%** \+ IVA | Única tasa competitiva (menor al 1,8%). |
 
-**Fuente de Datos:**.14  
+**Fuente de Datos:**.14
+**Consideración Regional (Buenos Aires):** Los valores de comisión presentados en la Tabla 3 corresponden específicamente a comercios registrados en la **Provincia de Buenos Aires**, según lo establecido en la política de aranceles vigente desde el 1 de agosto de 2025. Mercado Pago aplica tarifas diferenciadas por provincia; comercios en otras jurisdicciones pueden experimentar variaciones. Se recomienda consultar el simulador oficial para la provincia específica.14
 **Insight de Segundo Orden:** La tasa del **6,29% \+ IVA** para crédito inmediato implica que el comercio está pagando una tasa efectiva anualizada (TEA) implícita astronómica por adelantar esos fondos 10-18 días. Sin embargo, en un contexto de alta volatilidad cambiaria o necesidad de reposición de stock urgente, muchos comercios validan este costo como un "seguro de liquidez".
 
 #### **3.1.2 Arquitectura Técnica y API**
@@ -269,8 +270,8 @@ Este panorama exige que la decisión de proveedor no sea estática; los comercio
 1. El BCRA fijó un nuevo tope a la tasa de interés de tarjetas no ..., accessed January 6, 2026, [https://radiorafaela.com.ar/interes-general/el-bcra-fijo-un-nuevo-tope-a-la-tasa-de-interes-de-tarjetas-no-bancarias](https://radiorafaela.com.ar/interes-general/el-bcra-fijo-un-nuevo-tope-a-la-tasa-de-interes-de-tarjetas-no-bancarias)  
 2. Tarjeta de débito \- BCRA, accessed January 6, 2026, [https://www2.bcra.gob.ar/MediosPago/Tarjeta-de-debito.asp](https://www2.bcra.gob.ar/MediosPago/Tarjeta-de-debito.asp)  
 3. Fiserv | Pagos con QR, accessed January 6, 2026, [https://aranceles.fiservargentina.com/](https://aranceles.fiservargentina.com/)  
-4. Nave: Cobrá y recibí todos los pagos al instante, accessed January 6, 2026, [https://navenegocios.ar/home](https://navenegocios.ar/home)  
-5. Cobrá tus ventas con Nave \- Banco Galicia, accessed January 6, 2026, [https://www.galicia.ar/empresas/tarjetas-y-cuentas/cuenta-comercio/nave](https://www.galicia.ar/empresas/tarjetas-y-cuentas/cuenta-comercio/nave)  
+4. Simulador de Ventas - +Pagos Nación (BNA), accessed January 15, 2026, [https://maspagos.com.ar/simulador-de-ventas](https://maspagos.com.ar/simulador-de-ventas)  
+5. Aranceles Regulados BCRA - Tasas de Débito y Crédito, accessed January 15, 2026, [https://maspagos.com.ar/simulador-de-ventas](https://maspagos.com.ar/simulador-de-ventas)  
 6. En enero bajaron los aranceles que pagan los comercios a las tarjetas, accessed January 6, 2026, [https://www.argentina.gob.ar/noticias/en-enero-bajaron-los-aranceles-que-pagan-los-comercios-las-tarjetas](https://www.argentina.gob.ar/noticias/en-enero-bajaron-los-aranceles-que-pagan-los-comercios-las-tarjetas)  
 7. COMISIONES Y CARGOS \- CARTERA COMERCIAL \- Banco Nación, accessed January 6, 2026, [https://www.bna.com.ar/Downloads/ComisionesYCargosComercial.pdf](https://www.bna.com.ar/Downloads/ComisionesYCargosComercial.pdf)  
 8. Cuenta Comercios BNA \- Banco de la Nación Argentina, accessed January 6, 2026, [https://www.bna.com.ar/Empresas/Novedades/AdheriTuComercio](https://www.bna.com.ar/Empresas/Novedades/AdheriTuComercio)  
@@ -279,14 +280,14 @@ Este panorama exige que la decisión de proveedor no sea estática; los comercio
 11. Sumate a Cuenta DNI Comercios \- Provincia Microcréditos, accessed January 6, 2026, [https://www.provinciamicrocreditos.com.ar/comunidad/cdnicomercios2024/](https://www.provinciamicrocreditos.com.ar/comunidad/cdnicomercios2024/)  
 12. Cómo adherir un comercio a Cuenta DNI: requisitos, comisiones y ..., accessed January 6, 2026, [https://www.ambito.com/informacion-general/como-adherir-un-comercio-cuenta-dni-requisitos-comisiones-y-paso-paso-n5867618](https://www.ambito.com/informacion-general/como-adherir-un-comercio-cuenta-dni-requisitos-comisiones-y-paso-paso-n5867618)  
 13. Fiserv Argentina. Novedades en Procesamiento de Pagos., accessed January 6, 2026, [https://www.fiserv.com.ar/novedades/todas-las-novedades/](https://www.fiserv.com.ar/novedades/todas-las-novedades/)  
-14. Mercado Pago Point » iKiwi.net.ar, accessed January 6, 2026, [https://ikiwi.net.ar/medios-de-pago/pos/mercado-pago-point/](https://ikiwi.net.ar/medios-de-pago/pos/mercado-pago-point/)  
-15. ¿Cuánto cuesta recibir pagos con QR? \- Mercado Pago, accessed January 6, 2026, [https://www.mercadopago.com.ar/ayuda/cuanto-cuesta-recibir-pagos-con-QR\_3605](https://www.mercadopago.com.ar/ayuda/cuanto-cuesta-recibir-pagos-con-QR_3605)  
+14. ¿Cuánto cuesta recibir pagos con Point? - Mercado Pago (Buenos Aires), accessed January 15, 2026, [https://www.mercadopago.com.ar/ayuda/2779#tabla1](https://www.mercadopago.com.ar/ayuda/2779#tabla1)  
+15. ¿Cuánto cuesta recibir pagos con QR? - Mercado Pago (Buenos Aires), accessed January 15, 2026, [https://www.mercadopago.com.ar/ayuda/3605#tabla1](https://www.mercadopago.com.ar/ayuda/3605#tabla1)  
 16. Comisiones y cargos para individuos y vendedores \- Mercado Pago, accessed January 6, 2026, [https://www.mercadopago.com.ar/ayuda/26748](https://www.mercadopago.com.ar/ayuda/26748)  
 17. Overview \- Checkout API (via Orders) \- Mercado Pago Developers, accessed January 6, 2026, [https://www.mercadopago.com.ar/developers/en/docs/checkout-api-orders/overview](https://www.mercadopago.com.ar/developers/en/docs/checkout-api-orders/overview)  
 18. Other payment methods \- Integration configuration \- Mercado Pago ..., accessed January 6, 2026, [https://www.mercadopago.com.ar/developers/en/docs/checkout-api-payments/integration-configuration/other-payment-methods](https://www.mercadopago.com.ar/developers/en/docs/checkout-api-payments/integration-configuration/other-payment-methods)  
 19. Create payment \- Payments \- Mercado Pago Developers, accessed January 6, 2026, [https://www.mercadopago.com.co/developers/en/reference/payments/\_payments/post](https://www.mercadopago.com.co/developers/en/reference/payments/_payments/post)  
-20. Preguntas frecuentes sobre Ualá Bis \- Centro de Ayuda \- Tiendanube, accessed January 6, 2026, [https://ayuda.tiendanube.com/es\_ES/uala/preguntas-frecuentes-sobre-uala-bis](https://ayuda.tiendanube.com/es_ES/uala/preguntas-frecuentes-sobre-uala-bis)  
-21. Ualá lanza POS Pro, su nueva terminal de cobros para negocios, accessed January 6, 2026, [https://www.uala.com.ar/prensa/uala-lanza-pos-pro-su-nueva-terminal-de-cobros-para-negocios-medianos-y-grandes](https://www.uala.com.ar/prensa/uala-lanza-pos-pro-su-nueva-terminal-de-cobros-para-negocios-medianos-y-grandes)  
+20. POS Pro - Aranceles y Comisiones - Ualá Bis, accessed January 15, 2026, [https://www.ualabis.com.ar/pos-pro](https://www.ualabis.com.ar/pos-pro)  
+21. POS Pro - Solución de Cobros - Ualá Bis, accessed January 15, 2026, [https://www.ualabis.com.ar/pos-pro](https://www.ualabis.com.ar/pos-pro)  
 22. Comprá tu mPOS en la web \- Las mejores comisiones \- Ualá Bis, accessed January 6, 2026, [https://mpos.ualabis.com.ar/productos/mpos/](https://mpos.ualabis.com.ar/productos/mpos/)  
 23. Ualá Bis \- API Cobros Online, accessed January 6, 2026, [https://developers.ualabis.com.ar/v2/orders/get/snippets/js](https://developers.ualabis.com.ar/v2/orders/get/snippets/js)  
 24. Crear Orden \- API Cobros Online \- Ualá Bis, accessed January 6, 2026, [https://developers.ualabis.com.ar/v2/orders/create](https://developers.ualabis.com.ar/v2/orders/create)  
@@ -296,7 +297,7 @@ Este panorama exige que la decisión de proveedor no sea estática; los comercio
 28. Fintech \- Fiserv AppMarket, accessed January 6, 2026, [https://appmarket.fiservapps.com/fintech](https://appmarket.fiservapps.com/fintech)  
 29. Transaction data: Charges and fees \- Clover Developer, accessed January 6, 2026, [https://docs.clover.com/dev/docs/transaction-data](https://docs.clover.com/dev/docs/transaction-data)  
 30. Region Specific Features and Limitations \- FISERV, accessed January 6, 2026, [https://docs.apis-fiserv.com/latam/docs/card-present-clover-region-features-limitations](https://docs.apis-fiserv.com/latam/docs/card-present-clover-region-features-limitations)  
-31. ¿Cuánto cuesta recibir pagos con Point? \- Mercado Libre, accessed January 6, 2026, [https://www.mercadolibre.com.ar/ayuda/2779](https://www.mercadolibre.com.ar/ayuda/2779)  
+31. ¿Cuánto cuesta recibir pagos con Point? - Mercado Pago, accessed January 15, 2026, [https://www.mercadopago.com.ar/ayuda/2779](https://www.mercadopago.com.ar/ayuda/2779)  
 32. Modificación a la Ley de Tarjetas de Crédito \- Allende & Brea, accessed January 6, 2026, [https://allende.com/reforma-argentina-2024-25/modificacion-a-la-ley-de-tarjetas-de-credito-12-21-2023/](https://allende.com/reforma-argentina-2024-25/modificacion-a-la-ley-de-tarjetas-de-credito-12-21-2023/)  
 33. Other payment methods \- Integration configuration \- Mercado Pago, accessed January 6, 2026, [https://www.mercadopago.com.co/developers/en/docs/checkout-api-payments/integration-configuration/other-payment-methods](https://www.mercadopago.com.co/developers/en/docs/checkout-api-payments/integration-configuration/other-payment-methods)  
 34. Cómo calcular tus comisiones en Mercado Pago de modo facil, accessed January 6, 2026, [https://www.youtube.com/watch?v=P0htygBh8-I](https://www.youtube.com/watch?v=P0htygBh8-I)  

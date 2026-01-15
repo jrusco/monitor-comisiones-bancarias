@@ -1,3 +1,22 @@
+"""
+Mercado Pago Fee Updater Script
+
+Scrapes the official Mercado Pago fees pages for Buenos Aires province
+and updates the corresponding entries in data.json.
+
+This script fetches and updates:
+1. Point fees (physical card reader): Débito instant, Crédito instant, Crédito 14 días
+2. QR fees (code payments): Constructs fee range from all payment methods
+
+Updated 2026-01-15:
+- Now uses authoritative sources from mercadopago.com.ar/ayuda
+  * Point: /ayuda/2779#tabla1
+  * QR: /ayuda/3605#tabla1
+- All rates are specific to Buenos Aires province
+- QR fees are stored as a range "min% - max% (según medio)" in data.json
+- Automatically updates date stamp in index.html after successful update
+"""
+
 import json
 import requests
 from bs4 import BeautifulSoup
@@ -7,30 +26,56 @@ from datetime import datetime
 DATA_FILE = 'data.json'
 INDEX_FILE = 'index.html'
 MP_ID = 'mercadopago'
-# This is the specific page for Point fees, not the generic one.
-FEE_URL = 'https://www.mercadopago.com.ar/ayuda/2779'
+
+# Official Mercado Pago fees pages (Buenos Aires province rates)
+# Updated 2026-01-15: Using authoritative sources with direct anchor to fee tables
+POINT_FEE_URL = 'https://www.mercadopago.com.ar/ayuda/2779'  # Point (physical card reader)
+QR_FEE_URL = 'https://www.mercadopago.com.ar/ayuda/3605'     # QR (code payments)
+# Note: #tabla1 anchor not needed for HTTP requests, only for browser navigation
 
 # Defines the mapping between our data.json structure and the scraped data.
-FEE_MAPPING = [
+# NOTE: These rates are specific to Buenos Aires province. Mercado Pago applies
+# differentiated rates by province. See research_spanish.md for regional details.
+
+# POINT FEE MAPPINGS (from ayuda/2779)
+POINT_FEE_MAPPING = [
     {
+        "source": "point",
         "json_concept": "Point - Débito",
         "json_term": "En el momento",
         "page_payment_type": "Tarjeta de débito",
         "page_term": "Al instante",
     },
     {
+        "source": "point",
         "json_concept": "Point - Crédito",
         "json_term": "En el momento",
         "page_payment_type": "Tarjeta de crédito",
         "page_term": "Al instante",
     },
     {
+        "source": "point",
         "json_concept": "Point - Crédito",
         "json_term": "14 días",
         "page_payment_type": "Tarjeta de crédito",
-        "page_term": "10 días", # Mapping discrepancy noted here as the site shows 10, not 14.
+        "page_term": "10 días",  # Mapping discrepancy: site shows "10 días" but we keep "14 días" in data.json for consistency
     },
 ]
+
+# QR FEE MAPPINGS (from ayuda/3605)
+# QR fees in data.json are stored as a range because they vary by payment method
+# We scrape all QR payment methods and construct the range "min% - max% (según medio)"
+QR_FEE_MAPPING = [
+    {
+        "source": "qr",
+        "json_concept": "QR",
+        "json_term": "En el momento",
+        "parse_as_range": True,  # Special flag: construct range from all scraped QR fees
+    },
+]
+
+# Combined mapping for backward compatibility
+FEE_MAPPING = POINT_FEE_MAPPING + QR_FEE_MAPPING
 
 def scrape_fees_from_page(html_content):
     """
@@ -149,6 +194,45 @@ def update_single_fee(fee_dict, new_rate):
         return False
 
 
+def construct_qr_fee_range(scraped_fees):
+    """
+    Constructs a fee range string from all scraped QR fees.
+
+    Args:
+        scraped_fees: List of scraped fee dictionaries (all from QR page)
+
+    Returns:
+        String in format "min% - max% (según medio)" or None if no fees found
+    """
+    if not scraped_fees:
+        return None
+
+    # Extract numeric fee values (e.g., "3,25%" -> 3.25)
+    fee_values = []
+    for fee in scraped_fees:
+        fee_text = fee.get('fee', '')
+        # Extract number before % sign, handle both comma and dot as decimal separator
+        match = re.search(r'(\d+[,.]?\d*)\s*%', fee_text)
+        if match:
+            numeric_value = float(match.group(1).replace(',', '.'))
+            fee_values.append((numeric_value, fee_text))
+
+    if not fee_values:
+        return None
+
+    # Find min and max
+    min_fee = min(fee_values, key=lambda x: x[0])
+    max_fee = max(fee_values, key=lambda x: x[0])
+
+    # Construct range string
+    if min_fee[0] == max_fee[0]:
+        # All fees are the same
+        return f"{min_fee[1]} + IVA"
+    else:
+        # Create range
+        return f"{min_fee[1]} - {max_fee[1]} + IVA (según medio)"
+
+
 def process_single_mapping(mapping, scraped_fees, mp_entity):
     """
     Processes a single fee mapping: finds scraped fee, finds entity fee, and updates.
@@ -161,16 +245,23 @@ def process_single_mapping(mapping, scraped_fees, mp_entity):
     Returns:
         True if any update was made, False otherwise
     """
-    # Find the new rate from scraped data
-    new_rate = find_scraped_fee(
-        scraped_fees,
-        mapping['page_payment_type'],
-        mapping['page_term']
-    )
+    # Special handling for QR range mapping
+    if mapping.get('parse_as_range'):
+        new_rate = construct_qr_fee_range(scraped_fees)
+        if not new_rate:
+            print(f"WARN: Could not construct QR fee range from scraped data. Skipping.")
+            return False
+    else:
+        # Standard mapping: find specific fee by payment type and term
+        new_rate = find_scraped_fee(
+            scraped_fees,
+            mapping['page_payment_type'],
+            mapping['page_term']
+        )
 
-    if not new_rate:
-        print(f"WARN: Could not find a matching scraped fee for {mapping['json_concept']} - {mapping['json_term']}. Skipping.")
-        return False
+        if not new_rate:
+            print(f"WARN: Could not find a matching scraped fee for {mapping['json_concept']} - {mapping['json_term']}. Skipping.")
+            return False
 
     # Find the corresponding fee in data.json
     fee_dict = find_fee_in_entity(
@@ -187,10 +278,17 @@ def process_single_mapping(mapping, scraped_fees, mp_entity):
     return update_single_fee(fee_dict, new_rate)
 
 
-def update_fees_in_data(data, scraped_fees):
+def update_fees_in_data(data, point_scraped_fees, qr_scraped_fees):
     """
     Reads the data file, updates all mapped fees, and returns the modified data.
-    Returns None if no updates were made.
+
+    Args:
+        data: Loaded data.json content
+        point_scraped_fees: Fees scraped from Point page
+        qr_scraped_fees: Fees scraped from QR page
+
+    Returns:
+        Modified data if updates were made, None otherwise
     """
     # Find Mercado Pago entity
     mp_entity = find_entity_by_id(data, MP_ID)
@@ -200,7 +298,14 @@ def update_fees_in_data(data, scraped_fees):
 
     # Process each mapping and track if anything was updated
     something_was_updated = False
+
     for mapping in FEE_MAPPING:
+        # Select appropriate scraped fees based on source
+        if mapping.get('source') == 'qr':
+            scraped_fees = qr_scraped_fees
+        else:  # default to point
+            scraped_fees = point_scraped_fees
+
         was_updated = process_single_mapping(mapping, scraped_fees, mp_entity)
         something_was_updated = something_was_updated or was_updated
 
@@ -255,39 +360,69 @@ def update_date_in_html():
 
 if __name__ == "__main__":
     print("Starting Mercado Pago fee update...")
-    
-    print(f"Fetching data from: {FEE_URL}")
+    print("=" * 70)
+
     try:
-        response = requests.get(FEE_URL, headers={'User-Agent': 'Mozilla/5.0'})
-        response.raise_for_status()
-        
-        scraped_fees = scrape_fees_from_page(response.text)
-        
-        if not scraped_fees:
-            print("Could not extract any fees from the page. No changes were made.")
+        # Scrape Point fees
+        print(f"\n1. Fetching Point fees from: {POINT_FEE_URL}")
+        point_response = requests.get(POINT_FEE_URL, headers={'User-Agent': 'Mozilla/5.0'})
+        point_response.raise_for_status()
+
+        point_scraped_fees = scrape_fees_from_page(point_response.text)
+
+        if not point_scraped_fees:
+            print("WARNING: Could not extract any Point fees from the page.")
+            point_scraped_fees = []
+        else:
+            print(f"✓ Successfully scraped {len(point_scraped_fees)} Point fee entries")
+
+        # Scrape QR fees
+        print(f"\n2. Fetching QR fees from: {QR_FEE_URL}")
+        qr_response = requests.get(QR_FEE_URL, headers={'User-Agent': 'Mozilla/5.0'})
+        qr_response.raise_for_status()
+
+        qr_scraped_fees = scrape_fees_from_page(qr_response.text)
+
+        if not qr_scraped_fees:
+            print("WARNING: Could not extract any QR fees from the page.")
+            qr_scraped_fees = []
+        else:
+            print(f"✓ Successfully scraped {len(qr_scraped_fees)} QR fee entries")
+
+        # Check if we got any fees at all
+        if not point_scraped_fees and not qr_scraped_fees:
+            print("\nERROR: Could not extract any fees from either page. No changes were made.")
             exit(1)
-            
-        print(f"Successfully scraped {len(scraped_fees)} fee entries from the page.")
-        
+
+        # Update data.json
+        print(f"\n3. Updating {DATA_FILE}...")
+        print("-" * 70)
+
         with open(DATA_FILE, 'r', encoding='utf-8') as f:
             current_data = json.load(f)
-            
-        updated_data = update_fees_in_data(current_data, scraped_fees)
-        
+
+        updated_data = update_fees_in_data(current_data, point_scraped_fees, qr_scraped_fees)
+
+        print("-" * 70)
+
         if updated_data:
             with open(DATA_FILE, 'w', encoding='utf-8') as f:
                 json.dump(updated_data, f, indent=4, ensure_ascii=False)
-            print("data.json has been successfully updated.")
+            print(f"\n✓ {DATA_FILE} has been successfully updated.")
         else:
-            print("No fee changes detected. data.json remains unchanged.")
+            print(f"\n✓ No fee changes detected. {DATA_FILE} remains unchanged.")
 
-        # Update date stamp in HTML (always update to reflect when script was run)
-        print()
+        # Update date stamp in HTML
+        print(f"\n4. Updating date stamp in {INDEX_FILE}...")
         update_date_in_html()
 
-    except requests.exceptions.RequestException as e:
-        print(f"ERROR: Failed to fetch URL {FEE_URL}. Reason: {e}")
-        exit(1)
+        print("\n" + "=" * 70)
+        print("Script finished successfully.")
 
-    print("Script finished.")
+    except requests.exceptions.RequestException as e:
+        print(f"\nERROR: Failed to fetch URL. Reason: {e}")
+        exit(1)
+    except Exception as e:
+        print(f"\nERROR: Unexpected error: {e}")
+        exit(1)
 

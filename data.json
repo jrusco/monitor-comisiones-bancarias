@@ -6,7 +6,7 @@
         "color": "bg-blue-600",
         "textColor": "text-blue-600",
         "logo": "BN",
-        "feeUrl": "https://www.bna.com.ar/Downloads/ComisionesYCargosComercial.pdf",
+        "feeUrl": "https://maspagos.com.ar/simulador-de-ventas",
         "apiUrl": "N/A - Integración vía Procesadores (Fiserv/Payway)",
         "hasApi": false,
         "fees": [
@@ -34,7 +34,7 @@
         "color": "bg-emerald-600",
         "textColor": "text-emerald-600",
         "logo": "BP",
-        "feeUrl": "https://www.bancoprovincia.com.ar/web/comisiones",
+        "feeUrl": "https://www.bancoprovincia.com.ar/web/adhesion_comercios",
         "apiUrl": "N/A - Integración vía Procesadores",
         "hasApi": false,
         "fees": [
@@ -62,7 +62,7 @@
         "color": "bg-sky-500",
         "textColor": "text-sky-500",
         "logo": "MP",
-        "feeUrl": "https://www.mercadopago.com.ar/ayuda/costos-cobrar-point_220",
+        "feeUrl": "https://www.mercadopago.com.ar/ayuda/2779#tabla1",
         "apiUrl": "https://api.mercadopago.com/v1/payment_methods",
         "apiDocs": "https://www.mercadopago.com.ar/developers/es/docs/your-integrations",
         "hasApi": true,
@@ -85,7 +85,7 @@
             {
                 "concept": "QR",
                 "term": "En el momento",
-                "rate": "0.8% - 5.99% (según medio)"
+                "rate": "0,80% - 6,29% + IVA (según medio)"
             }
         ]
     },
@@ -96,7 +96,7 @@
         "color": "bg-pink-500",
         "textColor": "text-pink-500",
         "logo": "UA",
-        "feeUrl": "https://mpos.ualabis.com.ar/productos/mpos/",
+        "feeUrl": "https://www.ualabis.com.ar/pos-pro",
         "apiUrl": "https://api.uala.com.ar/merchant/v1/fees (Requiere Auth)",
         "apiDocs": "https://desarrolladores.uala.com.ar/",
         "hasApi": true,
@@ -125,7 +125,7 @@
         "color": "bg-orange-500",
         "textColor": "text-orange-500",
         "logo": "FI",
-        "feeUrl": "https://www.fiserv.com/es-ar/merchant-services.html",
+        "feeUrl": "https://aranceles.fiservargentina.com/",
         "apiUrl": "https://docs.fiserv.dev/public/docs/global-payment-gateway-api",
         "apiDocs": "https://www.fiserv.com/es-ar/developers.html",
         "hasApi": true,
