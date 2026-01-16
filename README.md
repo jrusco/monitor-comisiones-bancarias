@@ -20,3 +20,10 @@ python3 update_uala_fee.py
 ```
 
 Scrapers will only modify `data.json` if changes are detected.
+
+### Fee data sources
+
+- BNA -> [maspagos](https://maspagos.com.ar/simulador-de-ventas) and [Fiserv](aranceles.fiservargentina.com)
+- MercadoPago -> [Phisycal card reader "Point" in Buenos Aires province](https://www.mercadopago.com.ar/ayuda/2779#tabla1) and [QR code payments in Buenos Aires province](https://www.mercadopago.com.ar/ayuda/3605#tabla1)
+- Banco Provincia (de Buenos Aires) -> [BP adhesion comercios](https://www.bancoprovincia.com.ar/web/adhesion_comercios)
+- Uala -> [Phisycal card reader "Pos Pro"](https://www.ualabis.com.ar/pos-pro)

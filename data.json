@@ -6,19 +6,19 @@
         "color": "bg-blue-600",
         "textColor": "text-blue-600",
         "logo": "BN",
-        "feeUrl": "https://maspagos.com.ar/simulador-de-ventas",
+        "feeUrl": "https://aranceles.fiservargentina.com/",
         "apiUrl": "N/A - Integración vía Procesadores (Fiserv/Payway)",
         "hasApi": false,
         "fees": [
             {
                 "concept": "Débito",
-                "term": "48 hs",
-                "rate": "0.8% (Regulado)"
+                "term": "24 hs",
+                "rate": "0.8% + IVA"
             },
             {
                 "concept": "Crédito",
                 "term": "8-10 días hábiles",
-                "rate": "1.8% (Regulado)"
+                "rate": "1.8% + IVA"
             },
             {
                 "concept": "Mantenimiento Terminal",
@@ -70,22 +70,22 @@
             {
                 "concept": "Point - Débito",
                 "term": "En el momento",
-                "rate": "3,25% + IVA"
+                "rate": "3.25% + IVA"
             },
             {
                 "concept": "Point - Crédito",
                 "term": "En el momento",
-                "rate": "6,29% + IVA"
+                "rate": "6.29% + IVA"
             },
             {
                 "concept": "Point - Crédito",
                 "term": "14 días",
-                "rate": "4,39% + IVA"
+                "rate": "4.39% + IVA"
             },
             {
                 "concept": "QR",
                 "term": "En el momento",
-                "rate": "0,80% - 6,29% + IVA (según medio)"
+                "rate": "0.80% - 6.29% + IVA (según medio)"
             }
         ]
     },

@@ -121,7 +121,5 @@ To add more scrapers for other entities:
 
 ## Important Notes
 
-- The "updated date" badge in the navbar (index.html:95) is hardcoded and must be manually updated after data changes
-- The scraper has a mapping discrepancy: data.json uses "14 días" while the Mercado Pago page shows "10 días" - this is intentional (see update_mercadopago_fee.py:28)
-- Fee rates from banks (BNA, Bapro) are often labeled "(Regulado)" as they follow government-mandated caps
-- Fintech aggregators (Mercado Pago, Ualá) typically charge higher fees than regulated bank rates
+- Project-wide consistency: All entities should use international dot format ("3.25%" instead of "3,25%") considering that Argentine convention is to use  comma separators for decimal values in most occassions.
+- No value hardcoding: rates should come from authoritative sources that are verifiable. Each rate should be traced back to its authoritative source if needed. Do not assume standard values that can be hardcoded. If a value cant be found or scrapping fails, the user should know in order to fix it.

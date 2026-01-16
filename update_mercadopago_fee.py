@@ -8,13 +8,16 @@ This script fetches and updates:
 1. Point fees (physical card reader): Débito instant, Crédito instant, Crédito 14 días
 2. QR fees (code payments): Constructs fee range from all payment methods
 
-Updated 2026-01-15:
+Updated 2026-01-16:
 - Now uses authoritative sources from mercadopago.com.ar/ayuda
   * Point: /ayuda/2779#tabla1
   * QR: /ayuda/3605#tabla1
 - All rates are specific to Buenos Aires province
 - QR fees are stored as a range "min% - max% (según medio)" in data.json
 - Automatically updates date stamp in index.html after successful update
+- Normalizes decimal separators from comma (Argentine) to dot (International)
+  * Mercado Pago uses comma: "3,25%" → Converts to dot: "3.25%"
+  * Ensures consistent formatting across all data.json entries
 """
 
 import json
@@ -76,6 +79,23 @@ QR_FEE_MAPPING = [
 
 # Combined mapping for backward compatibility
 FEE_MAPPING = POINT_FEE_MAPPING + QR_FEE_MAPPING
+
+
+def normalize_decimal_separator(rate_string):
+    """
+    Convert Argentine comma separator to international dot separator.
+
+    Args:
+        rate_string: Rate string that may contain comma (e.g., "3,25% + IVA")
+
+    Returns:
+        Normalized rate string with dot (e.g., "3.25% + IVA")
+    """
+    if not rate_string:
+        return rate_string
+    # Example: "3,25% + IVA" → "3.25% + IVA"
+    return rate_string.replace(',', '.')
+
 
 def scrape_fees_from_page(html_content):
     """
@@ -148,11 +168,14 @@ def find_scraped_fee(scraped_fees, payment_type, term):
         term: Exact term string to match
 
     Returns:
-        Formatted rate string "{fee} + IVA" if found, None otherwise
+        Formatted rate string "{fee} + IVA" with normalized decimal separator,
+        or None if not found
     """
     for scraped_fee in scraped_fees:
         if payment_type in scraped_fee['payment_type'] and term == scraped_fee['term']:
-            return f"{scraped_fee['fee']} + IVA"
+            rate = f"{scraped_fee['fee']} + IVA"
+            # Normalize decimal separator from comma to dot
+            return normalize_decimal_separator(rate)
     return None
 
 
@@ -202,7 +225,8 @@ def construct_qr_fee_range(scraped_fees):
         scraped_fees: List of scraped fee dictionaries (all from QR page)
 
     Returns:
-        String in format "min% - max% (según medio)" or None if no fees found
+        String in format "min% - max% (según medio)" with normalized decimal
+        separators, or None if no fees found
     """
     if not scraped_fees:
         return None
@@ -227,10 +251,13 @@ def construct_qr_fee_range(scraped_fees):
     # Construct range string
     if min_fee[0] == max_fee[0]:
         # All fees are the same
-        return f"{min_fee[1]} + IVA"
+        result = f"{min_fee[1]} + IVA"
     else:
         # Create range
-        return f"{min_fee[1]} - {max_fee[1]} + IVA (según medio)"
+        result = f"{min_fee[1]} - {max_fee[1]} + IVA (según medio)"
+
+    # Normalize decimal separator from comma to dot
+    return normalize_decimal_separator(result)
 
 
 def process_single_mapping(mapping, scraped_fees, mp_entity):
