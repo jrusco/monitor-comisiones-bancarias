@@ -1,7 +1,23 @@
 # monitor-comisiones-bancarias
+
 A one-day vibe coded project to aggregate and show and compare credit card transaction fees from the most popular Argentinian financial entities.
 
 Currently hosted in GitHub pages at <https://jrusco.github.io/monitor-comisiones-bancarias/>
+
+## Running the Project
+
+The application is a static single-page app with no build process needed.
+
+```bash
+# Option 1: Open directly in browser
+open index.html
+
+# Option 2: Run a local HTTP server
+python3 -m http.server 8000
+# Then visit http://localhost:8000
+```
+
+No dependencies are required to view the application—it uses vanilla JavaScript and Tailwind CSS from CDN.
 
 ## Updating Fee Data
 
