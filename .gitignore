@@ -1,3 +1,7 @@
 # Python virtual environment
 venv/
 __pycache__/
+
+# Playwright MCP testing
+.playwright-mcp/
+

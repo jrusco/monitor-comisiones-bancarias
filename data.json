@@ -41,17 +41,22 @@
             {
                 "concept": "Débito",
                 "term": "48 hs",
-                "rate": "0.8% (Regulado)"
+                "rate": "0.8% + IVA"
             },
             {
                 "concept": "Crédito",
                 "term": "8-10 días hábiles",
-                "rate": "1.8% (Regulado)"
+                "rate": "1.8% + IVA"
             },
             {
-                "concept": "Cuenta DNI (QR)",
+                "concept": "Clave DNI (Token)",
                 "term": "Inmediato",
-                "rate": "0.6% - 0.8%"
+                "rate": "0.6% + IVA"
+            },
+            {
+                "concept": "QR (Saldo en Cuenta)",
+                "term": "Inmediato",
+                "rate": "0.8% + IVA"
             }
         ]
     },
