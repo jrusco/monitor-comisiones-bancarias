@@ -52,6 +52,11 @@ FEE_MAPPING = [
         "json_term": "48 hs",
         "page_keywords": ["débito", "debito", "debit", "d[ée]bito"],
         "rate_patterns": [
+            # Pattern for: "Tarjetas de débito:</strong><br><span>Fiserv: 0,8% + IVA"
+            r'tarjetas\s+de\s+d[ée]bito[^<]*<[^>]*>\s*[^:]*fiserv[^:]*:\s*(\d+[,\.]\d+)\s*%',
+            # Simpler pattern without HTML tags in between
+            r'tarjetas\s+de\s+d[ée]bito.*?fiserv[^:]*:\s*(\d+[,\.]\d+)\s*%',
+            # Original patterns as fallback
             r'(?:débito|debito)[:\s]+(\d+[,\.]\d+)\s*%',
             r'(\d+[,\.]\d+)\s*%[^.]{0,40}(?:con\s+)?(?:tarjeta\s+de\s+)?d[ée]bito',
         ],
@@ -63,6 +68,9 @@ FEE_MAPPING = [
         "json_term": "8-10 días hábiles",
         "page_keywords": ["crédito", "credito", "credit", "cr[ée]dito"],
         "rate_patterns": [
+            # Pattern for: "Tarjetas de crédito en un pago: 1,8% + IVA"
+            r'tarjetas\s+de\s+cr[ée]dito\s+en\s+un\s+pago[^:]*:\s*(\d+[,\.]\d+)\s*%',
+            # Original patterns as fallback
             r'(?:crédito|credito)[:\s]+(\d+[,\.]\d+)\s*%',
             r'(\d+[,\.]\d+)\s*%[^.]{0,40}(?:con\s+)?(?:tarjeta\s+de\s+)?cr[ée]dito(?!\s+en\s+\d+)',
         ],
@@ -86,6 +94,9 @@ FEE_MAPPING = [
         "json_term": "Inmediato",
         "page_keywords": ["qr", "saldo en cuenta", "saldo"],
         "rate_patterns": [
+            # Pattern for: "QR a través de débito en cuenta: 0,8% + IVA"
+            r'qr\s+a\s+trav[ée]s\s+de\s+d[ée]bito\s+en\s+cuenta[^:]*:\s*(\d+[,\.]\d+)\s*%',
+            # Original patterns as fallback
             r'qr[:\s]+(\d+[,\.]\d+)\s*%(?!\s*-)',  # 0.8% not followed by dash
             r'(?:qr|transferencia).*?saldo[^.]{0,50}(\d+[,\.]\d+)\s*%(?!\s*-)',
             r'saldo\s+en\s+cuenta[^.]{0,50}(\d+[,\.]\d+)\s*%(?!\s*-)',
