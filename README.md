@@ -37,6 +37,46 @@ python3 update_uala_fee.py
 
 Scrapers will only modify `data.json` if changes are detected.
 
+## Backend Server
+
+The project includes a Flask backend that exposes endpoints to trigger updater scripts via HTTP.
+
+### Running in Production
+
+```bash
+source venv/bin/activate
+pip install -r requirements.txt
+API_KEY=your-secret-key gunicorn server:app
+```
+
+For development, you can run directly with Flask:
+
+```bash
+python server.py
+```
+
+### Authentication
+
+Set the `API_KEY` environment variable to enable authentication. When set, all `/update` endpoints require a Bearer token:
+
+```bash
+curl -X POST http://localhost:8000/update/mercadopago \
+  -H "Authorization: Bearer your-secret-key"
+```
+
+If `API_KEY` is not set, no authentication is required.
+
+### Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/status` | Health check (no auth required) |
+| `POST` | `/update/mercadopago` | Run Mercado Pago updater |
+| `POST` | `/update/bna` | Run BNA updater |
+| `POST` | `/update/bapro` | Run Banco Provincia updater |
+| `POST` | `/update/uala` | Run Ualá updater |
+| `POST` | `/update/all` | Run all updaters sequentially |
+
 ### Fee data sources
 
 - BNA -> [maspagos](https://maspagos.com.ar/simulador-de-ventas) and [Fiserv](aranceles.fiservargentina.com)
