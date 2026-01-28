@@ -155,36 +155,89 @@ func constructQRFeeRange(fees []scrapedFee) string {
 	return common.NormalizeDecimalSeparator(result)
 }
 
+// fetchAndScrapeFees fetches a page and extracts fee data from it.
+// Returns the scraped fees and any fetch error.
+func fetchAndScrapeFees(name, url string) ([]scrapedFee, error) {
+	html, err := common.FetchPage(url)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch %s URL: %w", name, err)
+	}
+	fees := scrapeFeesFromPage(html)
+	if len(fees) == 0 {
+		fmt.Printf("WARNING: Could not extract any %s fees from the page.\n", name)
+	} else {
+		fmt.Printf("Successfully scraped %d %s fee entries\n", len(fees), name)
+	}
+	return fees, nil
+}
+
+// getRateForMapping looks up the rate for a fee mapping from scraped data.
+func getRateForMapping(m feeMapping, pointFees, qrFees []scrapedFee) string {
+	var scraped []scrapedFee
+	if m.source == "qr" {
+		scraped = qrFees
+	} else {
+		scraped = pointFees
+	}
+
+	if m.parseAsRange {
+		return constructQRFeeRange(scraped)
+	}
+	return findScrapedFee(scraped, m.pagePaymentType, m.pageTerm)
+}
+
+// processFeeMapping processes a single fee mapping and returns whether an update occurred.
+func processFeeMapping(m feeMapping, mp *common.Entity, pointFees, qrFees []scrapedFee) bool {
+	newRate := getRateForMapping(m, pointFees, qrFees)
+	if newRate == "" {
+		if m.parseAsRange {
+			fmt.Println("WARN: Could not construct QR fee range from scraped data. Skipping.")
+		} else {
+			fmt.Printf("WARN: Could not find a matching scraped fee for %s - %s. Skipping.\n", m.jsonConcept, m.jsonTerm)
+		}
+		return false
+	}
+
+	fee := common.FindFee(mp.Fees, m.jsonConcept, m.jsonTerm)
+	if fee == nil {
+		fmt.Printf("WARN: Could not find fee in data.json for '%s' (%s)\n", m.jsonConcept, m.jsonTerm)
+		return false
+	}
+
+	return common.UpdateFee(fee, newRate)
+}
+
+// saveIfUpdated saves data.json if updates were made, otherwise reports no changes.
+func saveIfUpdated(data []common.Entity, updated bool) error {
+	if updated {
+		if err := common.SaveData(data); err != nil {
+			return err
+		}
+		fmt.Printf("\n%s has been successfully updated.\n", common.DataFile)
+	} else {
+		fmt.Printf("\nNo fee changes detected. %s remains unchanged.\n", common.DataFile)
+	}
+	return nil
+}
+
 func main() {
 	fmt.Println("Starting Mercado Pago fee update...")
 	fmt.Println(strings.Repeat("=", 70))
 
-	// Scrape Point fees
+	// 1. Scrape Point fees
 	fmt.Printf("\n1. Fetching Point fees from: %s\n", pointFeeURL)
-	pointHTML, err := common.FetchPage(pointFeeURL)
+	pointFees, err := fetchAndScrapeFees("Point", pointFeeURL)
 	if err != nil {
-		fmt.Printf("\nERROR: Failed to fetch Point URL: %v\n", err)
+		fmt.Printf("\nERROR: %v\n", err)
 		os.Exit(1)
-	}
-	pointFees := scrapeFeesFromPage(pointHTML)
-	if len(pointFees) == 0 {
-		fmt.Println("WARNING: Could not extract any Point fees from the page.")
-	} else {
-		fmt.Printf("Successfully scraped %d Point fee entries\n", len(pointFees))
 	}
 
-	// Scrape QR fees
+	// 2. Scrape QR fees
 	fmt.Printf("\n2. Fetching QR fees from: %s\n", qrFeeURL)
-	qrHTML, err := common.FetchPage(qrFeeURL)
+	qrFees, err := fetchAndScrapeFees("QR", qrFeeURL)
 	if err != nil {
-		fmt.Printf("\nERROR: Failed to fetch QR URL: %v\n", err)
+		fmt.Printf("\nERROR: %v\n", err)
 		os.Exit(1)
-	}
-	qrFees := scrapeFeesFromPage(qrHTML)
-	if len(qrFees) == 0 {
-		fmt.Println("WARNING: Could not extract any QR fees from the page.")
-	} else {
-		fmt.Printf("Successfully scraped %d QR fee entries\n", len(qrFees))
 	}
 
 	if len(pointFees) == 0 && len(qrFees) == 0 {
@@ -192,7 +245,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Load and update data.json
+	// 3. Load and update data.json
 	fmt.Printf("\n3. Updating %s...\n", common.DataFile)
 	fmt.Println(strings.Repeat("-", 70))
 
@@ -210,53 +263,19 @@ func main() {
 
 	updated := false
 	for _, m := range feeMappings {
-		var newRate string
-		var scraped []scrapedFee
-
-		if m.source == "qr" {
-			scraped = qrFees
-		} else {
-			scraped = pointFees
-		}
-
-		if m.parseAsRange {
-			newRate = constructQRFeeRange(scraped)
-			if newRate == "" {
-				fmt.Println("WARN: Could not construct QR fee range from scraped data. Skipping.")
-				continue
-			}
-		} else {
-			newRate = findScrapedFee(scraped, m.pagePaymentType, m.pageTerm)
-			if newRate == "" {
-				fmt.Printf("WARN: Could not find a matching scraped fee for %s - %s. Skipping.\n", m.jsonConcept, m.jsonTerm)
-				continue
-			}
-		}
-
-		fee := common.FindFee(mp.Fees, m.jsonConcept, m.jsonTerm)
-		if fee == nil {
-			fmt.Printf("WARN: Could not find fee in data.json for '%s' (%s)\n", m.jsonConcept, m.jsonTerm)
-			continue
-		}
-
-		if common.UpdateFee(fee, newRate) {
+		if processFeeMapping(m, mp, pointFees, qrFees) {
 			updated = true
 		}
 	}
 
 	fmt.Println(strings.Repeat("-", 70))
 
-	if updated {
-		if err := common.SaveData(data); err != nil {
-			fmt.Printf("ERROR: %v\n", err)
-			os.Exit(1)
-		}
-		fmt.Printf("\n%s has been successfully updated.\n", common.DataFile)
-	} else {
-		fmt.Printf("\nNo fee changes detected. %s remains unchanged.\n", common.DataFile)
+	if err := saveIfUpdated(data, updated); err != nil {
+		fmt.Printf("ERROR: %v\n", err)
+		os.Exit(1)
 	}
 
-	// Update date stamp
+	// 4. Update date stamp
 	fmt.Printf("\n4. Updating date stamp in %s...\n", common.IndexFile)
 	common.UpdateDateInHTML()
 
