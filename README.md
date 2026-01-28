@@ -1,45 +1,53 @@
 # monitor-comisiones-bancarias
 
-A one-day vibe coded project to aggregate and show and compare credit card transaction fees from the most popular Argentinian financial entities.
+A project to aggregate, compare, and display credit card transaction fees from popular Argentine financial entities.
 
-Currently hosted in GitHub pages at <https://jrusco.github.io/monitor-comisiones-bancarias/>
+Hosted at <https://jrusco.github.io/monitor-comisiones-bancarias/>
 
-## Running the Project
+## Quick Start
 
 The application is a static single-page app with no build process needed.
 
 ```bash
-# Option 1: Open directly in browser
-open index.html
+# Open directly in browser
+xdg-open index.html
 
-# Option 2: Run a local HTTP server
+# Or run a local HTTP server
 python3 -m http.server 8000
 # Then visit http://localhost:8000
 ```
 
-No dependencies are required to view the application—it uses vanilla JavaScript and Tailwind CSS from CDN.
+## Fee Updates
 
-## Updating Fee Data
+Fee data is updated automatically via GitHub Actions every Sunday. You can also trigger updates manually.
 
-The project includes automated scrapers to update fee information from financial entities.
+### Automated Updates
+
+The workflow at `.github/workflows/update-fees.yml` runs weekly and:
+- Executes all Go scrapers
+- Validates the resulting `data.json`
+- Commits changes if any fees were updated
+
+To trigger manually: Go to **Actions** → **Update Fees** → **Run workflow**
+
+### Manual Updates (Local)
+
+Requires Go 1.24+
 
 ```bash
-# Setup (first time only)
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-
-# Run scrapers
-python3 update_mercadopago_fee.py
-python3 update_bna_fee.py
-python3 update_uala_fee.py
+go run ./cmd/update-mercadopago
+go run ./cmd/update-bna
+go run ./cmd/update-bapro
+go run ./cmd/update-uala
 ```
 
-Scrapers will only modify `data.json` if changes are detected.
+Scrapers only modify `data.json` if changes are detected.
 
-### Fee data sources
+## Fee Data Sources
 
-- BNA -> [maspagos](https://maspagos.com.ar/simulador-de-ventas) and [Fiserv](aranceles.fiservargentina.com)
-- MercadoPago -> [Phisycal card reader "Point" in Buenos Aires province](https://www.mercadopago.com.ar/ayuda/2779#tabla1) and [QR code payments in Buenos Aires province](https://www.mercadopago.com.ar/ayuda/3605#tabla1)
-- Banco Provincia (de Buenos Aires) -> [BP adhesion comercios](https://www.bancoprovincia.com.ar/web/adhesion_comercios)
-- Uala -> [Phisycal card reader "Pos Pro"](https://www.ualabis.com.ar/pos-pro)
+| Entity | Source |
+|--------|--------|
+| BNA | [Fiserv Argentina](https://aranceles.fiservargentina.com) |
+| Mercado Pago | [Point fees](https://www.mercadopago.com.ar/ayuda/2779), [QR fees](https://www.mercadopago.com.ar/ayuda/3605) |
+| Banco Provincia | [Adhesion comercios](https://www.bancoprovincia.com.ar/web/adhesion_comercios) |
+| Uala | [mPOS](https://mpos.ualabis.com.ar/productos/mpos/) |

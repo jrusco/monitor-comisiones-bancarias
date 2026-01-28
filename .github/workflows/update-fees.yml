@@ -1,0 +1,44 @@
+name: Update Fees
+
+on:
+  schedule:
+    - cron: '0 3 * * 0'  # Sundays 3 AM UTC
+  workflow_dispatch:
+
+concurrency:
+  group: update-fees
+  cancel-in-progress: false
+
+jobs:
+  update-fees:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+          cache: true
+
+      - name: Run scrapers
+        run: |
+          failed=0
+          go run ./cmd/update-mercadopago || { echo "::warning::mercadopago failed"; failed=1; }
+          go run ./cmd/update-bna || { echo "::warning::bna failed"; failed=1; }
+          go run ./cmd/update-bapro || { echo "::warning::bapro failed"; failed=1; }
+          go run ./cmd/update-uala || { echo "::warning::uala failed"; failed=1; }
+          [ $failed -ne 0 ] && echo "::warning::Some scrapers failed"
+          exit 0
+
+      - name: Validate data.json
+        run: jq empty data.json
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data.json index.html
+          git diff --staged --quiet || git commit -m "chore: update fees [automated]"
+          git push
