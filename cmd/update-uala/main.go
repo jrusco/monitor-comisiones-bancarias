@@ -76,9 +76,9 @@ func scrapeFeesFromPage(htmlContent string) []scrapedFee {
 		}
 	}
 
-	// Crédito patterns
+	// Crédito patterns (RE2 compatible - no negative lookahead)
 	creditPatterns := []string{
-		`(\d+[,.]\d+)\s*%[^.]{0,50}(?:con\s+)?(?:tarjeta\s+de\s+)?cr[ée]dito(?!\s+en\s+\d+\s+cuotas)`,
+		`(\d+[,.]\d+)\s*%[^.]{0,50}(?:con\s+)?(?:tarjeta\s+de\s+)?cr[ée]dito`,
 		`(?i)cr[ée]dito\s*:?\s*(\d+[,.]\d+)\s*%`,
 		`(?i)cr[ée]dito\s+(?:en\s+(?:1|un)\s+pago|en\s+el\s+momento)[^.]{0,30}(\d+[,.]\d+)\s*%`,
 		`(?i)["']?cr[ée]dito["']?\s*:\s*["']?(\d+[,.]\d+)\s*%?["']?`,

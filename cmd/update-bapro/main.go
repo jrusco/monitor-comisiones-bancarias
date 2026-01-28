@@ -36,6 +36,7 @@ type baproMapping struct {
 	expectedMax   float64
 }
 
+// RE2 compatible patterns (no negative lookahead)
 var feeMappings = []baproMapping{
 	{
 		jsonConcept: "Débito", jsonTerm: "48 hs",
@@ -52,16 +53,16 @@ var feeMappings = []baproMapping{
 		ratePatterns: []string{
 			`(?i)tarjetas\s+de\s+cr[ée]dito\s+en\s+un\s+pago[^:]*:\s*(\d+[,.]\d+)\s*%`,
 			`(?i)(?:crédito|credito)[:\s]+(\d+[,.]\d+)\s*%`,
-			`(?i)(\d+[,.]\d+)\s*%[^.]{0,40}(?:con\s+)?(?:tarjeta\s+de\s+)?cr[ée]dito(?!\s+en\s+\d+)`,
+			`(?i)(\d+[,.]\d+)\s*%[^.]{0,40}(?:con\s+)?(?:tarjeta\s+de\s+)?cr[ée]dito`,
 		},
 		fallbackKey: "credito", expectedMin: 1.7, expectedMax: 2.0,
 	},
 	{
 		jsonConcept: "Clave DNI (Token)", jsonTerm: "Inmediato",
 		ratePatterns: []string{
-			`(?i)(?:clave\s+)?dni[:\s]+(\d+[,.]\d+)\s*%(?!\s*-)`,
+			`(?i)clave\s+dni\s+token[:\s]*(\d+[,.]\d+)\s*%`,
 			`(?i)clave\s+(?:dni\s+)?token[:\s]*(\d+[,.]\d+)\s*%`,
-			`(?i)(?:clave\s+)?dni\s+(?:token|inmediata)[^.]{0,50}(\d+[,.]\d+)\s*%(?!\s*-)`,
+			`(?i)(?:clave\s+)?dni\s+(?:token|inmediata)[^.]{0,50}(\d+[,.]\d+)\s*%`,
 		},
 		fallbackKey: "clave_dni", expectedMin: 0.5, expectedMax: 0.7,
 	},
@@ -69,9 +70,9 @@ var feeMappings = []baproMapping{
 		jsonConcept: "QR (Saldo en Cuenta)", jsonTerm: "Inmediato",
 		ratePatterns: []string{
 			`(?i)qr\s+a\s+trav[ée]s\s+de\s+d[ée]bito\s+en\s+cuenta[^:]*:\s*(\d+[,.]\d+)\s*%`,
-			`(?i)qr[:\s]+(\d+[,.]\d+)\s*%(?!\s*-)`,
-			`(?i)(?:qr|transferencia).*?saldo[^.]{0,50}(\d+[,.]\d+)\s*%(?!\s*-)`,
-			`(?i)saldo\s+en\s+cuenta[^.]{0,50}(\d+[,.]\d+)\s*%(?!\s*-)`,
+			`(?i)qr[:\s]+(\d+[,.]\d+)\s*%`,
+			`(?i)(?:qr|transferencia).*?saldo[^.]{0,50}(\d+[,.]\d+)\s*%`,
+			`(?i)saldo\s+en\s+cuenta[^.]{0,50}(\d+[,.]\d+)\s*%`,
 		},
 		fallbackKey: "qr_saldo", expectedMin: 0.7, expectedMax: 0.9,
 	},
