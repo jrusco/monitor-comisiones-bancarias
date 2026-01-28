@@ -5,6 +5,9 @@ on:
     - cron: '0 3 * * 0'  # Sundays 3 AM UTC
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 concurrency:
   group: update-fees
   cancel-in-progress: false
