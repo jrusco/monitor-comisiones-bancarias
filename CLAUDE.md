@@ -4,33 +4,84 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a static single-page web application that monitors and compares credit card transaction fees from popular financial entities in Argentina. The project is hosted on GitHub Pages at <https://jrusco.github.io/monitor-comisiones-bancarias/>
+Static single-page web application that monitors and compares credit card transaction fees from Argentine financial entities. Hosted on GitHub Pages at <https://jrusco.github.io/monitor-comisiones-bancarias/>
 
-The application is built with:
-
-- Plain HTML (index.html)
-- Tailwind CSS (loaded via CDN)
-- Chart.js for data visualization (loaded via CDN)
-- Vanilla JavaScript for interactivity
+**Built with:**
+- HTML + Tailwind CSS + Chart.js (all via CDN)
+- Vanilla JavaScript
+- Go 1.24+ scrapers using [goquery](https://github.com/PuerkitoBio/goquery)
 
 ## Architecture
 
-### Data Flow
+```
+├── index.html           # SPA - reads data.json, renders UI
+├── data.json            # Central data store for all entities
+├── cmd/
+│   ├── update-mercadopago/  # Mercado Pago scraper
+│   ├── update-bna/          # Banco Nación scraper
+│   ├── update-bapro/        # Banco Provincia scraper
+│   └── update-uala/         # Ualá scraper
+└── internal/common/     # Shared utilities (data loading, HTTP, HTML parsing)
+```
 
-1. **data.json** - Central data store containing all financial entity information (fees, URLs, metadata)
-2. **index.html** - Single-page application that reads from data.json and renders the UI
-3. **update_mercadopago_fee.py** - Python script that scrapes Mercado Pago's fee page and updates data.json
+## Commands
 
-### Key Files
+### View the Application
 
-- `index.html` - Complete application with embedded JavaScript and styling
-- `data.json` - Structured data for all financial entities (banks and fintechs)
-- `update_mercadopago_fee.py` - Web scraper for automated fee updates
-- `research_spanish.md` - Research notes on the Argentinian payment processing market
+```bash
+python3 -m http.server 8000
+# Visit http://localhost:8000
+```
 
-### Data Structure
+### Run Fee Scrapers
 
-The `data.json` file contains an array of financial entities with this structure:
+```bash
+# Run a specific scraper
+go run ./cmd/update-mercadopago
+go run ./cmd/update-bna
+go run ./cmd/update-bapro
+go run ./cmd/update-uala
+
+# Run all scrapers
+for cmd in cmd/update-*; do go run ./$cmd; done
+```
+
+## Adding a New Scraper
+
+1. Create `cmd/update-<entity>/main.go` following existing patterns
+2. Define a `feeMapping` struct linking scraped data to `data.json` fields
+3. Use `internal/common` for HTTP requests and data loading/saving
+4. Only write to `data.json` if changes are detected
+
+Example pattern from existing scrapers:
+```go
+// Load existing data
+entities, err := common.LoadData("data.json")
+
+// Scrape and parse fees
+doc, err := common.FetchDocument(feeURL)
+// ... parse with goquery ...
+
+// Update only if changed
+if common.UpdateEntityFees(entities, entityID, newFees) {
+    common.SaveData("data.json", entities)
+}
+```
+
+## CI/CD
+
+- **Workflow:** `.github/workflows/update-fees.yml`
+- **Schedule:** Sundays 3 AM UTC
+- **Manual trigger:** Available via GitHub Actions UI ("Run workflow")
+- **Behavior:** Runs all scrapers, validates JSON, auto-commits if fees changed
+
+## Data Conventions
+
+- **Format:** International dot format (`3.25%` not `3,25%`)
+- **Sources:** All rates must come from verifiable authoritative sources
+- **No hardcoding:** If scraping fails, report the error - don't use fallback values
+
+## Data Structure
 
 ```json
 {
@@ -48,95 +99,14 @@ The `data.json` file contains an array of financial entities with this structure
     {
       "concept": "Fee category (e.g., 'Point - Débito')",
       "term": "Settlement term (e.g., 'En el momento', '14 días')",
-      "rate": "Rate string (e.g., '3,25% + IVA')"
+      "rate": "Rate string (e.g., '3.25% + IVA')"
     }
   ]
 }
 ```
 
-## Common Commands
+## Modifying Data
 
-### Running the Application
-
-No build process is required. Open `index.html` directly in a browser:
-
-```bash
-# On Linux
-xdg-open index.html
-
-# Or use a simple HTTP server
-python3 -m http.server 8000
-# Then visit http://localhost:8000
-```
-
-### Python Environment Setup
-
-```bash
-# Create virtual environment
-python3 -m venv venv
-
-# Activate virtual environment
-source venv/bin/activate  # Linux/Mac
-# or
-venv\Scripts\activate  # Windows
-
-# Install dependencies
-pip install -r requirements.txt
-```
-
-### Updating Mercado Pago Fees
-
-The scraper targets the Mercado Pago Point fees page and updates specific fee entries in data.json:
-
-```bash
-# Activate venv first
-source venv/bin/activate
-
-# Run the updater
-python update_mercadopago_fee.py
-```
-
-The script:
-
-- Scrapes <https://www.mercadopago.com.ar/ayuda/2779>
-- Maps scraped data to data.json entries using FEE_MAPPING
-- Updates only the fees defined in the mapping (Point - Débito/Crédito rates)
-- Preserves all other data.json content unchanged
-- Only writes to file if changes are detected
-
-## Development Guidelines
-
-### Modifying Entity Data
-
-All data changes should be made to `data.json`, not `index.html`. The HTML file reads from the JSON file dynamically.
-
-### Adding New Financial Entities
-
-1. Add a new entry to `data.json` following the structure above
-2. Assign a unique `id` and choose appropriate Tailwind color classes
-3. The UI will automatically render the new entity
-
-### Updating Fees Manually
-
-Edit the `fees` array in `data.json` for the relevant entity. The rate format should match existing entries (e.g., "X% + IVA" or "X% (Regulado)").
-
-### Extending the Scraper
-
-To add more scrapers for other entities:
-
-1. Follow the pattern in `update_mercadopago_fee.py`
-2. Define a FEE_MAPPING that links scraped data to data.json structure
-3. Use BeautifulSoup to parse the target page
-4. Only update data.json if changes are detected
-
-### Styling Conventions
-
-- Uses Tailwind utility classes throughout
-- Color palette: Slate (backgrounds/text), Blue (primary), Emerald (success/money)
-- Each entity has assigned `color` and `textColor` properties for consistent theming
-- Responsive design with mobile-first breakpoints
-
-## Important Notes
-
-- Project-wide consistency: All entities should use international dot format ("3.25%" instead of "3,25%") considering that Argentine convention is to use  comma separators for decimal values in most occassions.
-- No value hardcoding: rates should come from authoritative sources that are verifiable. Each rate should be traced back to its authoritative source if needed. Do not assume standard values that can be hardcoded. If a value cant be found or scrapping fails, the user should know in order to fix it.
+- **Entity data:** Edit `data.json` directly (UI renders dynamically)
+- **Add entity:** Add entry to `data.json` with unique `id` and Tailwind colors
+- **Manual fee update:** Edit the `fees` array for the relevant entity
