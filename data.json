@@ -5,7 +5,7 @@
         "type": "Banco (Adquirente)",
         "color": "bg-blue-600",
         "textColor": "text-blue-600",
-        "logo": "BN",
+        "logo": "BNA",
         "feeUrl": "https://aranceles.fiservargentina.com/",
         "apiUrl": "N/A - Integración vía Procesadores (Fiserv/Payway)",
         "hasApi": false,
@@ -33,7 +33,7 @@
         "type": "Banco (Adquirente)",
         "color": "bg-emerald-600",
         "textColor": "text-emerald-600",
-        "logo": "BP",
+        "logo": "BAPRO",
         "feeUrl": "https://www.bancoprovincia.com.ar/web/adhesion_comercios",
         "apiUrl": "N/A - Integración vía Procesadores",
         "hasApi": false,
@@ -120,35 +120,6 @@
                 "concept": "Link de Pago",
                 "term": "En el momento",
                 "rate": "4.4% + IVA"
-            }
-        ]
-    },
-    {
-        "id": "fiserv",
-        "name": "Fiserv / Posnet",
-        "type": "Procesador / Adquirente",
-        "color": "bg-orange-500",
-        "textColor": "text-orange-500",
-        "logo": "FI",
-        "feeUrl": "https://aranceles.fiservargentina.com/",
-        "apiUrl": "https://docs.fiserv.dev/public/docs/global-payment-gateway-api",
-        "apiDocs": "https://www.fiserv.com/es-ar/developers.html",
-        "hasApi": true,
-        "fees": [
-            {
-                "concept": "Terminal POS",
-                "term": "Mensual",
-                "rate": "Costo de Alquiler"
-            },
-            {
-                "concept": "Transacción Débito",
-                "term": "48 hs",
-                "rate": "0.8% (Pass-through)"
-            },
-            {
-                "concept": "Transacción Crédito",
-                "term": "Según Plan",
-                "rate": "1.8% (Pass-through)"
             }
         ]
     }

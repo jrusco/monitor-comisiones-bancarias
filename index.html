@@ -201,7 +201,7 @@
 
         <!-- Entity Directory (Grouped by Type) -->
         <section>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="entityGrid">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="entityGrid">
                 <!-- Javascript will populate grouped cards here -->
             </div>
         </section>
@@ -360,7 +360,7 @@
             };
 
             // Render grouped layout
-            grid.innerHTML = Object.entries(groups).map(([groupName, groupEntities]) => `
+            grid.innerHTML = Object.entries(groups).filter(([_, groupEntities]) => groupEntities.length > 0).map(([groupName, groupEntities]) => `
                 <div class="space-y-3">
                     <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider px-1">${groupName}</h3>
                     <div class="space-y-3">
@@ -403,17 +403,17 @@
 
                     if (fee.concept.includes('Débito')) {
                         if (rate < minDebit.rate) {
-                            minDebit = { rate, entities: [entity.name] };
+                            minDebit = { rate, entities: [{ name: entity.name, logo: entity.logo }] };
                         } else if (rate === minDebit.rate) {
-                            minDebit.entities.push(entity.name);
+                            minDebit.entities.push({ name: entity.name, logo: entity.logo });
                         }
                     }
 
                     if (fee.concept.includes('Crédito')) {
                         if (rate < minCredit.rate) {
-                            minCredit = { rate, entities: [entity.name] };
+                            minCredit = { rate, entities: [{ name: entity.name, logo: entity.logo }] };
                         } else if (rate === minCredit.rate) {
-                            minCredit.entities.push(entity.name);
+                            minCredit.entities.push({ name: entity.name, logo: entity.logo });
                         }
                     }
                 });
@@ -424,12 +424,16 @@
             const creditEl = document.getElementById('heroMinCredit');
 
             if (minDebit.rate !== Infinity) {
-                const entityList = minDebit.entities.join(' / ');
+                const entityList = minDebit.entities.length > 1
+                    ? minDebit.entities.map(e => e.logo).join(' / ')
+                    : minDebit.entities[0].name;
                 debitEl.innerHTML = `${minDebit.rate}% <span class="text-base font-normal text-blue-100">- ${entityList}</span>`;
             }
 
             if (minCredit.rate !== Infinity) {
-                const entityList = minCredit.entities.join(' / ');
+                const entityList = minCredit.entities.length > 1
+                    ? minCredit.entities.map(e => e.logo).join(' / ')
+                    : minCredit.entities[0].name;
                 creditEl.innerHTML = `${minCredit.rate}% <span class="text-base font-normal text-blue-100">- ${entityList}</span>`;
             }
 
@@ -509,8 +513,7 @@
                 { name: 'Banco Nación', id: 'bna' },
                 { name: 'Banco Provincia', id: 'bapro' },
                 { name: 'Mercado Pago', id: 'mercadopago' },
-                { name: 'Ualá', id: 'uala' },
-                { name: 'Fiserv', id: 'fiserv' }
+                { name: 'Ualá', id: 'uala' }
             ];
 
             const labels = entityData.map(e => e.name);
