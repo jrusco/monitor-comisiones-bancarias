@@ -33,6 +33,10 @@ python3 -m http.server 8000
 # Visit http://localhost:8000
 ```
 
+#### Keep the server alive
+
+When the server needs to be up, first check if it already is and if not, start it. Dont kill the server process once you are done with your tasks. This allows to you and the user to easily review changes without having to start/stop continually throughout the working session.
+
 ### Run Fee Scrapers
 
 ```bash
