@@ -44,7 +44,7 @@ type feeMapping struct {
 var feeMappings = []feeMapping{
 	{source: "point", jsonConcept: "Point - Débito", jsonTerm: "En el momento", pagePaymentType: "Tarjeta de débito", pageTerm: "Al instante"},
 	{source: "point", jsonConcept: "Point - Crédito", jsonTerm: "En el momento", pagePaymentType: "Tarjeta de crédito", pageTerm: "Al instante"},
-	{source: "point", jsonConcept: "Point - Crédito", jsonTerm: "14 días", pagePaymentType: "Tarjeta de crédito", pageTerm: "10 días"},
+	{source: "point", jsonConcept: "Point - Crédito", jsonTerm: "10 días", pagePaymentType: "Tarjeta de crédito", pageTerm: "10 días"},
 	{source: "qr", jsonConcept: "QR", jsonTerm: "En el momento", parseAsRange: true},
 }
 
