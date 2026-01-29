@@ -7,6 +7,7 @@
     <title>Monitor de Comisiones y Recursos: Pagos Argentina</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
     <style>
         body {
@@ -23,14 +24,13 @@
             position: relative;
             width: 100%;
             max-width: 800px;
-            /* Max width for large screens */
-            height: 350px;
+            height: 280px;
             margin: 0 auto;
         }
 
         @media (max-width: 768px) {
             .chart-container {
-                height: 300px;
+                height: 240px;
             }
         }
 
@@ -163,7 +163,7 @@
                 <div class="flex items-center space-x-4">
                     <span
                         class="text-xs font-medium bg-emerald-500/20 text-emerald-400 px-2.5 py-0.5 rounded-full status-badge">Actualizado:
-                        28/01/26</span>
+                        29/01/26</span>
                 </div>
             </div>
         </div>
@@ -172,156 +172,101 @@
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-        <!-- Intro Section -->
-        <section class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 animate-entrance" style="animation-delay: 0.05s; opacity: 0;">
-            <h1 class="text-2xl font-bold text-slate-900 mb-2">Recursos de Comisiones y Tasas</h1>
-            <p class="text-slate-600 max-w-3xl">
-                Directorio unificado de enlaces oficiales, documentación de API y estructuras de costos para
-                procesamiento de pagos en Argentina.
-                Seleccione una entidad para acceder a sus fuentes de información actualizadas.
-            </p>
-        </section>
-
-        <!-- Context Visualization -->
-        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Chart Column -->
-            <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-100 p-6">
-                <div class="mb-4">
-                    <h2 class="text-lg font-semibold text-slate-900">Comparativa de Modelos de Cobro</h2>
-                    <p class="text-sm text-slate-500">Diferencia estructural entre Bancos (Adquirentes directos) y
-                        Agregadores (Fintechs)</p>
+        <!-- Hero Section -->
+        <section id="heroSection" class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl p-8 shadow-lg text-white animate-entrance" style="animation-delay: 0.05s; opacity: 0;">
+            <h1 class="text-2xl md:text-3xl font-bold mb-2">Compará comisiones de cobro con tarjeta</h1>
+            <p class="text-blue-100 mb-6 max-w-2xl">Encontrá la opción más conveniente para tu negocio</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
+                <div class="bg-white/15 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                    <p class="text-blue-100 text-sm font-medium mb-1">Menor comisión Débito</p>
+                    <p id="heroMinDebit" class="text-2xl font-bold">Cargando...</p>
                 </div>
-                <!-- Chart Container -->
-                <div class="chart-container">
-                    <canvas id="feesChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Context Info -->
-            <div class="bg-slate-50 rounded-xl border border-slate-200 p-6 flex flex-col justify-center space-y-4">
-                <h3 class="font-semibold text-slate-900">Entendiendo los Costos</h3>
-                <div class="space-y-3 text-sm">
-                    <div class="p-3 bg-white rounded-lg border border-slate-100">
-                        <span class="font-medium text-blue-700 block mb-1">Bancos (BNA, Bapro)</span>
-                        Generalmente cobran el arancel tope regulado (0.8% Débito / 1.8% Crédito) + costo de terminal.
-                        Los plazos de pago son estándar (8-10 días hábiles crédito).
-                    </div>
-                    <div class="p-3 bg-white rounded-lg border border-slate-100">
-                        <span class="font-medium text-indigo-700 block mb-1">Agregadores (MP, Ualá)</span>
-                        Cobran una "Tasa de Servicio" mayor que incluye el arancel. Ofrecen liquidez inmediata o plazos
-                        cortos a cambio de comisiones más altas (3% - 6% + IVA).
-                    </div>
-                    <div class="p-3 bg-white rounded-lg border border-slate-100">
-                        <span class="font-medium text-slate-700 block mb-1">Procesadores (Fiserv)</span>
-                        Operan la red. Sus costos suelen estar desglosados en Alquiler de POS + Arancel por transacción.
-                    </div>
+                <div class="bg-white/15 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                    <p class="text-blue-100 text-sm font-medium mb-1">Menor comisión Crédito</p>
+                    <p id="heroMinCredit" class="text-2xl font-bold">Cargando...</p>
                 </div>
             </div>
         </section>
 
-        <!-- Entity Directory (Interactive Grid) -->
+        <!-- Chart Section -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+            <div class="mb-4">
+                <h2 class="text-xl font-semibold text-slate-900">¿Cuánto te cobran por venta?</h2>
+            </div>
+            <!-- Chart Container -->
+            <div class="chart-container">
+                <canvas id="feesChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Entity Directory (Grouped by Type) -->
         <section>
-            <h2 class="text-xl font-bold text-slate-900 mb-4">Directorio de Entidades</h2>
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="entityGrid">
-                <!-- Javascript will populate cards here -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="entityGrid">
+                <!-- Javascript will populate grouped cards here -->
             </div>
         </section>
 
         <!-- Entity Detail View (Dynamic) -->
         <section id="detailSection" class="hidden transition-all duration-500">
-            <div class="detail-entrance bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
-                <div class="p-0">
-                    <!-- Dynamic Header -->
-                    <div id="detailHeader" class="entity-header-accent text-white p-6 flex justify-between items-start">
+            <div class="detail-entrance bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden max-w-2xl mx-auto">
+                <!-- Dynamic Header -->
+                <div id="detailHeader" class="entity-header-accent text-white p-6 flex justify-between items-start">
+                    <div>
+                        <h2 id="detailTitle" class="text-2xl font-bold">Nombre Entidad</h2>
+                        <span id="detailType" class="inline-block mt-2 px-3 py-1 bg-white/20 rounded-full text-xs font-medium backdrop-blur-sm">Tipo</span>
+                    </div>
+                    <button onclick="closeDetail()"
+                        class="text-white/70 hover:text-white transition-colors text-2xl font-bold">&times;</button>
+                </div>
+
+                <div class="p-6 space-y-6">
+                    <!-- Fee Table (Primary Focus) -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="overflow-x-auto custom-scroll">
+                            <table class="w-full text-sm text-left">
+                                <thead class="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200">
+                                    <tr>
+                                        <th class="px-4 py-3">Tipo de pago</th>
+                                        <th class="px-4 py-3">Cuándo cobrás</th>
+                                        <th class="px-4 py-3 text-right">Comisión</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="detailTableBody" class="divide-y divide-slate-100">
+                                    <!-- JS populated -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="p-3 bg-yellow-50 border-t border-yellow-100 text-xs text-yellow-800">
+                            Las tasas no incluyen IVA ni retenciones. Verificá en la fuente oficial.
+                        </div>
+                    </div>
+
+                    <!-- Official Source -->
+                    <div class="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200">
                         <div>
-                            <h2 id="detailTitle" class="text-2xl font-bold">Nombre Entidad</h2>
-                            <span id="detailType"
-                                class="inline-block mt-2 px-3 py-1 bg-white/20 rounded-full text-xs font-medium backdrop-blur-sm">Tipo</span>
+                            <p class="text-sm font-medium text-slate-700">Fuente oficial de comisiones</p>
+                            <p class="text-xs text-slate-500 mt-0.5">Consultá las tasas actualizadas</p>
                         </div>
-                        <button onclick="closeDetail()"
-                            class="text-white/70 hover:text-white transition-colors text-2xl font-bold">&times;</button>
+                        <a id="detailFeeLink" href="#" target="_blank"
+                            class="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors font-bold text-sm whitespace-nowrap">
+                            Ir al sitio &rarr;
+                        </a>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-0">
-                        <!-- Left: Resources -->
-                        <div class="p-8 border-r border-slate-100">
-                            <h3 class="text-lg font-semibold text-slate-900 mb-6 flex items-center">
-                                <span
-                                    class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3 font-bold text-sm">1</span>
-                                Fuentes Oficiales
-                            </h3>
-
-                            <div class="space-y-6">
-                                <div>
-                                    <label
-                                        class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Link
-                                        a Tabla de Comisiones</label>
-                                    <div class="flex items-center gap-2 group">
-                                        <input type="text" id="detailFeeUrl" readonly
-                                            class="w-full bg-slate-50 border border-slate-200 text-slate-600 text-sm rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none font-mono">
-                                        <button onclick="copyToClipboard('detailFeeUrl')"
-                                            class="p-3 text-slate-400 hover:text-blue-600 bg-white border border-slate-200 rounded-lg transition-colors"
-                                            title="Copiar URL">
-                                            &#x2398;
-                                        </button>
-                                        <a id="detailFeeLink" href="#" target="_blank"
-                                            class="p-3 text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors font-bold text-sm whitespace-nowrap">
-                                            Ir al sitio &rarr;
-                                        </a>
-                                    </div>
-                                    <p class="mt-2 text-xs text-slate-400">Página oficial donde se publican los PDFs o
-                                        tablas actualizadas.</p>
-                                </div>
-
-                                <div id="apiSection">
-                                    <label
-                                        class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Recurso
-                                        para Desarrolladores (API)</label>
-                                    <div class="bg-slate-900 rounded-lg p-4 relative group">
-                                        <code id="detailApiUrl"
-                                            class="text-emerald-400 font-mono text-xs break-all"></code>
-                                        <div
-                                            class="mt-2 pt-2 border-t border-slate-700 flex justify-between items-center">
-                                            <span class="text-slate-400 text-xs">Endpoint Referencia</span>
-                                            <a id="detailApiLink" href="#" target="_blank"
-                                                class="text-xs text-white hover:text-emerald-400 underline decoration-emerald-400/50">Ver
-                                                Documentación</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                    <!-- Developer Section (Collapsed) -->
+                    <details id="apiSection" class="border border-slate-200 rounded-lg">
+                        <summary class="px-4 py-3 cursor-pointer text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors">
+                            Información para desarrolladores
+                        </summary>
+                        <div class="p-4 border-t border-slate-200 bg-slate-900 rounded-b-lg">
+                            <p class="text-xs text-slate-400 mb-2">Endpoint de referencia</p>
+                            <code id="detailApiUrl" class="text-emerald-400 font-mono text-xs break-all block mb-3"></code>
+                            <a id="detailApiLink" href="#" target="_blank"
+                                class="text-xs text-white hover:text-emerald-400 underline decoration-emerald-400/50">
+                                Ver documentación completa &rarr;
+                            </a>
                         </div>
-
-                        <!-- Right: Data Snapshot -->
-                        <div class="p-8 bg-slate-50">
-                            <h3 class="text-lg font-semibold text-slate-900 mb-6 flex items-center">
-                                <span
-                                    class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mr-3 font-bold text-sm">2</span>
-                                Estructura de Costos Típica
-                            </h3>
-                            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                                <div class="overflow-x-auto custom-scroll">
-                                    <table class="w-full text-sm text-left">
-                                        <thead
-                                            class="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200">
-                                            <tr>
-                                                <th class="px-4 py-3">Concepto</th>
-                                                <th class="px-4 py-3">Plazo</th>
-                                                <th class="px-4 py-3 text-right">Tasa Estimada*</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="detailTableBody" class="divide-y divide-slate-100">
-                                            <!-- JS populated -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div class="p-3 bg-yellow-50 border-t border-yellow-100 text-xs text-yellow-800">
-                                    * Las tasas son referenciales y no incluyen IVA ni retenciones impositivas (IIBB,
-                                    Ganancias). Verifique siempre en la fuente oficial.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    </details>
                 </div>
             </div>
         </section>
@@ -374,11 +319,12 @@
                 }
                 const entities = await response.json();
 
+                // Make entities available globally first
+                window.appData = { entities };
+
+                renderHeroMetrics(entities);  // Must run first to set min rates
                 renderChart(entities);
                 renderEntityGrid(entities);
-                
-                // Make entities available globally for button clicks
-                window.appData = { entities };
 
             } catch (error) {
                 console.error("Failed to load entity data:", error);
@@ -389,22 +335,108 @@
 
         function renderEntityGrid(entities) {
             const grid = document.getElementById('entityGrid');
-            grid.innerHTML = entities.map(entity => `
-                <button onclick="showEntityDetail('${entity.id}')"
-                        class="entity-card card-hover animate-entrance opacity-0 bg-white rounded-xl border border-slate-200 p-6 flex flex-col items-center justify-center text-center space-y-3 transition-all h-full group"
-                        style="--entity-color: ${getColorHex(entity.color)}">
-                    <div class="w-12 h-12 rounded-full ${entity.color} text-white flex items-center justify-center font-bold text-lg shadow-md group-hover:scale-110 transition-transform">
-                        ${entity.logo}
+
+            // Group entities by type
+            const groups = {
+                'Bancos tradicionales': entities.filter(e => e.type.includes('Banco')),
+                'Billeteras digitales': entities.filter(e => e.type.includes('Agregador') || e.type.includes('Fintech')),
+                'Procesadores': entities.filter(e => e.type.includes('Procesador'))
+            };
+
+            // Helper to check if entity has lowest fee
+            const hasLowestFee = (entity) => {
+                const extractRate = (rateStr) => {
+                    const match = rateStr.match(/(\d+[\.,]?\d*)/);
+                    return match ? parseFloat(match[0].replace(',', '.')) : null;
+                };
+
+                return entity.fees.some(fee => {
+                    const rate = extractRate(fee.rate);
+                    if (rate === null) return false;
+                    if (fee.concept.includes('Débito') && rate === window.appData?.minDebitRate) return true;
+                    if (fee.concept.includes('Crédito') && rate === window.appData?.minCreditRate) return true;
+                    return false;
+                });
+            };
+
+            // Render grouped layout
+            grid.innerHTML = Object.entries(groups).map(([groupName, groupEntities]) => `
+                <div class="space-y-3">
+                    <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider px-1">${groupName}</h3>
+                    <div class="space-y-3">
+                        ${groupEntities.map(entity => `
+                            <button onclick="showEntityDetail('${entity.id}')"
+                                    class="entity-card card-hover animate-entrance opacity-0 w-full bg-white rounded-xl border border-slate-200 p-4 flex items-center gap-4 transition-all group text-left relative"
+                                    style="--entity-color: ${getColorHex(entity.color)}">
+                                ${hasLowestFee(entity) ? '<span class="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">Menor costo</span>' : ''}
+                                <div class="w-10 h-10 rounded-full ${entity.color} text-white flex items-center justify-center font-bold text-sm shadow-md group-hover:scale-110 transition-transform flex-shrink-0">
+                                    ${entity.logo}
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-bold text-slate-800 text-sm leading-tight">${entity.name}</h4>
+                                </div>
+                                <span class="text-xs font-semibold ${entity.textColor} bg-slate-50 px-2 py-1 rounded flex-shrink-0">
+                                    Ver detalles &rarr;
+                                </span>
+                            </button>
+                        `).join('')}
                     </div>
-                    <div>
-                        <h3 class="font-bold text-slate-800 text-sm leading-tight">${entity.name}</h3>
-                        <p class="text-xs text-slate-500 mt-1">${entity.type}</p>
-                    </div>
-                    <div class="mt-2 text-xs font-semibold ${entity.textColor} bg-slate-50 px-2 py-1 rounded">
-                        Ver Recursos &rarr;
-                    </div>
-                </button>
+                </div>
             `).join('');
+        }
+
+        function renderHeroMetrics(entities) {
+            // Helper to extract numeric rate from fee string
+            const extractRate = (rateStr) => {
+                const match = rateStr.match(/(\d+[\.,]?\d*)/);
+                return match ? parseFloat(match[0].replace(',', '.')) : null;
+            };
+
+            // Find minimum debit fee
+            let minDebit = { rate: Infinity, entities: [] };
+            let minCredit = { rate: Infinity, entities: [] };
+
+            entities.forEach(entity => {
+                entity.fees.forEach(fee => {
+                    const rate = extractRate(fee.rate);
+                    if (rate === null) return;
+
+                    if (fee.concept.includes('Débito')) {
+                        if (rate < minDebit.rate) {
+                            minDebit = { rate, entities: [entity.name] };
+                        } else if (rate === minDebit.rate) {
+                            minDebit.entities.push(entity.name);
+                        }
+                    }
+
+                    if (fee.concept.includes('Crédito')) {
+                        if (rate < minCredit.rate) {
+                            minCredit = { rate, entities: [entity.name] };
+                        } else if (rate === minCredit.rate) {
+                            minCredit.entities.push(entity.name);
+                        }
+                    }
+                });
+            });
+
+            // Update hero section
+            const debitEl = document.getElementById('heroMinDebit');
+            const creditEl = document.getElementById('heroMinCredit');
+
+            if (minDebit.rate !== Infinity) {
+                const entityList = minDebit.entities.join(' / ');
+                debitEl.innerHTML = `${minDebit.rate}% <span class="text-base font-normal text-blue-100">- ${entityList}</span>`;
+            }
+
+            if (minCredit.rate !== Infinity) {
+                const entityList = minCredit.entities.join(' / ');
+                creditEl.innerHTML = `${minCredit.rate}% <span class="text-base font-normal text-blue-100">- ${entityList}</span>`;
+            }
+
+            // Store for use in entity cards
+            window.appData = window.appData || {};
+            window.appData.minDebitRate = minDebit.rate;
+            window.appData.minCreditRate = minCredit.rate;
         }
 
         function showEntityDetail(id) {
@@ -420,13 +452,11 @@
             document.getElementById('detailType').textContent = entity.type;
 
             // Update Resources
-            const feeInput = document.getElementById('detailFeeUrl');
-            feeInput.value = entity.feeUrl;
-
+            // Update fee link
             const feeLink = document.getElementById('detailFeeLink');
             feeLink.href = entity.feeUrl;
 
-            // API Section
+            // API Section (details element)
             const apiSection = document.getElementById('apiSection');
             if (entity.hasApi) {
                 apiSection.style.display = 'block';
@@ -461,57 +491,44 @@
             section.classList.remove('block');
         }
 
-        function copyToClipboard(elementId) {
-            const copyText = document.getElementById(elementId);
-            copyText.select();
-            copyText.setSelectionRange(0, 99999);
-            document.execCommand("copy");
-
-            // Visual feedback (could be improved with a toast)
-            const originalBg = copyText.style.backgroundColor;
-            copyText.style.backgroundColor = '#d1fae5'; // Light green
-            setTimeout(() => {
-                copyText.style.backgroundColor = originalBg;
-            }, 500);
-        }
-
         // --- Visualization Logic ---
         function renderChart(entities) {
             const ctx = document.getElementById('feesChart').getContext('2d');
-
-            // Data representing Typical Max Fees (Not exact, illustrative for comparison)
-            // Banks follow regulations. Fintechs add service fees for speed/tech.
-            const labels = ['Bancos (BNA/Bapro)', 'Fiserv (Procesador)', 'Mercado Pago (Fintech)', 'Ualá (Fintech)'];
 
             // Helper to find a specific fee rate, returns null if not found
             const getRate = (entityId, concept, term) => {
                 const entity = entities.find(e => e.id === entityId);
                 if (!entity) return null;
-                const fee = entity.fees.find(f => f.concept.includes(concept) && f.term.includes(term));
-                // Extract the first number found in the rate string
+                const fee = entity.fees.find(f => f.concept.includes(concept) && (term === '' || f.term.includes(term)));
                 const rateMatch = fee ? fee.rate.match(/(\d+[\.,]?\d*)/) : null;
                 return rateMatch ? parseFloat(rateMatch[0].replace(',', '.')) : null;
             };
 
-            const debitData = [
-                getRate('bna', 'Débito', ''),
-                getRate('fiserv', 'Débito', ''),
-                getRate('mercadopago', 'Débito', 'En el momento'),
-                getRate('uala', 'Débito', 'En el momento')
-            ];
-            const creditStdData = [
-                getRate('bna', 'Crédito', 'días hábiles'),
-                getRate('fiserv', 'Crédito', ''),
-                getRate('mercadopago', 'Crédito', '14 días'),
-                getRate('uala', 'Crédito', 'En el momento') // Uala only has instant
-            ]; 
-            const creditInstantData = [
-                null, 
-                null, 
-                getRate('mercadopago', 'Crédito', 'En el momento'),
-                getRate('uala', 'Crédito', 'En el momento')
+            // Build data for each entity - individual bars
+            const entityData = [
+                { name: 'Banco Nación', id: 'bna' },
+                { name: 'Banco Provincia', id: 'bapro' },
+                { name: 'Mercado Pago', id: 'mercadopago' },
+                { name: 'Ualá', id: 'uala' },
+                { name: 'Fiserv', id: 'fiserv' }
             ];
 
+            const labels = entityData.map(e => e.name);
+
+            // Debit: use standard/immediate rate
+            const debitData = entityData.map(e => {
+                let rate = getRate(e.id, 'Débito', 'En el momento');
+                if (rate === null) rate = getRate(e.id, 'Débito', '');
+                return rate;
+            });
+
+            // Credit: use standard timing (not immediate) for fair comparison
+            const creditData = entityData.map(e => {
+                let rate = getRate(e.id, 'Crédito', '14 días');
+                if (rate === null) rate = getRate(e.id, 'Crédito', 'días hábiles');
+                if (rate === null) rate = getRate(e.id, 'Crédito', '');
+                return rate;
+            });
 
             new Chart(ctx, {
                 type: 'bar',
@@ -519,59 +536,66 @@
                     labels: labels,
                     datasets: [
                         {
-                            label: 'Débito (Estándar)',
+                            label: 'Débito',
                             data: debitData,
-                            backgroundColor: '#3b82f6', // blue-500
+                            backgroundColor: '#3b82f6',
                             borderRadius: 4,
-                            barPercentage: 0.6
+                            barPercentage: 0.7
                         },
                         {
-                            label: 'Crédito (10-14 días)',
-                            data: creditStdData,
-                            backgroundColor: '#6366f1', // indigo-500
+                            label: 'Crédito',
+                            data: creditData,
+                            backgroundColor: '#6366f1',
                             borderRadius: 4,
-                            barPercentage: 0.6
-                        },
-                        {
-                            label: 'Crédito (Inmediato)',
-                            data: creditInstantData,
-                            backgroundColor: '#34d399', // emerald-400
-                            borderRadius: 4,
-                            barPercentage: 0.6
+                            barPercentage: 0.7
                         }
                     ]
                 },
+                plugins: [ChartDataLabels],
                 options: {
+                    indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'bottom' },
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        },
                         tooltip: {
                             callbacks: {
                                 label: function (context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.parsed.y !== null) {
-                                        label += context.parsed.y + '%';
-                                    }
-                                    // Add a note for non-null values
-                                    if (context.raw !== null) {
-                                        label += ' (+IVA aprox.)'
-                                    }
-                                    return label;
+                                    return context.dataset.label + ': ' + context.parsed.x + '% + IVA';
                                 }
+                            }
+                        },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'end',
+                            color: '#334155',
+                            font: {
+                                weight: 'bold',
+                                size: 11
+                            },
+                            formatter: function(value) {
+                                return value !== null ? value + '%' : '';
                             }
                         }
                     },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: { display: true, text: 'Comisión % Estimada' },
-                            grid: { color: '#f1f5f9' }
-                        },
                         x: {
+                            beginAtZero: true,
+                            max: 8,
+                            grid: { color: '#f1f5f9' },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        y: {
                             grid: { display: false }
                         }
                     }
