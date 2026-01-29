@@ -7,11 +7,16 @@
     <title>Monitor de Comisiones y Recursos: Pagos Argentina</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'DM Sans', sans-serif;
             background-color: #f8fafc;
+        }
+
+        /* Typography: Serif headlines for distinction */
+        h1, h2, .hero-title {
+            font-family: 'DM Serif Display', serif;
         }
 
         .chart-container {
@@ -58,6 +63,71 @@
         .custom-scroll::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
+
+        /* Entity card colored top border */
+        .entity-card {
+            border-top: 3px solid var(--entity-color, #94a3b8);
+        }
+
+        /* Status badge subtle pulse animation */
+        .status-badge {
+            animation: pulse-subtle 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Enhanced card hover */
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Page entrance animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-entrance {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        /* Staggered entrance for cards */
+        .entity-card:nth-child(1) { animation-delay: 0.1s; }
+        .entity-card:nth-child(2) { animation-delay: 0.15s; }
+        .entity-card:nth-child(3) { animation-delay: 0.2s; }
+        .entity-card:nth-child(4) { animation-delay: 0.25s; }
+        .entity-card:nth-child(5) { animation-delay: 0.3s; }
+
+        /* Detail modal slide-in animation */
+        .detail-entrance {
+            animation: slideInUp 0.4s ease-out forwards;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Entity-colored header accent */
+        .entity-header-accent {
+            background: linear-gradient(135deg, var(--entity-color, #1e293b) 0%, color-mix(in srgb, var(--entity-color, #1e293b) 70%, black) 100%);
+        }
     </style>
     <!-- Chosen Palette: Slate (Backgrounds/Text) + Blue (Primary) + Emerald (Success/Money) -->
     <!-- Application Structure Plan: 
@@ -81,18 +151,18 @@
 <body class="text-slate-800">
 
     <!-- Navbar -->
-    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <nav class="bg-slate-900 border-b border-slate-700 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center gap-3">
                     <div
-                        class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">
+                        class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold text-xl">
                         M</div>
-                    <span class="font-semibold text-lg tracking-tight text-slate-900">Monitor de Comisiones AR</span>
+                    <span class="font-semibold text-lg tracking-tight text-white">Monitor de Comisiones AR</span>
                 </div>
                 <div class="flex items-center space-x-4">
                     <span
-                        class="text-xs font-medium bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full">Actualizado:
+                        class="text-xs font-medium bg-emerald-500/20 text-emerald-400 px-2.5 py-0.5 rounded-full status-badge">Actualizado:
                         28/01/26</span>
                 </div>
             </div>
@@ -103,7 +173,7 @@
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
         <!-- Intro Section -->
-        <section class="bg-white rounded-xl p-6 shadow-sm border border-slate-100">
+        <section class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 animate-entrance" style="animation-delay: 0.05s; opacity: 0;">
             <h1 class="text-2xl font-bold text-slate-900 mb-2">Recursos de Comisiones y Tasas</h1>
             <p class="text-slate-600 max-w-3xl">
                 Directorio unificado de enlaces oficiales, documentación de API y estructuras de costos para
@@ -124,15 +194,6 @@
                 <!-- Chart Container -->
                 <div class="chart-container">
                     <canvas id="feesChart"></canvas>
-                </div>
-                <div class="mt-4 flex gap-4 text-xs text-slate-500 justify-center">
-                    <div class="flex items-center"><span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>Débito
-                    </div>
-                    <div class="flex items-center"><span class="w-3 h-3 bg-indigo-500 rounded-full mr-2"></span>Crédito
-                        (Estándar)</div>
-                    <div class="flex items-center"><span
-                            class="w-3 h-3 bg-emerald-400 rounded-full mr-2"></span>Liquidez Inmediata (Agregadores)
-                    </div>
                 </div>
             </div>
 
@@ -168,10 +229,10 @@
 
         <!-- Entity Detail View (Dynamic) -->
         <section id="detailSection" class="hidden transition-all duration-500">
-            <div class="bg-white rounded-xl shadow-lg border border-blue-100 overflow-hidden">
+            <div class="detail-entrance bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
                 <div class="p-0">
                     <!-- Dynamic Header -->
-                    <div id="detailHeader" class="bg-slate-900 text-white p-6 flex justify-between items-start">
+                    <div id="detailHeader" class="entity-header-accent text-white p-6 flex justify-between items-start">
                         <div>
                             <h2 id="detailTitle" class="text-2xl font-bold">Nombre Entidad</h2>
                             <span id="detailType"
@@ -283,6 +344,26 @@
         // --- Data Source ---
         // Data is now loaded dynamically from data.json
 
+        // --- Tailwind Color Mapping ---
+        // Maps Tailwind bg-* classes to hex colors for CSS variables
+        const tailwindColors = {
+            'bg-blue-600': '#2563eb',
+            'bg-blue-500': '#3b82f6',
+            'bg-emerald-600': '#059669',
+            'bg-emerald-500': '#10b981',
+            'bg-sky-500': '#0ea5e9',
+            'bg-pink-500': '#ec4899',
+            'bg-orange-500': '#f97316',
+            'bg-indigo-500': '#6366f1',
+            'bg-purple-500': '#a855f7',
+            'bg-red-500': '#ef4444',
+            'bg-slate-600': '#475569'
+        };
+
+        function getColorHex(tailwindClass) {
+            return tailwindColors[tailwindClass] || '#475569';
+        }
+
         // --- Core Functions ---
 
         async function initApp() {
@@ -309,8 +390,9 @@
         function renderEntityGrid(entities) {
             const grid = document.getElementById('entityGrid');
             grid.innerHTML = entities.map(entity => `
-                <button onclick="showEntityDetail('${entity.id}')" 
-                        class="card-hover bg-white rounded-xl border border-slate-200 p-6 flex flex-col items-center justify-center text-center space-y-3 transition-all h-full group">
+                <button onclick="showEntityDetail('${entity.id}')"
+                        class="entity-card card-hover animate-entrance opacity-0 bg-white rounded-xl border border-slate-200 p-6 flex flex-col items-center justify-center text-center space-y-3 transition-all h-full group"
+                        style="--entity-color: ${getColorHex(entity.color)}">
                     <div class="w-12 h-12 rounded-full ${entity.color} text-white flex items-center justify-center font-bold text-lg shadow-md group-hover:scale-110 transition-transform">
                         ${entity.logo}
                     </div>
@@ -330,7 +412,10 @@
             const entity = entities.find(e => e.id === id);
             if (!entity) return;
 
-            // Update Header
+            // Update Header with entity color
+            const detailHeader = document.getElementById('detailHeader');
+            detailHeader.style.setProperty('--entity-color', getColorHex(entity.color));
+
             document.getElementById('detailTitle').textContent = entity.name;
             document.getElementById('detailType').textContent = entity.type;
 
