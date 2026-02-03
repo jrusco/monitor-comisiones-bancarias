@@ -182,11 +182,11 @@
             .fee-simulator:not(.collapsed)::before {
                 opacity: 1;
             }
+        }
 
-            /* Prevent body scroll when expanded */
-            body:has(.fee-simulator:not(.collapsed)) {
-                overflow: hidden;
-            }
+        /* Fix #5a: Browser-compatible scroll lock (replaces :has() selector) */
+        body.simulator-expanded {
+            overflow: hidden;
         }
 
         /* Smooth height transitions for collapse/expand */
@@ -529,6 +529,13 @@
             document.getElementById('ivaToggle').addEventListener('change', handleIVAToggle);
             document.getElementById('toggleSimulator').addEventListener('click', toggleSimulatorCollapse);
 
+            // Fix #5c: Add resize handler to remove scroll lock on desktop
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
+                    document.body.classList.remove('simulator-expanded');
+                }
+            });
+
             // Set initial IVA state
             simulatorState.includeIVA = document.getElementById('ivaToggle').checked;
 
@@ -538,9 +545,21 @@
             // Set initial collapsed state icon
             document.getElementById('toggleIcon').textContent = '+';
 
-            // Set default entity (MercadoPago)
-            entitySelector.value = 'mercadopago';
-            entitySelector.dispatchEvent(new Event('change'));
+            // Fix #2: Defensive default entity selection with fallback
+            const defaultEntityId = 'mercadopago';
+            const defaultEntity = entities.find(e => e.id === defaultEntityId);
+
+            if (defaultEntity) {
+                entitySelector.value = defaultEntityId;
+                entitySelector.dispatchEvent(new Event('change'));
+            } else if (entities.length > 0) {
+                console.warn('Default entity (mercadopago) not found, using first available entity');
+                entitySelector.value = entities[0].id;
+                entitySelector.dispatchEvent(new Event('change'));
+            }
+
+            // Fix #5c: Ensure scroll lock is removed on init
+            document.body.classList.remove('simulator-expanded');
         }
 
         function handleAmountChange(e) {
@@ -573,11 +592,46 @@
             }
 
             const entity = entities.find(e => e.id === entityId);
+
+            // Fix #1: Add null safety check
+            if (!entity) {
+                console.warn(`Entity not found: ${entityId}`);
+                simulatorState.selectedEntity = null;
+                simulatorState.selectedFeeIndex = null;
+                document.getElementById('paymentTypeContainer').classList.add('hidden');
+                recalculateFee();
+                return;
+            }
+
             simulatorState.selectedEntity = entity;
 
             // Populate payment type dropdown
             const paymentTypeSelector = document.getElementById('paymentTypeSelector');
-            paymentTypeSelector.innerHTML = '<option value="">Seleccionar tipo...</option>';
+
+            // Fix #3a: Replace innerHTML with safe DOM manipulation
+            while (paymentTypeSelector.firstChild) {
+                paymentTypeSelector.removeChild(paymentTypeSelector.firstChild);
+            }
+            const placeholderOption = document.createElement('option');
+            placeholderOption.value = '';
+            placeholderOption.textContent = 'Seleccionar tipo...';
+            paymentTypeSelector.appendChild(placeholderOption);
+
+            // Fix #4: Handle empty fees array
+            if (!entity.fees || entity.fees.length === 0) {
+                console.warn(`Entity ${entity.name} has no fees configured`);
+                const noFeesOption = document.createElement('option');
+                noFeesOption.value = '';
+                noFeesOption.textContent = 'Sin comisiones configuradas';
+                noFeesOption.disabled = true;
+                paymentTypeSelector.appendChild(noFeesOption);
+                document.getElementById('paymentTypeContainer').classList.remove('hidden');
+                paymentTypeSelector.disabled = true;
+                simulatorState.selectedFeeIndex = null;
+                recalculateFee();
+                return;
+            }
+            paymentTypeSelector.disabled = false;
 
             entity.fees.forEach((fee, index) => {
                 const option = document.createElement('option');
@@ -618,9 +672,19 @@
         function toggleSimulatorCollapse() {
             const simulator = document.getElementById('feeSimulator');
             const icon = document.getElementById('toggleIcon');
+            const isCollapsed = simulator.classList.contains('collapsed');
 
             simulator.classList.toggle('collapsed');
             icon.textContent = simulator.classList.contains('collapsed') ? '+' : '−';
+
+            // Fix #5b: Toggle body scroll lock for mobile (browser-compatible)
+            if (window.innerWidth <= 768) {
+                if (isCollapsed) {
+                    document.body.classList.add('simulator-expanded');
+                } else {
+                    document.body.classList.remove('simulator-expanded');
+                }
+            }
         }
 
         function recalculateFee() {
@@ -647,7 +711,15 @@
                 resultEl.textContent = '$ -';
                 resultEl.classList.remove('text-red-600');
                 resultEl.classList.add('text-slate-400');
-                breakdownEl.innerHTML = '<span class="text-yellow-600">⚠️ Tasa variable - consultar con proveedor</span>';
+
+                // Fix #3b: Replace innerHTML with safe DOM manipulation
+                while (breakdownEl.firstChild) {
+                    breakdownEl.removeChild(breakdownEl.firstChild);
+                }
+                const warningSpan = document.createElement('span');
+                warningSpan.className = 'text-yellow-600';
+                warningSpan.textContent = '⚠️ Tasa variable - consultar con proveedor';
+                breakdownEl.appendChild(warningSpan);
                 return;
             }
 
@@ -686,8 +758,16 @@
             const amountText = formatCurrency(simulatorState.amount);
 
             if (fee.rate.includes('-')) {
-                // Rate is a range
-                breakdownEl.innerHTML = `${baseRate}%${ivaText} sobre $${amountText}<br><span class="text-blue-600">ℹ️ Tasa desde ${baseRate}% (puede variar)</span>`;
+                // Fix #3c: Replace innerHTML with safe DOM manipulation
+                while (breakdownEl.firstChild) {
+                    breakdownEl.removeChild(breakdownEl.firstChild);
+                }
+                breakdownEl.appendChild(document.createTextNode(`${baseRate}%${ivaText} sobre $${amountText}`));
+                breakdownEl.appendChild(document.createElement('br'));
+                const infoSpan = document.createElement('span');
+                infoSpan.className = 'text-blue-600';
+                infoSpan.textContent = `ℹ️ Tasa desde ${baseRate}% (puede variar)`;
+                breakdownEl.appendChild(infoSpan);
             } else {
                 breakdownEl.textContent = `${baseRate}%${ivaText} sobre $${amountText}`;
             }
