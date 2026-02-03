@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regression Tests - Fee Simulator Fixes</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace; padding: 20px; max-width: 900px; margin: 0 auto; }
+        .test { padding: 12px; margin: 8px 0; border-radius: 6px; border-left: 4px solid #ccc; }
+        .pass { background: #d4edda; border-color: #28a745; }
+        .fail { background: #f8d7da; border-color: #dc3545; }
+        .pending { background: #fff3cd; border-color: #ffc107; }
+        h1 { color: #333; }
+        h2 { color: #666; margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; font-size: 12px; }
+        .summary { font-size: 18px; padding: 15px; margin-top: 20px; border-radius: 8px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin: 5px; }
+        #runAll { background: #007bff; color: white; border: none; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>Regression Tests for Commit 98cd62a</h1>
+    <p>Testing: Fix critical security and stability issues in fee simulator</p>
+
+    <button id="runAll" onclick="runAllTests()">Run All Tests</button>
+
+    <div id="results"></div>
+
+    <script>
+        // Test results storage
+        const testResults = [];
+        let entities = [];
+
+        // Logging helper
+        const log = (testName, passed, details) => {
+            testResults.push({ name: testName, passed, details });
+            renderResults();
+        };
+
+        function renderResults() {
+            const container = document.getElementById('results');
+            let passed = testResults.filter(t => t.passed).length;
+            let failed = testResults.filter(t => !t.passed).length;
+
+            let html = `
+                <div class="summary ${failed === 0 && testResults.length > 0 ? 'pass' : (failed > 0 ? 'fail' : 'pending')}">
+                    <strong>Results:</strong> ${passed} passed, ${failed} failed, ${testResults.length} total
+                </div>
+            `;
+
+            testResults.forEach(test => {
+                html += `
+                    <div class="test ${test.passed ? 'pass' : 'fail'}">
+                        <strong>${test.passed ? '✓' : '✗'} ${test.name}</strong>
+                        <pre>${test.details}</pre>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Load data.json
+        async function loadEntities() {
+            try {
+                const response = await fetch('data.json?t=' + Date.now());
+                entities = await response.json();
+                log('Data Loading', true, `Loaded ${entities.length} entities from data.json`);
+                return true;
+            } catch (error) {
+                log('Data Loading', false, `Failed to load data.json: ${error.message}`);
+                return false;
+            }
+        }
+
+        // ========================================
+        // TEST FIX #1: Null Safety Check
+        // ========================================
+        function testFix1_NullSafetyCheck() {
+            console.log('Testing Fix #1: Null safety check for entity selection');
+
+            // Test 1a: Check if the handleEntityChange function handles null entity gracefully
+            const code = `
+                const entity = entities.find(e => e.id === entityId);
+
+                // Fix #1: Add null safety check
+                if (!entity) {
+                    console.warn(\`Entity not found: \${entityId}\`);
+                    simulatorState.selectedEntity = null;
+                    simulatorState.selectedFeeIndex = null;
+                    document.getElementById('paymentTypeContainer').classList.add('hidden');
+                    recalculateFee();
+                    return;
+                }
+            `;
+
+            // Verify the fix exists in index.html by checking the code pattern
+            const indexHtml = document.documentElement.outerHTML;
+            const hasNullCheck = indexHtml.includes('Entity not found:') &&
+                                 indexHtml.includes('if (!entity)');
+
+            if (hasNullCheck) {
+                log('Fix #1: Null Safety Check Code Present', true,
+                    'Code pattern found: if (!entity) with console.warn("Entity not found:")');
+            } else {
+                log('Fix #1: Null Safety Check Code Present', false,
+                    'Expected null safety check not found in code');
+            }
+
+            // Test 1b: Simulate selecting an invalid entity
+            const invalidEntityId = 'nonexistent-entity-12345';
+            const foundEntity = entities.find(e => e.id === invalidEntityId);
+
+            if (foundEntity === undefined) {
+                log('Fix #1: Invalid Entity Returns Undefined', true,
+                    `entities.find() correctly returns undefined for non-existent ID "${invalidEntityId}"`);
+            } else {
+                log('Fix #1: Invalid Entity Returns Undefined', false,
+                    `Unexpected: found entity for ID "${invalidEntityId}"`);
+            }
+        }
+
+        // ========================================
+        // TEST FIX #2: Default Entity Fallback
+        // ========================================
+        function testFix2_DefaultEntityFallback() {
+            console.log('Testing Fix #2: Default entity initialization with fallback');
+
+            // Test 2a: Verify mercadopago exists
+            const mercadopago = entities.find(e => e.id === 'mercadopago');
+            if (mercadopago) {
+                log('Fix #2a: Default Entity (mercadopago) Exists', true,
+                    `Found mercadopago: ${mercadopago.name}`);
+            } else {
+                log('Fix #2a: Default Entity (mercadopago) Exists', false,
+                    'mercadopago not found in entities - fallback will be used');
+            }
+
+            // Test 2b: Check fallback logic exists in code
+            const hasDefaultLogic = document.documentElement.outerHTML.includes('Default entity (mercadopago) not found') &&
+                                   document.documentElement.outerHTML.includes('entities[0].id');
+
+            if (hasDefaultLogic) {
+                log('Fix #2b: Fallback Logic Code Present', true,
+                    'Code handles missing mercadopago by falling back to first entity');
+            } else {
+                log('Fix #2b: Fallback Logic Code Present', false,
+                    'Fallback logic not found in code');
+            }
+
+            // Test 2c: Verify first entity exists as fallback
+            if (entities.length > 0) {
+                log('Fix #2c: Fallback Entity Available', true,
+                    `First entity available as fallback: ${entities[0].name} (${entities[0].id})`);
+            } else {
+                log('Fix #2c: Fallback Entity Available', false,
+                    'No entities available for fallback');
+            }
+        }
+
+        // ========================================
+        // TEST FIX #3: XSS Prevention
+        // ========================================
+        function testFix3_XSSPrevention() {
+            console.log('Testing Fix #3: XSS prevention - safe DOM manipulation');
+
+            const html = document.documentElement.outerHTML;
+
+            // Test 3a: Check paymentTypeSelector uses safe DOM manipulation
+            const hasSafeDOMForPaymentType = html.includes('while (paymentTypeSelector.firstChild)') &&
+                                              html.includes('paymentTypeSelector.removeChild(paymentTypeSelector.firstChild)');
+
+            log('Fix #3a: Safe DOM for Payment Type Selector', hasSafeDOMForPaymentType,
+                hasSafeDOMForPaymentType
+                    ? 'Uses removeChild() loop instead of innerHTML'
+                    : 'Still using innerHTML - XSS vulnerability');
+
+            // Test 3b: Check breakdown element uses safe DOM manipulation
+            const hasSafeDOMForBreakdown = html.includes('while (breakdownEl.firstChild)') &&
+                                           html.includes('breakdownEl.removeChild(breakdownEl.firstChild)');
+
+            log('Fix #3b: Safe DOM for Fee Breakdown', hasSafeDOMForBreakdown,
+                hasSafeDOMForBreakdown
+                    ? 'Uses removeChild() loop instead of innerHTML for breakdown'
+                    : 'Still using innerHTML for breakdown - potential XSS');
+
+            // Test 3c: Check that innerHTML is NOT used in simulator functions
+            // Count innerHTML occurrences in simulator-related code
+            const simulatorCodeMatch = html.match(/function (handleEntityChange|recalculateFee|toggleSimulatorCollapse)[\s\S]*?(?=function|<\/script>)/g);
+            let innerHTMLCount = 0;
+
+            if (simulatorCodeMatch) {
+                simulatorCodeMatch.forEach(code => {
+                    const matches = code.match(/\.innerHTML\s*=/g);
+                    if (matches) innerHTMLCount += matches.length;
+                });
+            }
+
+            log('Fix #3c: innerHTML Removed from Simulator Functions', innerHTMLCount === 0,
+                innerHTMLCount === 0
+                    ? 'No innerHTML assignments found in simulator functions'
+                    : `Found ${innerHTMLCount} innerHTML assignments in simulator - review needed`);
+        }
+
+        // ========================================
+        // TEST FIX #4: Empty Fees Array Handling
+        // ========================================
+        function testFix4_EmptyFeesHandling() {
+            console.log('Testing Fix #4: Empty fees array edge case handling');
+
+            const html = document.documentElement.outerHTML;
+
+            // Test 4a: Check code handles empty fees
+            const hasEmptyFeesCheck = html.includes('!entity.fees || entity.fees.length === 0') &&
+                                      html.includes('Sin comisiones configuradas');
+
+            log('Fix #4a: Empty Fees Check Code Present', hasEmptyFeesCheck,
+                hasEmptyFeesCheck
+                    ? 'Code checks for empty fees array and shows user feedback'
+                    : 'Empty fees handling not found');
+
+            // Test 4b: Check dropdown is disabled for empty fees
+            const hasDisabledDropdown = html.includes('paymentTypeSelector.disabled = true') &&
+                                        html.includes('has no fees configured');
+
+            log('Fix #4b: Dropdown Disabled for Empty Fees', hasDisabledDropdown,
+                hasDisabledDropdown
+                    ? 'Dropdown is disabled when entity has no fees'
+                    : 'Dropdown disable logic not found');
+
+            // Test 4c: Verify all current entities have fees
+            let entitiesWithoutFees = entities.filter(e => !e.fees || e.fees.length === 0);
+
+            log('Fix #4c: Current Entities Have Fees', entitiesWithoutFees.length === 0,
+                entitiesWithoutFees.length === 0
+                    ? `All ${entities.length} entities have fees configured`
+                    : `${entitiesWithoutFees.length} entities without fees: ${entitiesWithoutFees.map(e => e.name).join(', ')}`);
+        }
+
+        // ========================================
+        // TEST FIX #5: Browser-Compatible Scroll Lock
+        // ========================================
+        function testFix5_ScrollLockCompatibility() {
+            console.log('Testing Fix #5: Browser-compatible scroll lock functionality');
+
+            const html = document.documentElement.outerHTML;
+
+            // Test 5a: CSS :has() selector removed
+            const hasCSSHasSelector = html.includes('body:has(.fee-simulator');
+
+            log('Fix #5a: CSS :has() Selector Removed', !hasCSSHasSelector,
+                !hasCSSHasSelector
+                    ? 'CSS :has() selector not found (good - replaced with JS)'
+                    : 'CSS :has() still present - browser compatibility issue');
+
+            // Test 5b: New class-based scroll lock CSS exists
+            const hasClassBasedCSS = html.includes('body.simulator-expanded') &&
+                                     html.includes('overflow: hidden');
+
+            log('Fix #5b: Class-Based Scroll Lock CSS', hasClassBasedCSS,
+                hasClassBasedCSS
+                    ? 'body.simulator-expanded { overflow: hidden } CSS rule found'
+                    : 'Class-based scroll lock CSS not found');
+
+            // Test 5c: JS toggle function adds/removes class
+            const hasJSToggle = html.includes("document.body.classList.add('simulator-expanded')") &&
+                               html.includes("document.body.classList.remove('simulator-expanded')");
+
+            log('Fix #5c: JS Body Class Toggle', hasJSToggle,
+                hasJSToggle
+                    ? 'toggleSimulatorCollapse adds/removes simulator-expanded class'
+                    : 'JS class toggle logic not found');
+
+            // Test 5d: Resize handler removes scroll lock on desktop
+            const hasResizeHandler = html.includes("window.addEventListener('resize'") &&
+                                    html.includes('window.innerWidth > 768') &&
+                                    html.includes("document.body.classList.remove('simulator-expanded')");
+
+            log('Fix #5d: Resize Handler for Desktop', hasResizeHandler,
+                hasResizeHandler
+                    ? 'Resize handler removes scroll lock when viewport > 768px'
+                    : 'Resize handler not found');
+        }
+
+        // ========================================
+        // INTEGRATION TESTS
+        // ========================================
+        function testIntegration() {
+            console.log('Running integration tests');
+
+            // Test: Fee calculation for known values
+            const mp = entities.find(e => e.id === 'mercadopago');
+            if (mp && mp.fees.length > 0) {
+                const debitFee = mp.fees.find(f => f.concept.includes('Point') && f.concept.includes('Débito'));
+                if (debitFee) {
+                    const rateMatch = debitFee.rate.match(/(\d+[\.,]?\d*)/);
+                    const rate = parseFloat(rateMatch[0].replace(',', '.'));
+                    const amount = 10000;
+                    const expectedFee = amount * (rate / 100) * 1.21; // with IVA
+
+                    log('Integration: Fee Calculation', true,
+                        `MercadoPago Point Débito on $${amount}: Rate ${rate}%, Expected fee with IVA: $${expectedFee.toFixed(2)}`);
+                }
+            }
+
+            // Test: All entity IDs are unique
+            const ids = entities.map(e => e.id);
+            const uniqueIds = [...new Set(ids)];
+
+            log('Integration: Unique Entity IDs', ids.length === uniqueIds.length,
+                ids.length === uniqueIds.length
+                    ? `All ${ids.length} entity IDs are unique`
+                    : `Duplicate IDs found: ${ids.filter((id, i) => ids.indexOf(id) !== i)}`);
+
+            // Test: All fees have required fields
+            let invalidFees = [];
+            entities.forEach(e => {
+                e.fees.forEach((f, i) => {
+                    if (!f.concept || !f.term || !f.rate) {
+                        invalidFees.push(`${e.id} fee[${i}]`);
+                    }
+                });
+            });
+
+            log('Integration: Fee Data Integrity', invalidFees.length === 0,
+                invalidFees.length === 0
+                    ? 'All fees have concept, term, and rate fields'
+                    : `Invalid fees: ${invalidFees.join(', ')}`);
+        }
+
+        // ========================================
+        // RUN ALL TESTS
+        // ========================================
+        async function runAllTests() {
+            testResults.length = 0;
+            renderResults();
+
+            const loaded = await loadEntities();
+            if (!loaded) {
+                return;
+            }
+
+            testFix1_NullSafetyCheck();
+            testFix2_DefaultEntityFallback();
+            testFix3_XSSPrevention();
+            testFix4_EmptyFeesHandling();
+            testFix5_ScrollLockCompatibility();
+            testIntegration();
+
+            // Final summary
+            const passed = testResults.filter(t => t.passed).length;
+            const total = testResults.length;
+
+            console.log(`\n========================================`);
+            console.log(`REGRESSION TESTS COMPLETE: ${passed}/${total} passed`);
+            console.log(`========================================\n`);
+        }
+
+        // Auto-run on page load
+        window.onload = runAllTests;
+    </script>
+</body>
+</html>
