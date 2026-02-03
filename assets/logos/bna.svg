@@ -1,4 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-  <circle cx="32" cy="32" r="30" fill="#38bdf8"/>
-  <text x="32" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold" font-size="18" fill="white">BNA</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 50">
+  <!-- Banco Nación logo with white text for visibility on teal background -->
+  <defs>
+    <style>
+      .bna-text { fill: #FFFFFF; font-family: Arial, Helvetica, sans-serif; font-weight: 700; }
+    </style>
+  </defs>
+  <text x="70" y="22" class="bna-text" font-size="18" text-anchor="middle">BANCO</text>
+  <text x="70" y="40" class="bna-text" font-size="18" text-anchor="middle">NACIÓN</text>
 </svg>
