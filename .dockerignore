@@ -1,0 +1,27 @@
+# Git
+.git
+.gitignore
+
+# Go source files (not needed for static site serving)
+cmd/
+internal/
+go.mod
+go.sum
+
+# Documentation
+*.md
+LICENSE
+
+# GitHub workflows
+.github/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
