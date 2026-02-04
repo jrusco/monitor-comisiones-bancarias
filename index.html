@@ -143,6 +143,11 @@
             overflow-y: auto;
         }
 
+        .simulator-header {
+            cursor: pointer;
+            user-select: none; /* Prevent text selection when clicking */
+        }
+
         /* Collapsed state */
         .fee-simulator.collapsed .simulator-body {
             display: none;
@@ -406,7 +411,7 @@
     <aside id="feeSimulator" class="fee-simulator collapsed animate-entrance" style="opacity: 0; animation-delay: 0.35s;">
         <div class="simulator-container bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
             <!-- Header -->
-            <div class="simulator-header bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-3 flex justify-between items-center">
+            <div id="simulatorHeader" class="simulator-header bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-3 flex justify-between items-center">
                 <h3 class="text-sm font-bold flex items-center gap-2">
                     <span class="text-lg">💰</span>
                     <span>Simulador de Comisiones</span>
@@ -428,11 +433,11 @@
                         <input
                             type="number"
                             id="saleAmount"
-                            value="0"
                             placeholder="0.00"
                             min="0"
                             max="99999999"
                             step="0.01"
+                            autocomplete="off"
                             aria-label="Monto de la venta en pesos argentinos"
                             aria-describedby="feeResult"
                             class="w-full pl-7 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
@@ -576,7 +581,7 @@
             document.getElementById('entitySelector').addEventListener('change', handleEntityChange);
             document.getElementById('paymentTypeSelector').addEventListener('change', handlePaymentTypeChange);
             document.getElementById('ivaToggle').addEventListener('change', handleIVAToggle);
-            document.getElementById('toggleSimulator').addEventListener('click', toggleSimulatorCollapse);
+            document.getElementById('simulatorHeader').addEventListener('click', toggleSimulatorCollapse);
 
             // Fix #5c: Add resize handler to remove scroll lock on desktop
             window.addEventListener('resize', () => {
