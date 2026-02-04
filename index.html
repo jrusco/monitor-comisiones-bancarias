@@ -217,6 +217,43 @@
             padding: 0.25rem;
             margin: -0.25rem;
         }
+
+        /* Official Brand Colors */
+        .bg-bna-primary { background-color: #057EA3; }  /* Official BNA teal */
+        .text-bna-primary { color: #057EA3; }
+        .border-bna-primary { border-color: #057EA3; }
+
+        .bg-bapro-primary { background-color: #FFFFFF; }
+        .text-bapro-primary { color: #FFFFFF; }
+        .border-bapro-primary { border-color: #FFFFFF; }
+
+        .bg-bapro-dark { background-color: #2E7D32; }
+        .text-bapro-dark { color: #2E7D32; }
+
+        .bg-mercadopago-primary { background-color: #00bcff; }
+        .text-mercadopago-primary { color: #00bcff; }
+        .border-mercadopago-primary { border-color: #00bcff; }
+
+        .bg-mercadopago-dark { background-color: #0a0080; }
+        .text-mercadopago-dark { color: #0a0080; }
+
+        .bg-uala-primary { background-color: #022A9A; }
+        .text-uala-primary { color: #022A9A; }
+        .border-uala-primary { border-color: #022A9A; }
+
+        /* Hover variants */
+        .hover\:bg-bna-primary:hover { background-color: #057EA3; }
+        .hover\:bg-bapro-primary:hover { background-color: #FFFFFF; }
+        .hover\:bg-bapro-dark:hover { background-color: #2E7D32; }
+        .hover\:bg-mercadopago-primary:hover { background-color: #00bcff; }
+        .hover\:bg-uala-primary:hover { background-color: #022A9A; }
+
+        /* Opacity variants for overlays */
+        .bg-bna-primary\/20 { background-color: rgba(5, 126, 163, 0.2); }  /* Updated RGBA for teal */
+        .bg-bapro-primary\/20 { background-color: rgba(255, 255, 255, 0.2); }
+        .bg-bapro-dark\/20 { background-color: rgba(46, 125, 50, 0.2); }
+        .bg-mercadopago-primary\/20 { background-color: rgba(0, 188, 255, 0.2); }
+        .bg-uala-primary\/20 { background-color: rgba(2, 42, 154, 0.2); }
     </style>
     <!-- Chosen Palette: Slate (Backgrounds/Text) + Blue (Primary) + Emerald (Success/Money) -->
     <!-- Application Structure Plan: 
@@ -252,7 +289,7 @@
                 <div class="flex items-center space-x-4">
                     <span
                         class="text-xs font-medium bg-emerald-500/20 text-emerald-400 px-2.5 py-0.5 rounded-full status-badge">Actualizado:
-                        29/01/26</span>
+                        01/02/26</span>
                 </div>
             </div>
         </div>
@@ -300,9 +337,12 @@
             <div class="detail-entrance bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden max-w-2xl mx-auto">
                 <!-- Dynamic Header -->
                 <div id="detailHeader" class="entity-header-accent text-white p-6 flex justify-between items-start">
-                    <div>
-                        <h2 id="detailTitle" class="text-2xl font-bold">Nombre Entidad</h2>
-                        <span id="detailType" class="inline-block mt-2 px-3 py-1 bg-white/20 rounded-full text-xs font-medium backdrop-blur-sm">Tipo</span>
+                    <div class="flex items-center gap-4">
+                        <img id="detailLogo" src="" alt="Logo" class="w-14 h-14 rounded-full bg-white/20 p-1 shadow-lg object-contain">
+                        <div>
+                            <h2 id="detailTitle" class="text-2xl font-bold">Nombre Entidad</h2>
+                            <span id="detailType" class="inline-block mt-2 px-3 py-1 bg-white/20 rounded-full text-xs font-medium backdrop-blur-sm">Tipo</span>
+                        </div>
                     </div>
                     <button onclick="closeDetail()"
                         class="text-white/70 hover:text-white transition-colors text-2xl font-bold">&times;</button>
@@ -480,15 +520,24 @@
         const tailwindColors = {
             'bg-blue-600': '#2563eb',
             'bg-blue-500': '#3b82f6',
+            'bg-sky-400': '#38bdf8',
             'bg-emerald-600': '#059669',
             'bg-emerald-500': '#10b981',
             'bg-sky-500': '#0ea5e9',
+            'bg-amber-400': '#fbbf24',
             'bg-pink-500': '#ec4899',
             'bg-orange-500': '#f97316',
             'bg-indigo-500': '#6366f1',
             'bg-purple-500': '#a855f7',
             'bg-red-500': '#ef4444',
-            'bg-slate-600': '#475569'
+            'bg-slate-600': '#475569',
+            // Official Brand Colors
+            'bg-bna-primary': '#057EA3',  // Official BNA teal
+            'bg-bapro-primary': '#FFFFFF',
+            'bg-bapro-dark': '#2E7D32',
+            'bg-mercadopago-primary': '#00bcff',
+            'bg-mercadopago-dark': '#0a0080',
+            'bg-uala-primary': '#022A9A'
         };
 
         function getColorHex(tailwindClass) {
@@ -834,8 +883,8 @@
                                     class="entity-card card-hover animate-entrance opacity-0 w-full bg-white rounded-xl border border-slate-200 p-4 flex items-center gap-4 transition-all group text-left relative"
                                     style="--entity-color: ${getColorHex(entity.color)}">
                                 ${hasLowestFee(entity) ? '<span class="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">Menor costo</span>' : ''}
-                                <div class="w-10 h-10 rounded-full ${entity.color} text-white flex items-center justify-center font-bold text-sm shadow-md group-hover:scale-110 transition-transform flex-shrink-0">
-                                    ${entity.logo}
+                                <div class="w-10 h-10 rounded-full ${entity.color} flex items-center justify-center shadow-md group-hover:scale-110 transition-transform flex-shrink-0 overflow-hidden">
+                                    ${entity.logoUrl ? `<img src="${entity.logoUrl}" alt="${entity.name}" class="w-full h-full object-contain">` : `<span class="text-white font-bold text-sm">${entity.logo}</span>`}
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <h4 class="font-bold text-slate-800 text-sm leading-tight">${entity.name}</h4>
@@ -913,10 +962,12 @@
             const entity = entities.find(e => e.id === id);
             if (!entity) return;
 
-            // Update Header with entity color
+            // Update Header with entity color and logo
             const detailHeader = document.getElementById('detailHeader');
             detailHeader.style.setProperty('--entity-color', getColorHex(entity.color));
 
+            document.getElementById('detailLogo').src = entity.logoUrl || '';
+            document.getElementById('detailLogo').alt = entity.name + ' Logo';
             document.getElementById('detailTitle').textContent = entity.name;
             document.getElementById('detailType').textContent = entity.type;
 
@@ -1013,14 +1064,14 @@
                         {
                             label: 'Débito',
                             data: debitData,
-                            backgroundColor: '#3b82f6',
+                            backgroundColor: '#14b8a6',
                             borderRadius: 4,
                             barPercentage: 0.7
                         },
                         {
                             label: 'Crédito',
                             data: creditData,
-                            backgroundColor: '#6366f1',
+                            backgroundColor: '#8b5cf6',
                             borderRadius: 4,
                             barPercentage: 0.7
                         }
