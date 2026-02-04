@@ -104,7 +104,7 @@
         "color": "bg-uala-primary",
         "textColor": "text-uala-primary",
         "logo": "UA",
-        "logoUrl": "assets/logos/uala.svg",
+        "logoUrl": "assets/logos/uala-logo.png",
         "feeUrl": "https://mpos.ualabis.com.ar/productos/mpos/",
         "apiUrl": "https://api.uala.com.ar/merchant/v1/fees (Requiere Auth)",
         "apiDocs": "https://desarrolladores.uala.com.ar/",
