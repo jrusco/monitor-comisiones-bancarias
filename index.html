@@ -129,6 +129,100 @@
             background: linear-gradient(135deg, var(--entity-color, #1e293b) 0%, color-mix(in srgb, var(--entity-color, #1e293b) 70%, black) 100%);
         }
 
+        /* Transaction Fee Simulator Widget */
+        .fee-simulator {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 320px;
+            z-index: 40; /* Below navbar (50) but above content */
+        }
+
+        .simulator-container {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .simulator-header {
+            cursor: pointer;
+            user-select: none; /* Prevent text selection when clicking */
+        }
+
+        /* Collapsed state */
+        .fee-simulator.collapsed .simulator-body {
+            display: none;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .fee-simulator {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                width: 100%;
+                border-radius: 12px 12px 0 0 !important;
+            }
+
+            .fee-simulator .simulator-container {
+                border-radius: 12px 12px 0 0 !important;
+                max-height: 70vh;
+            }
+
+            /* Mobile backdrop overlay */
+            .fee-simulator::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.3);
+                z-index: -1;
+                opacity: 0;
+                transition: opacity 0.3s;
+                pointer-events: none;
+            }
+
+            .fee-simulator:not(.collapsed)::before {
+                opacity: 1;
+            }
+        }
+
+        /* Fix #5a: Browser-compatible scroll lock (replaces :has() selector) */
+        body.simulator-expanded {
+            overflow: hidden;
+        }
+
+        /* Smooth height transitions for collapse/expand */
+        .simulator-body {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Input number spin buttons (remove) */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        /* Visual feedback for calculation update */
+        @keyframes resultUpdate {
+            0% { background-color: #fee2e2; }
+            100% { background-color: transparent; }
+        }
+
+        .result-updated {
+            animation: resultUpdate 0.5s ease-out;
+            border-radius: 0.5rem;
+            padding: 0.25rem;
+            margin: -0.25rem;
+        }
+
         /* Official Brand Colors */
         .bg-bna-primary { background-color: #057EA3; }  /* Official BNA teal */
         .text-bna-primary { color: #057EA3; }
@@ -313,6 +407,103 @@
 
     </main>
 
+    <!-- Transaction Fee Simulator Widget -->
+    <aside id="feeSimulator" class="fee-simulator collapsed animate-entrance" style="opacity: 0; animation-delay: 0.35s;">
+        <div class="simulator-container bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+            <!-- Header -->
+            <div id="simulatorHeader" class="simulator-header bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-3 flex justify-between items-center">
+                <h3 class="text-sm font-bold flex items-center gap-2">
+                    <span class="text-lg">💰</span>
+                    <span>Simulador de Comisiones</span>
+                </h3>
+                <button id="toggleSimulator" class="text-white/80 hover:text-white transition-colors">
+                    <span id="toggleIcon">−</span>
+                </button>
+            </div>
+
+            <!-- Body (collapsible) -->
+            <div id="simulatorBody" class="simulator-body p-4 space-y-4">
+                <!-- Amount Input -->
+                <div>
+                    <label for="saleAmount" class="block text-xs font-medium text-slate-600 mb-1">
+                        Monto de venta
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">$</span>
+                        <input
+                            type="number"
+                            id="saleAmount"
+                            placeholder="0.00"
+                            min="0"
+                            max="99999999"
+                            step="0.01"
+                            autocomplete="off"
+                            aria-label="Monto de la venta en pesos argentinos"
+                            aria-describedby="feeResult"
+                            class="w-full pl-7 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                        />
+                    </div>
+                </div>
+
+                <!-- Entity Selector -->
+                <div>
+                    <label for="entitySelector" class="block text-xs font-medium text-slate-600 mb-1">
+                        Procesador de pagos
+                    </label>
+                    <select
+                        id="entitySelector"
+                        class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white"
+                    >
+                        <option value="">Seleccionar procesador...</option>
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+
+                <!-- Payment Type Selector (populated dynamically) -->
+                <div id="paymentTypeContainer" class="hidden">
+                    <label for="paymentTypeSelector" class="block text-xs font-medium text-slate-600 mb-1">
+                        Tipo de pago
+                    </label>
+                    <select
+                        id="paymentTypeSelector"
+                        class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white"
+                    >
+                        <option value="">Seleccionar tipo...</option>
+                        <!-- Populated by JS when entity is selected -->
+                    </select>
+                </div>
+
+                <!-- IVA Toggle -->
+                <div>
+                    <label class="flex items-center gap-2 cursor-pointer group">
+                        <input
+                            type="checkbox"
+                            id="ivaToggle"
+                            class="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500 cursor-pointer"
+                            checked
+                        />
+                        <span class="text-sm text-slate-700 group-hover:text-slate-900 transition-colors">
+                            Incluir IVA (21%)
+                        </span>
+                    </label>
+                </div>
+
+                <!-- Result Display -->
+                <div class="pt-2 border-t border-slate-200">
+                    <p class="text-xs font-semibold text-red-600 uppercase tracking-wide mb-1">
+                        💳 Vas a pagar en comisión
+                    </p>
+                    <p id="feeResult" class="text-2xl font-bold text-red-600 font-mono">
+                        $ 0,00
+                    </p>
+                    <p id="feeBreakdown" class="text-xs text-slate-500 mt-1">
+                        <!-- Shows percentage used -->
+                    </p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
     <footer class="bg-slate-900 text-slate-400 py-12 mt-12 border-t border-slate-800">
         <div class="max-w-7xl mx-auto px-4 text-center">
             <p class="mb-4">Monitor de Recursos Financieros Argentina</p>
@@ -358,6 +549,284 @@
             return tailwindColors[tailwindClass] || '#475569';
         }
 
+        // --- Transaction Fee Simulator Logic ---
+
+        const simulatorState = {
+            amount: 0,
+            selectedEntity: null,
+            selectedFeeIndex: null,
+            includeIVA: true
+        };
+
+        // Helper: Format currency with Argentine locale (thousands separator)
+        function formatCurrency(amount) {
+            return amount.toLocaleString('es-AR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function initSimulator(entities) {
+            // Populate entity selector
+            const entitySelector = document.getElementById('entitySelector');
+            entities.forEach(entity => {
+                const option = document.createElement('option');
+                option.value = entity.id;
+                option.textContent = entity.name;
+                entitySelector.appendChild(option);
+            });
+
+            // Event listeners
+            document.getElementById('saleAmount').addEventListener('input', handleAmountChange);
+            document.getElementById('entitySelector').addEventListener('change', handleEntityChange);
+            document.getElementById('paymentTypeSelector').addEventListener('change', handlePaymentTypeChange);
+            document.getElementById('ivaToggle').addEventListener('change', handleIVAToggle);
+            document.getElementById('simulatorHeader').addEventListener('click', toggleSimulatorCollapse);
+
+            // Fix #5c: Add resize handler to remove scroll lock on desktop
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
+                    document.body.classList.remove('simulator-expanded');
+                }
+            });
+
+            // Set initial IVA state
+            simulatorState.includeIVA = document.getElementById('ivaToggle').checked;
+
+            // Set initial amount
+            simulatorState.amount = 0;
+
+            // Set initial collapsed state icon
+            document.getElementById('toggleIcon').textContent = '+';
+
+            // Fix #2: Defensive default entity selection with fallback
+            const defaultEntityId = 'mercadopago';
+            const defaultEntity = entities.find(e => e.id === defaultEntityId);
+
+            if (defaultEntity) {
+                entitySelector.value = defaultEntityId;
+                entitySelector.dispatchEvent(new Event('change'));
+            } else if (entities.length > 0) {
+                console.warn('Default entity (mercadopago) not found, using first available entity');
+                entitySelector.value = entities[0].id;
+                entitySelector.dispatchEvent(new Event('change'));
+            }
+
+            // Fix #5c: Ensure scroll lock is removed on init
+            document.body.classList.remove('simulator-expanded');
+        }
+
+        function handleAmountChange(e) {
+            let value = parseFloat(e.target.value) || 0;
+
+            // Validate and clamp to reasonable range
+            if (value < 0) {
+                value = 0;
+                e.target.value = 0;
+            }
+            if (value > 99999999) { // ~100 million pesos max
+                value = 99999999;
+                e.target.value = 99999999;
+            }
+
+            simulatorState.amount = value;
+            recalculateFee();
+        }
+
+        function handleEntityChange(e) {
+            const entityId = e.target.value;
+            const entities = window.appData.entities;
+
+            if (!entityId) {
+                simulatorState.selectedEntity = null;
+                simulatorState.selectedFeeIndex = null;
+                document.getElementById('paymentTypeContainer').classList.add('hidden');
+                recalculateFee();
+                return;
+            }
+
+            const entity = entities.find(e => e.id === entityId);
+
+            // Fix #1: Add null safety check
+            if (!entity) {
+                console.warn(`Entity not found: ${entityId}`);
+                simulatorState.selectedEntity = null;
+                simulatorState.selectedFeeIndex = null;
+                document.getElementById('paymentTypeContainer').classList.add('hidden');
+                recalculateFee();
+                return;
+            }
+
+            simulatorState.selectedEntity = entity;
+
+            // Populate payment type dropdown
+            const paymentTypeSelector = document.getElementById('paymentTypeSelector');
+
+            // Fix #3a: Replace innerHTML with safe DOM manipulation
+            while (paymentTypeSelector.firstChild) {
+                paymentTypeSelector.removeChild(paymentTypeSelector.firstChild);
+            }
+            const placeholderOption = document.createElement('option');
+            placeholderOption.value = '';
+            placeholderOption.textContent = 'Seleccionar tipo...';
+            paymentTypeSelector.appendChild(placeholderOption);
+
+            // Fix #4: Handle empty fees array
+            if (!entity.fees || entity.fees.length === 0) {
+                console.warn(`Entity ${entity.name} has no fees configured`);
+                const noFeesOption = document.createElement('option');
+                noFeesOption.value = '';
+                noFeesOption.textContent = 'Sin comisiones configuradas';
+                noFeesOption.disabled = true;
+                paymentTypeSelector.appendChild(noFeesOption);
+                document.getElementById('paymentTypeContainer').classList.remove('hidden');
+                paymentTypeSelector.disabled = true;
+                simulatorState.selectedFeeIndex = null;
+                recalculateFee();
+                return;
+            }
+            paymentTypeSelector.disabled = false;
+
+            entity.fees.forEach((fee, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = `${fee.concept} - ${fee.term}`;
+                paymentTypeSelector.appendChild(option);
+            });
+
+            // Show payment type selector
+            document.getElementById('paymentTypeContainer').classList.remove('hidden');
+
+            // Auto-select QR for MercadoPago
+            if (entityId === 'mercadopago') {
+                const qrIndex = entity.fees.findIndex(fee => fee.concept.includes('QR'));
+                if (qrIndex !== -1) {
+                    paymentTypeSelector.value = qrIndex;
+                    paymentTypeSelector.dispatchEvent(new Event('change'));
+                    return; // Skip the reset below
+                }
+            }
+
+            // Reset fee selection
+            simulatorState.selectedFeeIndex = null;
+            recalculateFee();
+        }
+
+        function handlePaymentTypeChange(e) {
+            const feeIndex = e.target.value;
+            simulatorState.selectedFeeIndex = feeIndex !== '' ? parseInt(feeIndex) : null;
+            recalculateFee();
+        }
+
+        function handleIVAToggle(e) {
+            simulatorState.includeIVA = e.target.checked;
+            recalculateFee();
+        }
+
+        function toggleSimulatorCollapse() {
+            const simulator = document.getElementById('feeSimulator');
+            const icon = document.getElementById('toggleIcon');
+            const isCollapsed = simulator.classList.contains('collapsed');
+
+            simulator.classList.toggle('collapsed');
+            icon.textContent = simulator.classList.contains('collapsed') ? '+' : '−';
+
+            // Fix #5b: Toggle body scroll lock for mobile (browser-compatible)
+            if (window.innerWidth <= 768) {
+                if (isCollapsed) {
+                    document.body.classList.add('simulator-expanded');
+                } else {
+                    document.body.classList.remove('simulator-expanded');
+                }
+            }
+        }
+
+        function recalculateFee() {
+            const resultEl = document.getElementById('feeResult');
+            const breakdownEl = document.getElementById('feeBreakdown');
+
+            // Validate inputs
+            if (!simulatorState.amount || !simulatorState.selectedEntity || simulatorState.selectedFeeIndex === null) {
+                resultEl.textContent = '$ 0,00';
+                resultEl.classList.remove('result-updated', 'text-red-600', 'text-slate-400');
+                resultEl.classList.add('text-slate-900');
+                breakdownEl.textContent = '';
+                return;
+            }
+
+            // Get selected fee
+            const fee = simulatorState.selectedEntity.fees[simulatorState.selectedFeeIndex];
+
+            // Extract numeric rate from fee.rate string (e.g., "3.25% + IVA")
+            const rateMatch = fee.rate.match(/(\d+[\.,]?\d*)/);
+
+            // Handle non-numeric rates (e.g., "Bonificado o Variable")
+            if (!rateMatch) {
+                resultEl.textContent = '$ -';
+                resultEl.classList.remove('text-red-600');
+                resultEl.classList.add('text-slate-400');
+
+                // Fix #3b: Replace innerHTML with safe DOM manipulation
+                while (breakdownEl.firstChild) {
+                    breakdownEl.removeChild(breakdownEl.firstChild);
+                }
+                const warningSpan = document.createElement('span');
+                warningSpan.className = 'text-yellow-600';
+                warningSpan.textContent = '⚠️ Tasa variable - consultar con proveedor';
+                breakdownEl.appendChild(warningSpan);
+                return;
+            }
+
+            // Reset result styling (will be set based on totalFee amount)
+            resultEl.classList.remove('text-slate-400');
+
+            const baseRate = parseFloat(rateMatch[0].replace(',', '.'));
+
+            // Calculate base fee
+            let totalFee = simulatorState.amount * (baseRate / 100);
+
+            // Apply IVA if enabled
+            if (simulatorState.includeIVA) {
+                totalFee = totalFee * 1.21;
+            }
+
+            // Apply color based on fee amount
+            if (totalFee > 0) {
+                resultEl.classList.remove('text-slate-900');
+                resultEl.classList.add('text-red-600');
+            } else {
+                resultEl.classList.remove('text-red-600');
+                resultEl.classList.add('text-slate-900');
+            }
+
+            // Display result with Argentine formatting
+            resultEl.textContent = `$ ${formatCurrency(totalFee)}`;
+
+            // Trigger update animation
+            resultEl.classList.remove('result-updated');
+            void resultEl.offsetWidth; // Force reflow
+            resultEl.classList.add('result-updated');
+
+            // Show breakdown with warning for ranges
+            const ivaText = simulatorState.includeIVA ? ' + IVA' : '';
+            const amountText = formatCurrency(simulatorState.amount);
+
+            if (fee.rate.includes('-')) {
+                // Fix #3c: Replace innerHTML with safe DOM manipulation
+                while (breakdownEl.firstChild) {
+                    breakdownEl.removeChild(breakdownEl.firstChild);
+                }
+                breakdownEl.appendChild(document.createTextNode(`${baseRate}%${ivaText} sobre $${amountText}`));
+                breakdownEl.appendChild(document.createElement('br'));
+                const infoSpan = document.createElement('span');
+                infoSpan.className = 'text-blue-600';
+                infoSpan.textContent = `ℹ️ Tasa desde ${baseRate}% (puede variar)`;
+                breakdownEl.appendChild(infoSpan);
+            } else {
+                breakdownEl.textContent = `${baseRate}%${ivaText} sobre $${amountText}`;
+            }
+        }
+
         // --- Core Functions ---
 
         async function initApp() {
@@ -374,6 +843,7 @@
                 renderHeroMetrics(entities);  // Must run first to set min rates
                 renderChart(entities);
                 renderEntityGrid(entities);
+                initSimulator(entities);  // Initialize fee simulator
 
             } catch (error) {
                 console.error("Failed to load entity data:", error);
@@ -538,6 +1008,13 @@
 
             // Scroll to detail
             section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            // Pre-populate simulator with selected entity
+            const entitySelector = document.getElementById('entitySelector');
+            if (entitySelector && entitySelector.value !== id) {
+                entitySelector.value = id;
+                entitySelector.dispatchEvent(new Event('change'));
+            }
         }
 
         function closeDetail() {
