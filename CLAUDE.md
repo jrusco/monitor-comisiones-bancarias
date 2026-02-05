@@ -109,6 +109,52 @@ if common.UpdateEntityFees(entities, entityID, newFees) {
 }
 ```
 
+## Color Palette
+
+The website uses a consistent color palette based on **Slate neutrals** with **Blue primary** and **Emerald success** accents. Each financial entity has its own official brand color for visual distinction.
+
+### Primary Brand Colors (Financial Entities)
+
+| Entity | Color Name | Hex | RGB |
+|--------|-----------|-----|-----|
+| Banco Nación | Teal | `#057EA3` | RGB(5, 126, 163) |
+| Banco Provincia | Green | `#2E7D32` | RGB(46, 125, 50) |
+| Mercado Pago | Cyan | `#00bcff` | RGB(0, 188, 255) |
+| Mercado Pago | Dark Blue | `#0a0080` | RGB(10, 0, 128) |
+| Ualá | Dark Blue | `#022A9A` | RGB(2, 42, 154) |
+
+### UI Primary Colors
+
+| Purpose | Hex | RGB |
+|---------|-----|-----|
+| Hero gradient start (Blue 600) | `#2563eb` | RGB(37, 99, 235) |
+| Hero gradient end (Blue 700) | `#1d4ed8` | RGB(29, 78, 216) |
+| Status badge (Emerald 500) | `#10b981` | RGB(16, 185, 129) |
+| Navbar (Slate 900) | `#0f172a` | RGB(15, 23, 42) |
+
+### Background & Neutral Colors
+
+| Purpose | Hex | RGB |
+|---------|-----|-----|
+| Body background (Slate 50) | `#f8fafc` | RGB(248, 250, 252) |
+| Card background | `#FFFFFF` | RGB(255, 255, 255) |
+
+### Chart/Data Visualization
+
+| Data Type | Hex | RGB |
+|-----------|-----|-----|
+| Debit data (Teal) | `#14b8a6` | RGB(20, 184, 166) |
+| Credit data (Purple) | `#8b5cf6` | RGB(139, 92, 246) |
+
+### Accent Colors
+
+| Purpose | Hex | RGB |
+|---------|-----|-----|
+| Fee emphasis (Red 600) | `#dc2626` | RGB(220, 38, 38) |
+| Warnings (Amber 400) | `#fbbf24` | RGB(251, 191, 36) |
+
+**Note:** When adding new entities, choose brand colors that maintain visual distinction while complementing the existing palette. Define custom color classes in the `<style>` section of `index.html` and add mappings to the `tailwindColors` JavaScript object.
+
 ## Modifying Data
 
 - **Entity data:** Edit `data.json` directly (UI renders dynamically)
