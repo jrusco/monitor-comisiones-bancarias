@@ -9,6 +9,11 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <!-- Google AdSense -->
+    <link rel="preconnect" href="//pagead2.googlesyndication.com">
+    <link rel="dns-prefetch" href="//pagead2.googlesyndication.com">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+         crossorigin="anonymous"></script>
     <style>
         body {
             font-family: 'DM Sans', sans-serif;
@@ -259,6 +264,29 @@
         .bg-bapro-dark\/20 { background-color: rgba(46, 125, 50, 0.2); }
         .bg-mercadopago-primary\/20 { background-color: rgba(0, 188, 255, 0.2); }
         .bg-uala-primary\/20 { background-color: rgba(2, 42, 154, 0.2); }
+
+        /* Ad Container Styles */
+        .ad-container {
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ad-container ins.adsbygoogle {
+            width: 100%;
+        }
+
+        /* Hide ads on very small screens where they provide poor UX */
+        @media (max-width: 320px) {
+            .ad-container { display: none; }
+        }
+
+        /* Reduce reserved height on mobile */
+        @media (max-width: 768px) {
+            .ad-container { min-height: 60px; }
+        }
     </style>
     <!-- Chosen Palette: Slate (Backgrounds/Text) + Blue (Primary) + Emerald (Success/Money) -->
     <!-- Application Structure Plan: 
@@ -318,6 +346,19 @@
                 </div>
             </div>
         </section>
+
+        <!-- Ad: Between Hero and Chart -->
+        <div class="ad-container bg-white rounded-xl shadow-sm border border-slate-100 p-2 text-center overflow-hidden"
+             role="complementary" aria-label="Publicidad">
+            <p class="text-xs text-slate-400 mb-1 uppercase tracking-wider">Publicidad</p>
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                 data-ad-slot="XXXXXXXXXX"
+                 data-ad-format="horizontal"
+                 data-full-width-responsive="true"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
 
         <!-- Chart Section -->
         <section class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
@@ -503,6 +544,21 @@
             </div>
         </div>
     </aside>
+
+    <!-- Ad: Pre-Footer -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+        <div id="ad-pre-footer"
+             class="ad-container bg-white rounded-xl shadow-sm border border-slate-100 p-2 text-center overflow-hidden"
+             role="complementary" aria-label="Publicidad">
+            <p class="text-xs text-slate-400 mb-1 uppercase tracking-wider">Publicidad</p>
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                 data-ad-slot="XXXXXXXXXX"
+                 data-ad-format="horizontal"
+                 data-full-width-responsive="true"></ins>
+        </div>
+    </div>
 
     <footer class="bg-slate-900 text-slate-400 py-12 mt-12 border-t border-slate-800">
         <div class="max-w-7xl mx-auto px-4 text-center">
@@ -1136,6 +1192,24 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', initApp);
+
+        // ── Deferred Ad Loading (below-the-fold) ───────────
+        (function() {
+            var adEl = document.getElementById('ad-pre-footer');
+            if (!adEl) return;
+
+            if ('IntersectionObserver' in window) {
+                var observer = new IntersectionObserver(function(entries) {
+                    if (entries[0].isIntersecting) {
+                        (adsbygoogle = window.adsbygoogle || []).push({});
+                        observer.disconnect();
+                    }
+                }, { rootMargin: '200px' });
+                observer.observe(adEl);
+            } else {
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            }
+        })();
 
     </script>
 </body>
