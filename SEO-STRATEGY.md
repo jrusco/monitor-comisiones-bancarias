@@ -40,7 +40,7 @@ This document outlines a comprehensive SEO strategy to achieve first-page (ideal
 | No favicon or apple-touch-icon | Poor branding in tabs/bookmarks | P2 |
 | No Google Search Console setup | No search performance data | P1 |
 | No analytics (GA4 or alternative) | No traffic/behavior insights | P2 |
-| GitHub Pages subdomain (no .com.ar) | Weak geo-signal for Argentina | P2 |
+| GitHub Pages subdomain (no .com.ar) | Weak geo-signal for Argentina | P1 — Domain purchased: `cobrocontarjeta.com.ar`. See [Domain Setup](#phase-5--domain-setup--infrastructure) for configuration. |
 | No FAQ section | Missing long-tail keyword capture | P1 |
 | No `<noscript>` fallback content | Zero content for JS-disabled crawlers | P0 |
 | `lang="es"` instead of `lang="es-AR"` | Imprecise geo-linguistic signal | P2 |
@@ -113,23 +113,23 @@ These changes are high-impact, low-effort, and should be implemented first.
   <!-- Primary SEO -->
   <title>Comisiones por Cobro con Tarjeta en Argentina — Comparador Actualizado | Monitor Comisiones</title>
   <meta name="description" content="Compara comisiones de Mercado Pago, Ualá, Banco Nación y Banco Provincia para cobrar con tarjeta de débito y crédito en Argentina. Datos actualizados automáticamente desde fuentes oficiales.">
-  <link rel="canonical" href="https://jrusco.github.io/monitor-comisiones-bancarias/">
+  <link rel="canonical" href="https://cobrocontarjeta.com.ar/">
   <meta name="robots" content="index, follow">
 
   <!-- Geographic targeting -->
   <meta name="geo.region" content="AR">
   <meta name="geo.placename" content="Argentina">
-  <link rel="alternate" href="https://jrusco.github.io/monitor-comisiones-bancarias/" hreflang="es-AR">
-  <link rel="alternate" href="https://jrusco.github.io/monitor-comisiones-bancarias/" hreflang="x-default">
+  <link rel="alternate" href="https://cobrocontarjeta.com.ar/" hreflang="es-AR">
+  <link rel="alternate" href="https://cobrocontarjeta.com.ar/" hreflang="x-default">
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Comparador de Comisiones por Cobro con Tarjeta en Argentina">
   <meta property="og:description" content="Compara comisiones de Mercado Pago, Ualá, Banco Nación y Banco Provincia. Datos actualizados semanalmente desde fuentes oficiales.">
-  <meta property="og:url" content="https://jrusco.github.io/monitor-comisiones-bancarias/">
+  <meta property="og:url" content="https://cobrocontarjeta.com.ar/">
   <meta property="og:locale" content="es_AR">
-  <meta property="og:site_name" content="Monitor de Comisiones Bancarias">
-  <meta property="og:image" content="https://jrusco.github.io/monitor-comisiones-bancarias/og-image.png">
+  <meta property="og:site_name" content="Cobro con Tarjeta Argentina">
+  <meta property="og:image" content="https://cobrocontarjeta.com.ar/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
 
@@ -137,7 +137,7 @@ These changes are high-impact, low-effort, and should be implemented first.
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Comparador de Comisiones por Cobro con Tarjeta en Argentina">
   <meta name="twitter:description" content="Compara comisiones de Mercado Pago, Ualá, Banco Nación y Banco Provincia. Datos actualizados semanalmente.">
-  <meta name="twitter:image" content="https://jrusco.github.io/monitor-comisiones-bancarias/og-image.png">
+  <meta name="twitter:image" content="https://cobrocontarjeta.com.ar/og-image.png">
 
   <!-- Theme & Branding -->
   <meta name="theme-color" content="#1e40af">
@@ -163,10 +163,10 @@ Add a `<script type="application/ld+json">` block in the `<head>` with the follo
   "@graph": [
     {
       "@type": "WebApplication",
-      "@id": "https://jrusco.github.io/monitor-comisiones-bancarias/#app",
-      "name": "Monitor de Comisiones Bancarias",
+      "@id": "https://cobrocontarjeta.com.ar/#app",
+      "name": "Cobro con Tarjeta Argentina",
       "description": "Comparador de comisiones por cobro con tarjeta de débito y crédito en Argentina",
-      "url": "https://jrusco.github.io/monitor-comisiones-bancarias/",
+      "url": "https://cobrocontarjeta.com.ar/",
       "applicationCategory": "FinanceApplication",
       "operatingSystem": "All",
       "inLanguage": "es-AR",
@@ -275,7 +275,7 @@ Allow: /
 Disallow: /cmd/
 Disallow: /internal/
 
-Sitemap: https://jrusco.github.io/monitor-comisiones-bancarias/sitemap.xml
+Sitemap: https://cobrocontarjeta.com.ar/sitemap.xml
 ```
 
 #### 1.4 sitemap.xml
@@ -286,7 +286,7 @@ Sitemap: https://jrusco.github.io/monitor-comisiones-bancarias/sitemap.xml
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://jrusco.github.io/monitor-comisiones-bancarias/</loc>
+    <loc>https://cobrocontarjeta.com.ar/</loc>
     <lastmod>2026-02-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
@@ -539,33 +539,168 @@ This can be automated: when scrapers detect a fee change, auto-generate a change
 
 ---
 
-### Phase 5 — Infrastructure & Domain
+### Phase 5 — Domain Setup & Infrastructure
 
-#### 5.1 Custom Domain (Recommended)
+Domain `cobrocontarjeta.com.ar` has been purchased. This is an excellent SEO-optimized domain — it contains the exact-match keyword "cobro con tarjeta" which is the primary user intent, combined with the `.com.ar` TLD for strong Argentine geo-targeting.
 
-A `.com.ar` domain provides:
-- Strong geographic signal for Google Argentina
-- Brand credibility for Argentine users
-- Shorter, memorable URL
+#### 5.1 GitHub Pages Custom Domain Configuration
 
-**Recommended domain candidates:**
-- `comisionesargentina.com.ar`
-- `monitorcomisiones.com.ar`
-- `comisionescobro.com.ar`
+**Step 1: Add CNAME file to the repository**
 
-Cost: ~$3,000-5,000 ARS/year for a `.com.ar` domain. This is the single highest-ROI infrastructure investment for SEO.
+Create a file named `CNAME` (no extension) in the project root:
 
-**Setup:** Purchase domain, configure DNS to point to GitHub Pages, add CNAME file to repo.
+```
+cobrocontarjeta.com.ar
+```
 
-#### 5.2 Google Search Console
+This file tells GitHub Pages which custom domain to serve. It must contain only the bare domain — no `https://`, no trailing slash, no `www`.
 
-- Verify ownership via HTML meta tag or DNS record
-- Submit sitemap.xml
-- Set target country to Argentina (International Targeting)
-- Monitor coverage, performance, and Core Web Vitals
-- Use URL Inspection to verify Google can render the JS content
+**Step 2: Configure DNS records**
 
-#### 5.3 Google Analytics 4 (or Privacy-Friendly Alternative)
+At your `.com.ar` domain registrar (likely NIC Argentina or a reseller), add the following DNS records:
+
+```
+# Option A: Apex domain (cobrocontarjeta.com.ar) — recommended
+# Add these A records pointing to GitHub Pages servers:
+A     @    185.199.108.153
+A     @    185.199.109.153
+A     @    185.199.110.153
+A     @    185.199.111.153
+
+# Add AAAA records for IPv6:
+AAAA  @    2606:50c0:8000::153
+AAAA  @    2606:50c0:8001::153
+AAAA  @    2606:50c0:8002::153
+AAAA  @    2606:50c0:8003::153
+
+# Add www CNAME (redirects www → apex):
+CNAME www  jrusco.github.io.
+```
+
+**Step 3: Enable HTTPS in GitHub Pages settings**
+
+1. Go to repository Settings → Pages
+2. Under "Custom domain", enter `cobrocontarjeta.com.ar`
+3. Check "Enforce HTTPS" (may take up to 24 hours for the SSL certificate to provision via Let's Encrypt)
+4. Verify the DNS check passes (green checkmark)
+
+**Step 4: Verify propagation**
+
+```bash
+# Check A records
+dig cobrocontarjeta.com.ar +short
+# Should return 185.199.108.153, etc.
+
+# Check HTTPS
+curl -I https://cobrocontarjeta.com.ar
+# Should return HTTP/2 200 with GitHub Pages headers
+
+# Check redirect from old URL
+curl -I https://cobrocontarjeta.com.ar/
+# Should return 301 redirect to cobrocontarjeta.com.ar
+```
+
+**Important:** GitHub Pages automatically sets up 301 redirects from `cobrocontarjeta.com.ar/` to `cobrocontarjeta.com.ar` once the custom domain is configured. This means:
+- Existing links and bookmarks will automatically redirect
+- Google will follow the 301 and transfer PageRank to the new domain
+- No manual redirect configuration needed
+
+**Step 5: Update repository base paths**
+
+Since the site moves from a subdirectory (`/monitor-comisiones-bancarias/`) to the root (`/`) of the new domain, check for any hardcoded paths in the codebase:
+
+```bash
+# Search for references to the old path
+grep -r "monitor-comisiones-bancarias" --include="*.html" --include="*.js" --include="*.json"
+```
+
+Update any references. With a custom domain, the site serves from `/` instead of `/monitor-comisiones-bancarias/`, so relative paths like `data.json` should continue working but any absolute paths need updating.
+
+#### 5.2 AdSense Configuration for Custom Domain
+
+AdSense requires explicit authorization for each domain serving ads. Without this, ads won't display on the new domain.
+
+**Step 1: Add the new domain to AdSense**
+
+1. Sign in to [Google AdSense](https://www.google.com/adsense/)
+2. Go to **Sites** (left sidebar)
+3. Click **Add site**
+4. Enter `cobrocontarjeta.com.ar`
+5. Google will provide a verification snippet (likely the same `<meta>` tag or `ads.txt` approach)
+6. Wait for review and approval (typically 24-48 hours for existing accounts; can take up to 2 weeks for new domains)
+
+**Step 2: Update ads.txt**
+
+The current `ads.txt` file should remain at the root of the new domain. Verify it's accessible at `https://cobrocontarjeta.com.ar/ads.txt`:
+
+```
+google.com, pub-9911542239640489, DIRECT, f08c47fec0942fa0
+```
+
+**Important:** `ads.txt` must be served from the exact domain where ads appear. If users access via `www.cobrocontarjeta.com.ar`, that subdomain also needs to serve `ads.txt` (GitHub Pages handles this automatically via redirect).
+
+**Step 3: Verify ad serving**
+
+After domain approval:
+1. Clear browser cache or use incognito mode
+2. Visit `https://cobrocontarjeta.com.ar`
+3. Check browser DevTools Console for AdSense errors
+4. Common issues:
+   - `ads.txt not found` → DNS not fully propagated, wait 24-48 hours
+   - `Site not authorized` → AdSense approval pending
+   - No ads showing → Normal for low-traffic new domains; AdSense may take days to start filling ad slots
+
+**Step 4: Domain-level ad settings**
+
+In AdSense, navigate to **Sites → cobrocontarjeta.com.ar** and configure:
+- **Auto ads:** Consider enabling for automatic ad placement optimization (but monitor CLS impact)
+- **Ad review center:** Review and block any inappropriate ad categories for a financial tool
+- **Privacy & messaging:** Set up a GDPR/privacy consent banner if serving ads to EU users (not strictly required for Argentina-only traffic, but good practice)
+
+**Step 5: Remove old domain from AdSense (after migration)**
+
+Once the new domain is verified and serving ads:
+1. Keep `cobrocontarjeta.com.ar` in AdSense for 30 days (during redirect transition)
+2. After confirming all traffic redirects properly, remove the old domain
+
+#### 5.3 Google Search Console
+
+**Register the new domain property:**
+
+1. Go to [Google Search Console](https://search.google.com/search-console/)
+2. Add property → **Domain** property type → enter `cobrocontarjeta.com.ar`
+3. Verify via DNS TXT record:
+   ```
+   TXT  @  "google-site-verification=XXXXXXXXXXXXX"
+   ```
+4. Submit sitemap: `https://cobrocontarjeta.com.ar/sitemap.xml`
+
+**Handle the domain migration:**
+
+If the site was previously indexed under `cobrocontarjeta.com.ar`:
+1. Keep the old property verified in Search Console
+2. Use the **Change of Address** tool: old property → new property
+3. Monitor the "Coverage" report for both properties during transition
+4. Expect a 2-4 week indexing transition period
+
+**Configure international targeting:**
+
+1. Go to **Legacy tools and reports → International Targeting**
+2. Set target country to **Argentina**
+3. This reinforces the `.com.ar` TLD's geographic signal
+
+#### 5.4 Bing Webmaster Tools
+
+1. Go to [Bing Webmaster Tools](https://www.bing.com/webmasters/)
+2. Add `cobrocontarjeta.com.ar`
+3. Verify via DNS CNAME record:
+   ```
+   CNAME  _bingverify  verify.bing.com.
+   ```
+4. Submit sitemap
+5. Enable IndexNow (Bing's preferred instant indexing protocol)
+
+#### 5.5 Google Analytics 4 (or Privacy-Friendly Alternative)
 
 Add analytics to track:
 - Organic search traffic and queries
@@ -573,7 +708,27 @@ Add analytics to track:
 - Bounce rate and session duration
 - Geographic distribution (confirm Argentine audience)
 
-Privacy-friendly alternatives: Plausible, Umami (self-hosted), or Fathom.
+**GA4 setup:**
+1. Create a new GA4 property for `cobrocontarjeta.com.ar`
+2. Add the tracking snippet to `index.html` (use `async` and `defer` to avoid blocking)
+3. Configure a "Measurement-enhanced" data stream
+4. Link to Search Console for combined reporting
+
+**Privacy-friendly alternatives:** Plausible, Umami (self-hosted), or Fathom. These are lighter, don't require cookie consent banners, and still provide essential traffic data.
+
+#### 5.6 SEO Impact of the Domain Choice
+
+The domain `cobrocontarjeta.com.ar` has significant SEO advantages:
+
+| Factor | Impact | Notes |
+|--------|--------|-------|
+| **Exact-match keyword** | High | "cobro con tarjeta" is a primary search term. EMDs (Exact Match Domains) still carry weight for focused, high-quality sites. |
+| **`.com.ar` TLD** | High | Strongest possible geo-signal for Google Argentina. No need for Search Console geo-targeting workarounds. |
+| **Short and memorable** | Medium | Easy to share verbally and on WhatsApp (critical for Argentine market). |
+| **Brand-keyword hybrid** | High | Works as both a brand name and a keyword — "cobrocontarjeta" can become the brand while the domain itself ranks for the keyword. |
+| **Root domain (no subdirectory)** | Medium | Site serves from `/` instead of `/monitor-comisiones-bancarias/`. Shorter URLs are slightly preferred by Google and significantly better for sharing. |
+
+**Caveat about EMDs:** Google's EMD update (2012) reduced the advantage of low-quality exact-match domains. However, **high-quality EMDs still benefit** — the key is that the domain matches user intent AND the content delivers genuine value. This site qualifies because it provides a real tool with real data, not just a keyword-stuffed page.
 
 ---
 
@@ -623,7 +778,7 @@ Privacy-friendly alternatives: Plausible, Umami (self-hosted), or Fathom.
 
 | # | Task | Impact | Effort | Dependencies |
 |---|------|--------|--------|-------------|
-| 26 | Purchase and configure .com.ar domain | High | Medium | Budget approval |
+| 26 | Configure `cobrocontarjeta.com.ar` (DNS, CNAME, HTTPS, AdSense) | Critical | Medium | Domain purchased (done) |
 | 27 | Setup Google Analytics 4 (or alternative) | Medium | Low | None |
 | 28 | Submit site to Google Search Console + Bing Webmaster | High | Low | Task 10 |
 | 29 | Build automated changelog (fee change detection) | Medium | High | Scraper changes |
@@ -916,10 +1071,10 @@ When fees change (detected by scrapers), the site should notify search engines i
     curl -X POST "https://api.indexnow.org/indexnow" \
       -H "Content-Type: application/json" \
       -d '{
-        "host": "jrusco.github.io",
+        "host": "cobrocontarjeta.com.ar",
         "key": "${{ secrets.INDEXNOW_KEY }}",
         "urlList": [
-          "https://jrusco.github.io/monitor-comisiones-bancarias/"
+          "https://cobrocontarjeta.com.ar/"
         ]
       }'
 ```
@@ -978,7 +1133,7 @@ Even for a single page, `BreadcrumbList` structured data helps Google understand
       "@type": "ListItem",
       "position": 1,
       "name": "Inicio",
-      "item": "https://jrusco.github.io/monitor-comisiones-bancarias/"
+      "item": "https://cobrocontarjeta.com.ar/"
     },
     {
       "@type": "ListItem",
@@ -1013,21 +1168,33 @@ While not a direct ranking factor, security signals contribute to overall site t
 
 On GitHub Pages, many of these are set automatically, but verify with a tool like SecurityHeaders.com.
 
-### 5.10 The Canonical URL Must Account for Domain Changes
+### 5.10 Domain Migration Checklist (jrusco.github.io → cobrocontarjeta.com.ar)
 
-The plan proposes a canonical URL with the GitHub Pages domain. If a `.com.ar` domain is later added (Phase 5.1), all canonical URLs, OG URLs, sitemap URLs, and structured data URLs must be updated simultaneously. Failure to do this causes:
+The domain `cobrocontarjeta.com.ar` has been purchased. When activating it, all URL references must be updated simultaneously to avoid split authority. Here's the complete migration checklist:
 
-- Canonical confusion (Google sees two versions of the site)
-- Loss of accumulated PageRank during migration
-- Deindexing of one version
+**Before flipping the switch:**
+- [ ] Update all canonical URLs in `index.html` to `https://cobrocontarjeta.com.ar/`
+- [ ] Update all Open Graph URLs (`og:url`, `og:image`)
+- [ ] Update all Twitter Card image URLs
+- [ ] Update sitemap.xml `<loc>` entries
+- [ ] Update robots.txt `Sitemap:` directive
+- [ ] Update all JSON-LD structured data URLs (`@id`, `url`, `item`)
+- [ ] Update IndexNow `host` field in CI/CD
+- [ ] Create `CNAME` file with `cobrocontarjeta.com.ar`
+- [ ] Add new domain to Google AdSense and wait for approval
+- [ ] Ensure `ads.txt` is accessible at new domain root
+- [ ] Update PWA `manifest.json` `start_url` (if implemented)
 
-**Recommendation:** When migrating to a custom domain:
-1. Set up 301 redirects from `jrusco.github.io/monitor-comisiones-bancarias/` to the new domain
-2. Update all canonical/OG/structured data URLs
-3. Submit a Change of Address in Google Search Console
-4. Keep the old sitemap for 6 months with the new URLs
-
-Plan the URL structure from day one to minimize migration pain.
+**After activation:**
+- [ ] Verify HTTPS works (`curl -I https://cobrocontarjeta.com.ar`)
+- [ ] Verify 301 redirect from `jrusco.github.io/monitor-comisiones-bancarias/` works
+- [ ] Register `cobrocontarjeta.com.ar` in Google Search Console
+- [ ] Use Search Console "Change of Address" tool (old → new property)
+- [ ] Register in Bing Webmaster Tools
+- [ ] Submit sitemap to both Search Console and Bing
+- [ ] Verify ads are serving on the new domain
+- [ ] Monitor Search Console "Coverage" for both properties for 4 weeks
+- [ ] After 30 days: remove old domain from AdSense
 
 ### 5.11 Link Attribute Strategy for Outbound Links
 
@@ -1066,9 +1233,9 @@ Build a lightweight, embeddable `<iframe>` widget that other sites can embed to 
 
 ```html
 <!-- Embed code for other sites -->
-<iframe src="https://jrusco.github.io/monitor-comisiones-bancarias/widget.html?entity=mercadopago"
+<iframe src="https://cobrocontarjeta.com.ar/widget.html?entity=mercadopago"
         width="400" height="300" frameborder="0"></iframe>
-<p><a href="https://jrusco.github.io/monitor-comisiones-bancarias/">
+<p><a href="https://cobrocontarjeta.com.ar/">
   Powered by Monitor de Comisiones Bancarias</a></p>
 ```
 
@@ -1120,7 +1287,7 @@ Encontré esta herramienta para comparar comisiones de cobro con tarjeta 🔍
 Mercado Pago Point Débito: 3.25% + IVA
 Banco Nación Débito: 0.8% + IVA
 
-Mirá la comparativa completa: https://jrusco.github.io/monitor-comisiones-bancarias/
+Mirá la comparativa completa: https://cobrocontarjeta.com.ar/
 ```
 
 **SEO benefit:**
@@ -1139,7 +1306,7 @@ Add `manifest.json` and a basic service worker for:
 {
   "name": "Monitor de Comisiones Bancarias",
   "short_name": "Comisiones AR",
-  "start_url": "/monitor-comisiones-bancarias/",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#f8fafc",
   "theme_color": "#1e40af",
@@ -1258,16 +1425,11 @@ This means the structured data stays synchronized with displayed data — a requ
 - `max-image-preview:large` — Required for Google Discover eligibility and enables large image thumbnails in search results
 - `max-video-preview:-1` — Future-proofing if video content is added
 
-### 7.5 The ".com.ar" Domain Timing Matters
+### 7.5 Domain Timing — Already Done Right
 
-The plan lists a custom domain in Phase 5 (last sprint). **SEO experts would move this to Sprint 1.** Here's why:
+The domain `cobrocontarjeta.com.ar` has been purchased early, which is the optimal approach. Domain age starts accruing immediately upon registration, and all SEO work from this point forward will build authority on the final domain rather than accumulating value on a GitHub Pages subdomain that would need to be migrated later.
 
-- Domain age is a ranking signal — the sooner you register, the sooner the clock starts
-- Every day of SEO work on the GitHub Pages URL accumulates PageRank and backlinks on the wrong domain
-- Domain migration always causes a temporary ranking dip (2-8 weeks), so it's better to migrate before you have rankings to lose
-- A `.com.ar` domain costs ~$5,000 ARS/year (~$5 USD) — negligible cost
-
-**Revised recommendation:** Purchase the domain in Sprint 1. Do all SEO work on the final domain from the start. If budget doesn't allow, at minimum register the domain early to start aging it.
+**Next step:** Configure DNS and GitHub Pages immediately (see [Phase 5](#phase-5--domain-setup--infrastructure)) so that all implementation work, backlinks, and Search Console data target the permanent domain from day one. The domain name itself is an asset — "cobro con tarjeta" is an exact-match keyword for the site's primary use case.
 
 ### 7.6 Structured Data Testing Workflow
 
@@ -1344,7 +1506,7 @@ After the expert review, the implementation priority shifts. Here's the updated 
 
 | Rank | Action | Why It Moves Up/Down |
 |------|--------|---------------------|
-| 1 | **Purchase .com.ar domain** | Moved from Sprint 4 → Sprint 1. Every day of work on the wrong domain is wasted authority. |
+| 1 | **Configure `cobrocontarjeta.com.ar`** (DNS, CNAME, HTTPS, AdSense) | Domain purchased. Configure immediately so all SEO work targets the final domain. |
 | 2 | **Replace Tailwind CDN with static CSS** | New addition. The single biggest performance win — 300-800ms LCP improvement. |
 | 3 | **Build-time pre-rendering of content** | Unchanged (P0). Solves the fundamental "empty page" indexing problem. |
 | 4 | **Meta description + title + canonical + robots** | Unchanged (P0). Basic SEO hygiene. |
