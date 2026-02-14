@@ -1,14 +1,57 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-AR">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor de Comisiones y Recursos: Pagos Argentina</title>
+
+    <!-- Primary SEO -->
+    <title>Comparar Comisiones Cobro con Tarjeta | Argentina 2026</title>
+    <meta name="description" content="Compará comisiones de Mercado Pago, Ualá, Banco Nación y Banco Provincia para cobrar con tarjeta de débito y crédito. Datos actualizados semanalmente desde fuentes oficiales.">
+    <link rel="canonical" href="https://cobrocontarjeta.com.ar/">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+
+    <!-- Geographic targeting -->
+    <meta name="geo.region" content="AR">
+    <meta name="geo.placename" content="Argentina">
+    <link rel="alternate" href="https://cobrocontarjeta.com.ar/" hreflang="es-AR">
+    <link rel="alternate" href="https://cobrocontarjeta.com.ar/" hreflang="x-default">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Comparador de Comisiones por Cobro con Tarjeta en Argentina">
+    <meta property="og:description" content="Compará comisiones de Mercado Pago, Ualá, Banco Nación y Banco Provincia. Datos actualizados semanalmente desde fuentes oficiales.">
+    <meta property="og:url" content="https://cobrocontarjeta.com.ar/">
+    <meta property="og:locale" content="es_AR">
+    <meta property="og:site_name" content="Cobro con Tarjeta Argentina">
+    <meta property="og:image" content="https://cobrocontarjeta.com.ar/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Comparador de Comisiones por Cobro con Tarjeta en Argentina">
+    <meta name="twitter:description" content="Compará comisiones de Mercado Pago, Ualá, Banco Nación y Banco Provincia. Datos actualizados semanalmente.">
+    <meta name="twitter:image" content="https://cobrocontarjeta.com.ar/og-image.png">
+
+    <!-- Preconnect to CDN origins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preload" href="data.json" as="fetch" crossorigin>
+
+    <!-- Favicon & Theme -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="theme-color" content="#1e40af">
+
+    <!-- Stylesheets -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+
+    <!-- Scripts (deferred where possible) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2" defer></script>
+
     <!-- Google AdSense -->
     <link rel="preconnect" href="//pagead2.googlesyndication.com">
     <link rel="dns-prefetch" href="//pagead2.googlesyndication.com">
@@ -305,6 +348,120 @@
          - Dynamic DOM Updating: To display the specific "Source Report" data (URLs/APIs) without reloading the page.
     -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "@id": "https://cobrocontarjeta.com.ar/#app",
+          "name": "Cobro con Tarjeta Argentina",
+          "alternateName": "Monitor de Comisiones Bancarias",
+          "description": "Comparador de comisiones por cobro con tarjeta de débito y crédito en Argentina",
+          "url": "https://cobrocontarjeta.com.ar/",
+          "applicationCategory": "FinanceApplication",
+          "operatingSystem": "All",
+          "inLanguage": "es-AR",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "ARS"
+          },
+          "author": {
+            "@type": "Person",
+            "name": "jrusco",
+            "url": "https://github.com/jrusco"
+          }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Inicio",
+              "item": "https://cobrocontarjeta.com.ar/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Comparador de Comisiones"
+            }
+          ]
+        },
+        {
+          "@type": "ItemList",
+          "name": "Procesadores de pago en Argentina",
+          "description": "Comparativa de comisiones de procesadores de pago con tarjeta en Argentina",
+          "numberOfItems": 4,
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "item": {
+                "@type": "PaymentService",
+                "name": "Mercado Pago",
+                "provider": {
+                  "@type": "Organization",
+                  "name": "Mercado Pago",
+                  "url": "https://www.mercadopago.com.ar"
+                },
+                "areaServed": { "@type": "Country", "name": "Argentina" },
+                "feesAndCommissionsSpecification": "https://www.mercadopago.com.ar/ayuda/cuanto-cuesta-recibir-pagos-con-point_2779"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "item": {
+                "@type": "PaymentService",
+                "name": "Ualá Bis",
+                "provider": {
+                  "@type": "Organization",
+                  "name": "Ualá",
+                  "url": "https://www.uala.com.ar"
+                },
+                "areaServed": { "@type": "Country", "name": "Argentina" },
+                "feesAndCommissionsSpecification": "https://www.uala.com.ar/bis/costos"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "item": {
+                "@type": "PaymentService",
+                "name": "Banco de la Nación Argentina",
+                "provider": {
+                  "@type": "BankOrCreditUnion",
+                  "name": "Banco de la Nación Argentina",
+                  "url": "https://www.bna.com.ar"
+                },
+                "areaServed": { "@type": "Country", "name": "Argentina" },
+                "feesAndCommissionsSpecification": "https://aranceles.fiservargentina.com/"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 4,
+              "item": {
+                "@type": "PaymentService",
+                "name": "Banco Provincia",
+                "provider": {
+                  "@type": "BankOrCreditUnion",
+                  "name": "Banco de la Provincia de Buenos Aires",
+                  "url": "https://www.bancoprovincia.com.ar"
+                },
+                "areaServed": { "@type": "Country", "name": "Argentina" },
+                "feesAndCommissionsSpecification": "https://www.bancoprovincia.com.ar/web/adhesion_comercios"
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
 </head>
 
 <body class="text-slate-800">

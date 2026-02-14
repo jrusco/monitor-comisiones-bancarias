@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /cmd/
+Disallow: /internal/
+Disallow: /scripts/
+
+Sitemap: https://cobrocontarjeta.com.ar/sitemap.xml
