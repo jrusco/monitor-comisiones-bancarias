@@ -9,3 +9,6 @@ update-*
 # Playwright MCP testing
 .playwright-mcp/
 
+# Tailwind CLI binary
+tailwindcss-linux-x64
+
