@@ -73,181 +73,372 @@
 
     <!-- Structured Data -->
     <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
     {
-      "@context": "https://schema.org",
-      "@graph": [
+      "@type": "WebApplication",
+      "@id": "https://cobrocontarjeta.com.ar/#app",
+      "name": "Cobro con Tarjeta Argentina",
+      "alternateName": "Monitor de Comisiones Bancarias",
+      "description": "Comparador de comisiones por cobro con tarjeta de débito y crédito en Argentina",
+      "url": "https://cobrocontarjeta.com.ar/",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "All",
+      "inLanguage": "es-AR",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "ARS"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "jrusco",
+        "url": "https://github.com/jrusco"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
         {
-          "@type": "WebApplication",
-          "@id": "https://cobrocontarjeta.com.ar/#app",
-          "name": "Cobro con Tarjeta Argentina",
-          "alternateName": "Monitor de Comisiones Bancarias",
-          "description": "Comparador de comisiones por cobro con tarjeta de débito y crédito en Argentina",
-          "url": "https://cobrocontarjeta.com.ar/",
-          "applicationCategory": "FinanceApplication",
-          "operatingSystem": "All",
-          "inLanguage": "es-AR",
-          "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "ARS"
-          },
-          "author": {
-            "@type": "Person",
-            "name": "jrusco",
-            "url": "https://github.com/jrusco"
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Inicio",
+          "item": "https://cobrocontarjeta.com.ar/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Comparador de Comisiones"
+        }
+      ]
+    },
+    {
+      "@type": "ItemList",
+      "name": "Procesadores de pago en Argentina",
+      "description": "Comparativa de comisiones de procesadores de pago con tarjeta en Argentina",
+      "numberOfItems": 4,
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "item": {
+            "@type": "PaymentService",
+            "name": "Mercado Pago",
+            "provider": {
+              "@type": "Organization",
+              "name": "Mercado Pago",
+              "url": "https://www.mercadopago.com.ar"
+            },
+            "areaServed": {
+              "@type": "Country",
+              "name": "Argentina"
+            },
+            "feesAndCommissionsSpecification": "https://www.mercadopago.com.ar/ayuda/cuanto-cuesta-recibir-pagos-con-point_2779"
           }
         },
         {
-          "@type": "BreadcrumbList",
-          "itemListElement": [
-            {
-              "@type": "ListItem",
-              "position": 1,
-              "name": "Inicio",
-              "item": "https://cobrocontarjeta.com.ar/"
+          "@type": "ListItem",
+          "position": 2,
+          "item": {
+            "@type": "PaymentService",
+            "name": "Ualá Bis",
+            "provider": {
+              "@type": "Organization",
+              "name": "Ualá",
+              "url": "https://www.uala.com.ar"
             },
-            {
-              "@type": "ListItem",
-              "position": 2,
-              "name": "Comparador de Comisiones"
-            }
-          ]
+            "areaServed": {
+              "@type": "Country",
+              "name": "Argentina"
+            },
+            "feesAndCommissionsSpecification": "https://www.uala.com.ar/bis/costos"
+          }
         },
         {
-          "@type": "ItemList",
-          "name": "Procesadores de pago en Argentina",
-          "description": "Comparativa de comisiones de procesadores de pago con tarjeta en Argentina",
-          "numberOfItems": 4,
-          "itemListElement": [
-            {
-              "@type": "ListItem",
-              "position": 1,
-              "item": {
-                "@type": "PaymentService",
-                "name": "Mercado Pago",
-                "provider": {
-                  "@type": "Organization",
-                  "name": "Mercado Pago",
-                  "url": "https://www.mercadopago.com.ar"
-                },
-                "areaServed": { "@type": "Country", "name": "Argentina" },
-                "feesAndCommissionsSpecification": "https://www.mercadopago.com.ar/ayuda/cuanto-cuesta-recibir-pagos-con-point_2779"
-              }
+          "@type": "ListItem",
+          "position": 3,
+          "item": {
+            "@type": "PaymentService",
+            "name": "Banco de la Nación Argentina",
+            "provider": {
+              "@type": "BankOrCreditUnion",
+              "name": "Banco de la Nación Argentina",
+              "url": "https://www.bna.com.ar"
             },
-            {
-              "@type": "ListItem",
-              "position": 2,
-              "item": {
-                "@type": "PaymentService",
-                "name": "Ualá Bis",
-                "provider": {
-                  "@type": "Organization",
-                  "name": "Ualá",
-                  "url": "https://www.uala.com.ar"
-                },
-                "areaServed": { "@type": "Country", "name": "Argentina" },
-                "feesAndCommissionsSpecification": "https://www.uala.com.ar/bis/costos"
-              }
+            "areaServed": {
+              "@type": "Country",
+              "name": "Argentina"
             },
-            {
-              "@type": "ListItem",
-              "position": 3,
-              "item": {
-                "@type": "PaymentService",
-                "name": "Banco de la Nación Argentina",
-                "provider": {
-                  "@type": "BankOrCreditUnion",
-                  "name": "Banco de la Nación Argentina",
-                  "url": "https://www.bna.com.ar"
-                },
-                "areaServed": { "@type": "Country", "name": "Argentina" },
-                "feesAndCommissionsSpecification": "https://aranceles.fiservargentina.com/"
-              }
-            },
-            {
-              "@type": "ListItem",
-              "position": 4,
-              "item": {
-                "@type": "PaymentService",
-                "name": "Banco Provincia",
-                "provider": {
-                  "@type": "BankOrCreditUnion",
-                  "name": "Banco de la Provincia de Buenos Aires",
-                  "url": "https://www.bancoprovincia.com.ar"
-                },
-                "areaServed": { "@type": "Country", "name": "Argentina" },
-                "feesAndCommissionsSpecification": "https://www.bancoprovincia.com.ar/web/adhesion_comercios"
-              }
-            }
-          ]
+            "feesAndCommissionsSpecification": "https://aranceles.fiservargentina.com/"
+          }
         },
         {
-          "@type": "FAQPage",
-          "mainEntity": [
-            {
-              "@type": "Question",
-              "name": "¿Cuánto cobra Mercado Pago por cobrar con tarjeta de débito?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Mercado Pago cobra 3.25% + IVA por ventas con tarjeta de débito a través de Point, con acreditación en el momento. Para cobros por QR, la comisión varía entre 0.80% y 6.29% + IVA según el medio de pago utilizado por el comprador."
-              }
+          "@type": "ListItem",
+          "position": 4,
+          "item": {
+            "@type": "PaymentService",
+            "name": "Banco Provincia",
+            "provider": {
+              "@type": "BankOrCreditUnion",
+              "name": "Banco de la Provincia de Buenos Aires",
+              "url": "https://www.bancoprovincia.com.ar"
             },
-            {
-              "@type": "Question",
-              "name": "¿Qué conviene más: Mercado Pago o Ualá para cobrar con tarjeta?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Depende de tu volumen y tipo de ventas. Ualá Bis cobra 2.9% + IVA en débito (vs 3.25% de Mercado Pago Point). En crédito, Ualá cobra 4.4% + IVA mientras Mercado Pago cobra 4.39% + IVA con acreditación a 10 días. Ambos acreditan en el momento para débito."
-              }
+            "areaServed": {
+              "@type": "Country",
+              "name": "Argentina"
             },
-            {
-              "@type": "Question",
-              "name": "¿Cuánto me descuentan si cobro con tarjeta de crédito en Argentina?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Los bancos adquirentes (Banco Nación, Banco Provincia) cobran 1.8% + IVA con acreditación en 8-10 días hábiles. Los agregadores fintech (Mercado Pago, Ualá) cobran entre 4.39% y 6.29% + IVA, pero ofrecen acreditación inmediata o en menor plazo."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "¿Cuáles son las comisiones de Banco Nación para comercios?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Banco Nación cobra 0.8% + IVA para débito (acreditación en 24 horas) y 1.8% + IVA para crédito (acreditación en 8-10 días hábiles). El mantenimiento de la terminal POS puede ser bonificado o variable según el acuerdo comercial."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "¿Qué es un agregador de pagos y en qué se diferencia de un banco adquirente?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Un banco adquirente tiene relación directa con las marcas de tarjetas y opera bajo aranceles regulados por el BCRA. Un agregador de pagos funciona como intermediario, fijando sus propias comisiones (generalmente más altas) pero con mayor simplicidad de alta y acreditación más rápida."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "¿Cada cuánto se actualizan las comisiones en este sitio?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Las comisiones se actualizan automáticamente cada semana. Los scrapers consultan las páginas oficiales de cada entidad y actualizan los datos si detectan cambios. Todos los datos provienen de fuentes oficiales verificables."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "¿Cómo se comparan las comisiones de cobro por QR vs Point/POS?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "El cobro por QR generalmente tiene comisiones más bajas que un dispositivo POS/Point. En Mercado Pago, el QR cobra entre 0.80% y 6.29% + IVA según el medio de pago, mientras que el Point cobra 3.25% + IVA en débito. Banco Provincia ofrece QR con saldo en cuenta a 0.8% + IVA."
-              }
-            }
-          ]
+            "feesAndCommissionsSpecification": "https://www.bancoprovincia.com.ar/web/adhesion_comercios"
+          }
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "¿Cuánto cobra Mercado Pago por cobrar con tarjeta de débito?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Mercado Pago cobra 3.25% + IVA por ventas con tarjeta de débito a través de Point, con acreditación en el momento. Para cobros por QR, la comisión varía entre 0.80% y 6.29% + IVA según el medio de pago utilizado por el comprador."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Qué conviene más: Mercado Pago o Ualá para cobrar con tarjeta?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Depende de tu volumen y tipo de ventas. Ualá Bis cobra 2.9% + IVA en débito (vs 3.25% de Mercado Pago Point). En crédito, Ualá cobra 4.4% + IVA mientras Mercado Pago cobra 4.39% + IVA con acreditación a 10 días. Ambos acreditan en el momento para débito."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Cuánto me descuentan si cobro con tarjeta de crédito en Argentina?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Los bancos adquirentes (Banco Nación, Banco Provincia) cobran 1.8% + IVA con acreditación en 8-10 días hábiles. Los agregadores fintech (Mercado Pago, Ualá) cobran entre 4.39% y 6.29% + IVA, pero ofrecen acreditación inmediata o en menor plazo."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Cuáles son las comisiones de Banco Nación para comercios?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Banco Nación cobra 0.8% + IVA para débito (acreditación en 24 horas) y 1.8% + IVA para crédito (acreditación en 8-10 días hábiles). El mantenimiento de la terminal POS puede ser bonificado o variable según el acuerdo comercial."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Qué es un agregador de pagos y en qué se diferencia de un banco adquirente?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Un banco adquirente tiene relación directa con las marcas de tarjetas y opera bajo aranceles regulados por el BCRA. Un agregador de pagos funciona como intermediario, fijando sus propias comisiones (generalmente más altas) pero con mayor simplicidad de alta y acreditación más rápida."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Cada cuánto se actualizan las comisiones en este sitio?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Las comisiones se actualizan automáticamente cada semana. Los scrapers consultan las páginas oficiales de cada entidad y actualizan los datos si detectan cambios. Todos los datos provienen de fuentes oficiales verificables."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Cómo se comparan las comisiones de cobro por QR vs Point/POS?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "El cobro por QR generalmente tiene comisiones más bajas que un dispositivo POS/Point. En Mercado Pago, el QR cobra entre 0.80% y 6.29% + IVA según el medio de pago, mientras que el Point cobra 3.25% + IVA en débito. Banco Provincia ofrece QR con saldo en cuenta a 0.8% + IVA."
+          }
         }
       ]
     }
+  ]
+}
     </script>
 </head>
 
 <body class="text-slate-800">
+<noscript>
+    <div style="max-width: 1280px; margin: 2rem auto; padding: 0 1rem;">
+        <div style="background: white; border-radius: 12px; padding: 1.5rem; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; color: #1e293b;">Comparación de Comisiones por Cobro con Tarjeta</h2>
+            <p style="color: #64748b; margin-bottom: 1.5rem; font-size: 0.875rem;">Esta tabla muestra las comisiones actualizadas de cada procesador. Para ver la versión interactiva, habilite JavaScript.</p>
+
+            
+            <div style="margin-bottom: 2rem; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+                <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; padding: 1rem; font-weight: bold; font-size: 1.125rem;">
+                    Banco Nación
+                </div>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f1f5f9; border-bottom: 1px solid #e2e8f0;">
+                            <th style="padding: 0.75rem; text-align: left; font-size: 0.875rem; color: #475569;">Tipo de pago</th>
+                            <th style="padding: 0.75rem; text-align: left; font-size: 0.875rem; color: #475569;">Cuándo cobrás</th>
+                            <th style="padding: 0.75rem; text-align: right; font-size: 0.875rem; color: #475569;">Comisión</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">Débito</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">24 hs</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">0.8% + IVA</td>
+                        </tr>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">Crédito</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">8-10 días hábiles</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">1.8% + IVA</td>
+                        </tr>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">Mantenimiento Terminal</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">Mensual</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">Bonificado o Variable</td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+                <div style="padding: 0.75rem; background: #fef3c7; border-top: 1px solid #fde68a; font-size: 0.75rem; color: #92400e;">
+                    Las tasas no incluyen IVA ni retenciones. Verificá en la <a href="https://aranceles.fiservargentina.com/" style="color: #1d4ed8; text-decoration: underline;" target="_blank" rel="noopener">fuente oficial</a>.
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 2rem; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+                <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; padding: 1rem; font-weight: bold; font-size: 1.125rem;">
+                    Banco Provincia
+                </div>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f1f5f9; border-bottom: 1px solid #e2e8f0;">
+                            <th style="padding: 0.75rem; text-align: left; font-size: 0.875rem; color: #475569;">Tipo de pago</th>
+                            <th style="padding: 0.75rem; text-align: left; font-size: 0.875rem; color: #475569;">Cuándo cobrás</th>
+                            <th style="padding: 0.75rem; text-align: right; font-size: 0.875rem; color: #475569;">Comisión</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">Débito</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">48 hs</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">0.8% + IVA</td>
+                        </tr>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">Crédito</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">8-10 días hábiles</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">1.8% + IVA</td>
+                        </tr>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">Clave DNI (Token)</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">Inmediato</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">0.6% + IVA</td>
+                        </tr>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">QR (Saldo en Cuenta)</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">Inmediato</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">0.8% + IVA</td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+                <div style="padding: 0.75rem; background: #fef3c7; border-top: 1px solid #fde68a; font-size: 0.75rem; color: #92400e;">
+                    Las tasas no incluyen IVA ni retenciones. Verificá en la <a href="https://www.bancoprovincia.com.ar/web/adhesion_comercios" style="color: #1d4ed8; text-decoration: underline;" target="_blank" rel="noopener">fuente oficial</a>.
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 2rem; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+                <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; padding: 1rem; font-weight: bold; font-size: 1.125rem;">
+                    Mercado Pago
+                </div>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f1f5f9; border-bottom: 1px solid #e2e8f0;">
+                            <th style="padding: 0.75rem; text-align: left; font-size: 0.875rem; color: #475569;">Tipo de pago</th>
+                            <th style="padding: 0.75rem; text-align: left; font-size: 0.875rem; color: #475569;">Cuándo cobrás</th>
+                            <th style="padding: 0.75rem; text-align: right; font-size: 0.875rem; color: #475569;">Comisión</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">Point - Débito</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">En el momento</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">3.25% + IVA</td>
+                        </tr>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">Point - Crédito</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">En el momento</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">6.29% + IVA</td>
+                        </tr>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">Point - Crédito</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">10 días</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">4.39% + IVA</td>
+                        </tr>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">QR</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">En el momento</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">0.80% - 6.29% + IVA (según medio)</td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+                <div style="padding: 0.75rem; background: #fef3c7; border-top: 1px solid #fde68a; font-size: 0.75rem; color: #92400e;">
+                    Las tasas no incluyen IVA ni retenciones. Verificá en la <a href="https://www.mercadopago.com.ar/ayuda/2779#tabla1" style="color: #1d4ed8; text-decoration: underline;" target="_blank" rel="noopener">fuente oficial</a>.
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 2rem; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+                <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; padding: 1rem; font-weight: bold; font-size: 1.125rem;">
+                    Ualá (Bis)
+                </div>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f1f5f9; border-bottom: 1px solid #e2e8f0;">
+                            <th style="padding: 0.75rem; text-align: left; font-size: 0.875rem; color: #475569;">Tipo de pago</th>
+                            <th style="padding: 0.75rem; text-align: left; font-size: 0.875rem; color: #475569;">Cuándo cobrás</th>
+                            <th style="padding: 0.75rem; text-align: right; font-size: 0.875rem; color: #475569;">Comisión</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">mPOS - Débito</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">En el momento</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">2.9% + IVA</td>
+                        </tr>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">mPOS - Crédito</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">En el momento</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">4.4% + IVA</td>
+                        </tr>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">Link de Pago</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">En el momento</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">4.4% + IVA</td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+                <div style="padding: 0.75rem; background: #fef3c7; border-top: 1px solid #fde68a; font-size: 0.75rem; color: #92400e;">
+                    Las tasas no incluyen IVA ni retenciones. Verificá en la <a href="https://mpos.ualabis.com.ar/productos/mpos/" style="color: #1d4ed8; text-decoration: underline;" target="_blank" rel="noopener">fuente oficial</a>.
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</noscript>
+
 
     <!-- Navbar -->
     <nav class="bg-slate-900 border-b border-slate-700 sticky top-0 z-50">
@@ -279,11 +470,11 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
                 <div class="bg-white/15 backdrop-blur-sm rounded-lg p-4 border border-white/20">
                     <p class="text-blue-100 text-sm font-medium mb-1">Menor comisión Débito</p>
-                    <p id="heroMinDebit" class="text-2xl font-bold">Cargando...</p>
+                    <p id="heroMinDebit" class="text-2xl font-bold">0.8% <span class="text-sm font-normal text-blue-200">(Banco Nación)</span></p>
                 </div>
                 <div class="bg-white/15 backdrop-blur-sm rounded-lg p-4 border border-white/20">
                     <p class="text-blue-100 text-sm font-medium mb-1">Menor comisión Crédito</p>
-                    <p id="heroMinCredit" class="text-2xl font-bold">Cargando...</p>
+                    <p id="heroMinCredit" class="text-2xl font-bold">1.8% <span class="text-sm font-normal text-blue-200">(Banco Nación)</span></p>
                 </div>
             </div>
         </section>
