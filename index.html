@@ -37,7 +37,6 @@
     <!-- Preconnect to CDN origins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preload" href="data.json" as="fetch" crossorigin>
 
     <!-- Favicon & Theme -->
@@ -48,10 +47,6 @@
     <!-- Stylesheets -->
     <link rel="stylesheet" href="/tailwind.min.css">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
-
-    <!-- Scripts (deferred where possible) -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2" defer></script>
 
     <!-- Google AdSense -->
     <link rel="preconnect" href="//pagead2.googlesyndication.com">
@@ -314,6 +309,9 @@
             <!-- Chart Container -->
             <div class="chart-container">
                 <canvas id="feesChart"></canvas>
+                <p id="chartPlaceholder" class="text-center text-sm text-slate-400 py-12">
+                    Cargando grafico comparativo...
+                </p>
             </div>
         </section>
 
@@ -1013,9 +1011,31 @@
 
         // --- Core Functions ---
 
+        function lazyLoadChart(entities) {
+            const chartSection = document.querySelector('.chart-container');
+            if (!chartSection) return;
+
+            const observer = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) {
+                    observer.disconnect();
+                    const chartScript = document.createElement('script');
+                    chartScript.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+                    chartScript.onload = () => {
+                        const pluginScript = document.createElement('script');
+                        pluginScript.src = 'https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2';
+                        pluginScript.onload = () => renderChart(entities);
+                        document.head.appendChild(pluginScript);
+                    };
+                    document.head.appendChild(chartScript);
+                }
+            }, { rootMargin: '300px' });
+
+            observer.observe(chartSection);
+        }
+
         async function initApp() {
             try {
-                const response = await fetch('data.json?t=' + new Date().getTime());
+                const response = await fetch('data.json');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -1026,7 +1046,7 @@
 
                 renderLastUpdated(entities);  // Update navbar timestamp
                 renderHeroMetrics(entities);  // Must run first to set min rates
-                renderChart(entities);
+                lazyLoadChart(entities);
                 renderEntityGrid(entities);
                 initSimulator(entities);  // Initialize fee simulator
 
@@ -1069,7 +1089,8 @@
                     <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider px-1">${groupName}</h3>
                     <div class="space-y-3">
                         ${groupEntities.map(entity => `
-                            <button onclick="showEntityDetail('${entity.id}')"
+                            <button id="${entity.id}"
+                                    onclick="showEntityDetail('${entity.id}')"
                                     class="entity-card card-hover animate-entrance opacity-0 w-full bg-white rounded-xl border border-slate-200 p-4 flex items-center gap-4 transition-all group text-left relative"
                                     style="--entity-color: ${getColorHex(entity.color)}">
                                 ${hasLowestFee(entity) ? '<span class="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">Menor costo</span>' : ''}
@@ -1220,6 +1241,8 @@
 
         // --- Visualization Logic ---
         function renderChart(entities) {
+            const placeholder = document.getElementById('chartPlaceholder');
+            if (placeholder) placeholder.remove();
             const ctx = document.getElementById('feesChart').getContext('2d');
 
             // Helper to find a specific fee rate, returns null if not found
