@@ -11,6 +11,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/jrusco/monitor-comisiones-bancarias/internal/common"
@@ -245,24 +246,22 @@ func main() {
 		urlUpdated = true
 	}
 
+	// Update lastUpdated timestamp (even if fees unchanged - shows "last verified")
+	entity.LastUpdated = time.Now().UTC().Format(time.RFC3339)
+	fmt.Printf("\nUpdated lastUpdated timestamp: %s\n", entity.LastUpdated)
+
 	fmt.Println()
 	fmt.Println(strings.Repeat("=", 60))
 
-	if updated || urlUpdated {
-		if err := common.SaveData(data); err != nil {
-			fmt.Printf("ERROR: %v\n", err)
-			os.Exit(1)
-		}
-		fmt.Println("data.json has been successfully updated")
-	} else {
-		fmt.Println("No changes needed - all fees are current")
+	if err := common.SaveData(data); err != nil {
+		fmt.Printf("ERROR: %v\n", err)
+		os.Exit(1)
 	}
 
-	fmt.Println()
-	if common.UpdateDateInHTML() {
-		fmt.Println("Date stamp updated in index.html")
+	if updated || urlUpdated {
+		fmt.Println("data.json has been successfully updated with new fee data")
 	} else {
-		fmt.Println("Date stamp already current in index.html")
+		fmt.Println("No fee changes detected, but lastUpdated timestamp refreshed")
 	}
 
 	fmt.Println(strings.Repeat("=", 60))

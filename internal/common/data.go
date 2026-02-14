@@ -21,17 +21,18 @@ type Fee struct {
 
 // Entity represents a financial entity in data.json.
 type Entity struct {
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	Type      string `json:"type"`
-	Color     string `json:"color"`
-	TextColor string `json:"textColor"`
-	Logo      string `json:"logo"`
-	FeeURL    string `json:"feeUrl"`
-	APIURL    string `json:"apiUrl"`
-	APIDocs   string `json:"apiDocs,omitempty"`
-	HasAPI    bool   `json:"hasApi"`
-	Fees      []Fee  `json:"fees"`
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Type        string `json:"type"`
+	Color       string `json:"color"`
+	TextColor   string `json:"textColor"`
+	Logo        string `json:"logo"`
+	FeeURL      string `json:"feeUrl"`
+	APIURL      string `json:"apiUrl"`
+	APIDocs     string `json:"apiDocs,omitempty"`
+	HasAPI      bool   `json:"hasApi"`
+	LastUpdated string `json:"lastUpdated,omitempty"`
+	Fees        []Fee  `json:"fees"`
 }
 
 // LoadData reads and parses data.json.
