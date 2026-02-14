@@ -1,6 +1,6 @@
 module github.com/jrusco/monitor-comisiones-bancarias
 
-go 1.24.7
+go 1.18
 
 require (
 	github.com/PuerkitoBio/goquery v1.11.0 // indirect

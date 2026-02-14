@@ -14,6 +14,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/jrusco/monitor-comisiones-bancarias/internal/common"
@@ -268,16 +269,22 @@ func main() {
 		}
 	}
 
+	// Update lastUpdated timestamp (even if fees unchanged - shows "last verified")
+	mp.LastUpdated = time.Now().UTC().Format(time.RFC3339)
+	fmt.Printf("  Updated lastUpdated timestamp: %s\n", mp.LastUpdated)
+
 	fmt.Println(strings.Repeat("-", 70))
 
-	if err := saveIfUpdated(data, updated); err != nil {
+	if err := common.SaveData(data); err != nil {
 		fmt.Printf("ERROR: %v\n", err)
 		os.Exit(1)
 	}
 
-	// 4. Update date stamp
-	fmt.Printf("\n4. Updating date stamp in %s...\n", common.IndexFile)
-	common.UpdateDateInHTML()
+	if updated {
+		fmt.Printf("\n%s has been successfully updated with new fee data.\n", common.DataFile)
+	} else {
+		fmt.Printf("\nNo fee changes detected, but lastUpdated timestamp refreshed.\n")
+	}
 
 	fmt.Println("\n" + strings.Repeat("=", 70))
 	fmt.Println("Script finished successfully.")

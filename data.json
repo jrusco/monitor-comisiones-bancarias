@@ -10,6 +10,7 @@
         "feeUrl": "https://aranceles.fiservargentina.com/",
         "apiUrl": "N/A - Integración vía Procesadores (Fiserv/Payway)",
         "hasApi": false,
+        "lastUpdated": "2026-02-14T12:00:00Z",
         "fees": [
             {
                 "concept": "Débito",
@@ -39,6 +40,7 @@
         "feeUrl": "https://www.bancoprovincia.com.ar/web/adhesion_comercios",
         "apiUrl": "N/A - Integración vía Procesadores",
         "hasApi": false,
+        "lastUpdated": "2026-02-14T12:00:00Z",
         "fees": [
             {
                 "concept": "Débito",
@@ -74,6 +76,7 @@
         "apiUrl": "https://api.mercadopago.com/v1/payment_methods",
         "apiDocs": "https://www.mercadopago.com.ar/developers/es/docs/your-integrations",
         "hasApi": true,
+        "lastUpdated": "2026-02-14T12:00:00Z",
         "fees": [
             {
                 "concept": "Point - Débito",
@@ -109,6 +112,7 @@
         "apiUrl": "https://api.uala.com.ar/merchant/v1/fees (Requiere Auth)",
         "apiDocs": "https://desarrolladores.uala.com.ar/",
         "hasApi": true,
+        "lastUpdated": "2026-02-14T12:00:00Z",
         "fees": [
             {
                 "concept": "mPOS - Débito",

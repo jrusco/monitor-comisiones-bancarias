@@ -42,6 +42,7 @@
 
     <!-- Favicon & Theme -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <meta name="theme-color" content="#1e40af">
 
     <!-- Stylesheets -->
@@ -458,6 +459,67 @@
               }
             }
           ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "¿Cuánto cobra Mercado Pago por cobrar con tarjeta de débito?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Mercado Pago cobra 3.25% + IVA por ventas con tarjeta de débito a través de Point, con acreditación en el momento. Para cobros por QR, la comisión varía entre 0.80% y 6.29% + IVA según el medio de pago utilizado por el comprador."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "¿Qué conviene más: Mercado Pago o Ualá para cobrar con tarjeta?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Depende de tu volumen y tipo de ventas. Ualá Bis cobra 2.9% + IVA en débito (vs 3.25% de Mercado Pago Point). En crédito, Ualá cobra 4.4% + IVA mientras Mercado Pago cobra 4.39% + IVA con acreditación a 10 días. Ambos acreditan en el momento para débito."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "¿Cuánto me descuentan si cobro con tarjeta de crédito en Argentina?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Los bancos adquirentes (Banco Nación, Banco Provincia) cobran 1.8% + IVA con acreditación en 8-10 días hábiles. Los agregadores fintech (Mercado Pago, Ualá) cobran entre 4.39% y 6.29% + IVA, pero ofrecen acreditación inmediata o en menor plazo."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "¿Cuáles son las comisiones de Banco Nación para comercios?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Banco Nación cobra 0.8% + IVA para débito (acreditación en 24 horas) y 1.8% + IVA para crédito (acreditación en 8-10 días hábiles). El mantenimiento de la terminal POS puede ser bonificado o variable según el acuerdo comercial."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "¿Qué es un agregador de pagos y en qué se diferencia de un banco adquirente?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Un banco adquirente tiene relación directa con las marcas de tarjetas y opera bajo aranceles regulados por el BCRA. Un agregador de pagos funciona como intermediario, fijando sus propias comisiones (generalmente más altas) pero con mayor simplicidad de alta y acreditación más rápida."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "¿Cada cuánto se actualizan las comisiones en este sitio?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Las comisiones se actualizan automáticamente cada semana. Los scrapers consultan las páginas oficiales de cada entidad y actualizan los datos si detectan cambios. Todos los datos provienen de fuentes oficiales verificables."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "¿Cómo se comparan las comisiones de cobro por QR vs Point/POS?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "El cobro por QR generalmente tiene comisiones más bajas que un dispositivo POS/Point. En Mercado Pago, el QR cobra entre 0.80% y 6.29% + IVA según el medio de pago, mientras que el Point cobra 3.25% + IVA en débito. Banco Provincia ofrece QR con saldo en cuenta a 0.8% + IVA."
+              }
+            }
+          ]
         }
       ]
     }
@@ -477,9 +539,10 @@
                     <span class="font-semibold text-lg tracking-tight text-white">Monitor de Comisiones AR</span>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <span
-                        class="text-xs font-medium bg-emerald-500/20 text-emerald-400 px-2.5 py-0.5 rounded-full status-badge">Actualizado:
-                        08/02/26</span>
+                    <time id="globalLastUpdated" datetime=""
+                          class="text-xs font-medium bg-emerald-500/20 text-emerald-400 px-2.5 py-0.5 rounded-full status-badge">
+                        Datos actualizados semanalmente
+                    </time>
                 </div>
             </div>
         </div>
@@ -545,6 +608,7 @@
                         <div>
                             <h2 id="detailTitle" class="text-2xl font-bold">Nombre Entidad</h2>
                             <span id="detailType" class="inline-block mt-2 px-3 py-1 bg-white/20 rounded-full text-xs font-medium backdrop-blur-sm">Tipo</span>
+                            <time id="detailTimestamp" datetime="" class="hidden block mt-1 text-xs text-white/70"></time>
                         </div>
                     </div>
                     <button onclick="closeDetail()"
@@ -717,6 +781,166 @@
         </div>
     </div>
 
+    <!-- FAQ Section -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h2 class="text-2xl font-bold text-slate-900 mb-6">Preguntas frecuentes sobre comisiones</h2>
+
+        <div class="space-y-4">
+            <details class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden group" open>
+                <summary class="px-6 py-4 cursor-pointer font-semibold text-slate-800 hover:bg-slate-50 transition-colors list-none flex justify-between items-center">
+                    <h3 class="text-base font-semibold">¿Cuánto cobra Mercado Pago por cobrar con tarjeta de débito?</h3>
+                    <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </summary>
+                <div class="px-6 pb-4 text-slate-600 text-sm leading-relaxed">
+                    <p>Mercado Pago cobra <strong>3.25% + IVA</strong> por ventas con tarjeta de débito
+                    a través de Point, con acreditación en el momento. Para cobros por QR, la comisión
+                    varía entre 0.80% y 6.29% + IVA según el medio de pago utilizado por el comprador.
+                    Podés consultar las tarifas oficiales en la
+                    <a href="https://www.mercadopago.com.ar/ayuda/2779" rel="noopener" target="_blank"
+                       class="text-blue-600 underline hover:text-blue-800">página de costos de Mercado Pago</a>.</p>
+                </div>
+            </details>
+
+            <details class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden group">
+                <summary class="px-6 py-4 cursor-pointer font-semibold text-slate-800 hover:bg-slate-50 transition-colors list-none flex justify-between items-center">
+                    <h3 class="text-base font-semibold">¿Qué conviene más: Mercado Pago o Ualá para cobrar con tarjeta?</h3>
+                    <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </summary>
+                <div class="px-6 pb-4 text-slate-600 text-sm leading-relaxed">
+                    <p>Depende de tu volumen y tipo de ventas. <strong>Ualá Bis cobra 2.9% + IVA en débito</strong>
+                    (vs 3.25% de Mercado Pago Point), lo que lo hace más económico para ventas con débito.
+                    En crédito, Ualá cobra 4.4% + IVA mientras Mercado Pago cobra 4.39% + IVA con acreditación a 10 días.
+                    Ambos acreditan en el momento para débito. Usá el simulador de arriba para comparar
+                    cuánto recibirías según tu monto de venta.</p>
+                </div>
+            </details>
+
+            <details class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden group">
+                <summary class="px-6 py-4 cursor-pointer font-semibold text-slate-800 hover:bg-slate-50 transition-colors list-none flex justify-between items-center">
+                    <h3 class="text-base font-semibold">¿Cuánto me descuentan si cobro con tarjeta de crédito en Argentina?</h3>
+                    <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </summary>
+                <div class="px-6 pb-4 text-slate-600 text-sm leading-relaxed">
+                    <p>El descuento depende del procesador que utilices. Los <strong>bancos adquirentes</strong>
+                    (como Banco Nación y Banco Provincia) cobran <strong>1.8% + IVA</strong> por ventas con
+                    crédito, con acreditación en 8-10 días hábiles. Los <strong>agregadores fintech</strong>
+                    (Mercado Pago, Ualá) cobran entre 4.39% y 6.29% + IVA, pero ofrecen acreditación
+                    inmediata o en menor plazo. A la comisión base siempre se suma el 21% de IVA sobre
+                    el monto de la comisión.</p>
+                </div>
+            </details>
+
+            <details class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden group">
+                <summary class="px-6 py-4 cursor-pointer font-semibold text-slate-800 hover:bg-slate-50 transition-colors list-none flex justify-between items-center">
+                    <h3 class="text-base font-semibold">¿Cuáles son las comisiones de Banco Nación para comercios?</h3>
+                    <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </summary>
+                <div class="px-6 pb-4 text-slate-600 text-sm leading-relaxed">
+                    <p>Banco Nación cobra <strong>0.8% + IVA para débito</strong> (acreditación en 24 horas)
+                    y <strong>1.8% + IVA para crédito</strong> (acreditación en 8-10 días hábiles). El
+                    mantenimiento de la terminal POS puede ser bonificado o variable según el acuerdo
+                    comercial. Consultá los aranceles oficiales en la
+                    <a href="https://aranceles.fiservargentina.com/" rel="noopener" target="_blank"
+                       class="text-blue-600 underline hover:text-blue-800">página de Fiserv Argentina</a>.</p>
+                </div>
+            </details>
+
+            <details class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden group">
+                <summary class="px-6 py-4 cursor-pointer font-semibold text-slate-800 hover:bg-slate-50 transition-colors list-none flex justify-between items-center">
+                    <h3 class="text-base font-semibold">¿Qué es un agregador de pagos y en qué se diferencia de un banco adquirente?</h3>
+                    <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </summary>
+                <div class="px-6 pb-4 text-slate-600 text-sm leading-relaxed">
+                    <p>Un <strong>banco adquirente</strong> (como Banco Nación o Banco Provincia) tiene relación
+                    directa con las marcas de tarjetas (Visa, Mastercard) y opera bajo los aranceles regulados
+                    por el BCRA. Un <strong>agregador de pagos</strong> (como Mercado Pago o Ualá) funciona como
+                    intermediario: procesa pagos bajo su propia cuenta adquirente y fija sus propias comisiones,
+                    generalmente más altas pero con mayor simplicidad de alta y acreditación más rápida. Los bancos
+                    requieren trámites de adhesión y una terminal POS; los agregadores permiten empezar a cobrar
+                    con solo descargar una app.</p>
+                </div>
+            </details>
+
+            <details class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden group">
+                <summary class="px-6 py-4 cursor-pointer font-semibold text-slate-800 hover:bg-slate-50 transition-colors list-none flex justify-between items-center">
+                    <h3 class="text-base font-semibold">¿Cada cuánto se actualizan las comisiones en este sitio?</h3>
+                    <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </summary>
+                <div class="px-6 pb-4 text-slate-600 text-sm leading-relaxed">
+                    <p>Las comisiones se actualizan <strong>automáticamente cada semana</strong> (domingos a las
+                    3 AM UTC). Nuestros scrapers consultan las páginas oficiales de cada entidad y, si detectan
+                    cambios, actualizan los datos automáticamente. No usamos valores fijos ni estimaciones:
+                    todos los datos provienen de fuentes oficiales verificables. Podés ver el
+                    <a href="https://github.com/jrusco/monitor-comisiones-bancarias" rel="noopener" target="_blank"
+                       class="text-blue-600 underline hover:text-blue-800">código fuente en GitHub</a>.</p>
+                </div>
+            </details>
+
+            <details class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden group">
+                <summary class="px-6 py-4 cursor-pointer font-semibold text-slate-800 hover:bg-slate-50 transition-colors list-none flex justify-between items-center">
+                    <h3 class="text-base font-semibold">¿Cómo se comparan las comisiones de cobro por QR vs Point/POS?</h3>
+                    <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </summary>
+                <div class="px-6 pb-4 text-slate-600 text-sm leading-relaxed">
+                    <p>El cobro por <strong>QR</strong> generalmente tiene comisiones más bajas que un dispositivo
+                    POS/Point porque no requiere hardware. En Mercado Pago, el QR cobra entre 0.80% y 6.29% + IVA
+                    según el medio de pago del comprador (débito, crédito, saldo en cuenta), mientras que el Point
+                    cobra 3.25% + IVA en débito. Banco Provincia ofrece QR con saldo en cuenta a 0.8% + IVA y
+                    Clave DNI (token) a 0.6% + IVA. La diferencia principal está en la experiencia de usuario:
+                    QR requiere que el comprador escanee un código, mientras que Point/POS acepta contactless y
+                    chip directamente.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- Methodology Section -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+            <h2 class="text-xl font-bold text-slate-900 mb-4">Cómo funciona este comparador</h2>
+            <div class="prose prose-sm prose-slate max-w-none">
+                <p>Este comparador recopila las comisiones de cobro con tarjeta de débito y crédito de las
+                principales entidades de pago de Argentina. Los datos se obtienen <strong>directamente de
+                las páginas oficiales</strong> de cada entidad mediante scrapers automatizados que se
+                ejecutan semanalmente.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 not-prose">
+                    <div class="bg-slate-50 rounded-lg p-4">
+                        <p class="font-semibold text-slate-800 text-sm mb-1">Fuentes oficiales</p>
+                        <p class="text-xs text-slate-500">Todas las tasas provienen de las páginas oficiales
+                        de cada entidad. No usamos valores estimados ni datos de terceros.</p>
+                    </div>
+                    <div class="bg-slate-50 rounded-lg p-4">
+                        <p class="font-semibold text-slate-800 text-sm mb-1">Actualización automática</p>
+                        <p class="text-xs text-slate-500">Los scrapers se ejecutan todos los domingos a las
+                        3 AM UTC. Si detectan cambios, los datos se actualizan automáticamente.</p>
+                    </div>
+                    <div class="bg-slate-50 rounded-lg p-4">
+                        <p class="font-semibold text-slate-800 text-sm mb-1">Código abierto</p>
+                        <p class="text-xs text-slate-500">El código fuente es público y verificable en
+                        <a href="https://github.com/jrusco/monitor-comisiones-bancarias"
+                           rel="noopener" target="_blank"
+                           class="text-blue-600 underline">GitHub</a>. Cualquiera puede auditar la metodología.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <footer class="bg-slate-900 text-slate-400 py-12 mt-12 border-t border-slate-800">
         <div class="max-w-7xl mx-auto px-4 text-center">
             <p class="mb-4">Monitor de Recursos Financieros Argentina</p>
@@ -760,6 +984,27 @@
 
         function getColorHex(tailwindClass) {
             return tailwindColors[tailwindClass] || '#475569';
+        }
+
+        // --- Date Formatting Utilities ---
+
+        function formatDate(isoString) {
+            if (!isoString) return null;
+            return new Date(isoString).toLocaleDateString('es-AR', {
+                day: 'numeric', month: 'short', year: 'numeric'
+            });
+        }
+
+        function renderLastUpdated(entities) {
+            const dates = entities
+                .filter(e => e.lastUpdated)
+                .map(e => new Date(e.lastUpdated));
+            if (!dates.length) return;
+
+            const latest = new Date(Math.max(...dates));
+            const el = document.getElementById('globalLastUpdated');
+            el.textContent = `Actualizado: ${formatDate(latest.toISOString())}`;
+            el.setAttribute('datetime', latest.toISOString());
         }
 
         // --- Transaction Fee Simulator Logic ---
@@ -1053,6 +1298,7 @@
                 // Make entities available globally first
                 window.appData = { entities };
 
+                renderLastUpdated(entities);  // Update navbar timestamp
                 renderHeroMetrics(entities);  // Must run first to set min rates
                 renderChart(entities);
                 renderEntityGrid(entities);
@@ -1188,6 +1434,16 @@
             document.getElementById('detailLogo').alt = entity.name + ' Logo';
             document.getElementById('detailTitle').textContent = entity.name;
             document.getElementById('detailType').textContent = entity.type;
+
+            // Update timestamp
+            const detailTimestamp = document.getElementById('detailTimestamp');
+            if (entity.lastUpdated) {
+                detailTimestamp.textContent = `Verificado: ${formatDate(entity.lastUpdated)}`;
+                detailTimestamp.setAttribute('datetime', entity.lastUpdated);
+                detailTimestamp.classList.remove('hidden');
+            } else {
+                detailTimestamp.classList.add('hidden');
+            }
 
             // Update Resources
             // Update fee link
