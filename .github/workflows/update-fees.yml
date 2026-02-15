@@ -15,7 +15,7 @@ concurrency:
 jobs:
   update-fees:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
 
     steps:
       - uses: actions/checkout@v4
@@ -24,6 +24,10 @@ jobs:
         with:
           go-version: '1.24'
           cache: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
       - name: Run scrapers
         run: |
@@ -38,10 +42,29 @@ jobs:
       - name: Validate data.json
         run: jq empty data.json
 
+      - name: Build Tailwind CSS
+        run: |
+          curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64
+          chmod +x tailwindcss-linux-x64
+          ./tailwindcss-linux-x64 -i input.css -o tailwind.min.css --minify
+
+      - name: Pre-render content into HTML
+        run: node scripts/prerender.js
+
+      - name: Validate structured data
+        run: |
+          node -e "
+            const html = require('fs').readFileSync('index.html','utf8');
+            const match = html.match(/<script type=\"application\/ld\+json\">([\s\S]*?)<\/script>/);
+            if (!match) { console.error('No JSON-LD found'); process.exit(1); }
+            const data = JSON.parse(match[1]);
+            console.log('JSON-LD valid. Types:', data['@graph'].map(i => i['@type']).join(', '));
+          "
+
       - name: Commit and push if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data.json index.html
+          git add data.json index.html sitemap.xml tailwind.min.css
           git diff --staged --quiet || git commit -m "chore: update fees [automated]"
           git push

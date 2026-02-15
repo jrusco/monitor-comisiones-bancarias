@@ -37,7 +37,6 @@
     <!-- Preconnect to CDN origins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preload" href="data.json" as="fetch" crossorigin>
 
     <!-- Favicon & Theme -->
@@ -46,292 +45,14 @@
     <meta name="theme-color" content="#1e40af">
 
     <!-- Stylesheets -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/tailwind.min.css">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
-
-    <!-- Scripts (deferred where possible) -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2" defer></script>
 
     <!-- Google AdSense -->
     <link rel="preconnect" href="//pagead2.googlesyndication.com">
     <link rel="dns-prefetch" href="//pagead2.googlesyndication.com">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9911542239640489"
          crossorigin="anonymous"></script>
-    <style>
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background-color: #f8fafc;
-        }
-
-        /* Typography: Serif headlines for distinction */
-        h1, h2, .hero-title {
-            font-family: 'DM Serif Display', serif;
-        }
-
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 800px;
-            height: 280px;
-            margin: 0 auto;
-        }
-
-        @media (max-width: 768px) {
-            .chart-container {
-                height: 240px;
-            }
-        }
-
-        .card-hover:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-
-        .transition-all {
-            transition-property: all;
-            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-            transition-duration: 300ms;
-        }
-
-        /* Custom scrollbar for data tables */
-        .custom-scroll::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        .custom-scroll::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 3px;
-        }
-
-        .custom-scroll::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-
-        /* Entity card colored top border */
-        .entity-card {
-            border-top: 3px solid var(--entity-color, #94a3b8);
-        }
-
-        /* Status badge subtle pulse animation */
-        .status-badge {
-            animation: pulse-subtle 3s ease-in-out infinite;
-        }
-
-        @keyframes pulse-subtle {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        /* Enhanced card hover */
-        .card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-        }
-
-        /* Page entrance animation */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-entrance {
-            animation: fadeInUp 0.5s ease-out forwards;
-        }
-
-        /* Staggered entrance for cards */
-        .entity-card:nth-child(1) { animation-delay: 0.1s; }
-        .entity-card:nth-child(2) { animation-delay: 0.15s; }
-        .entity-card:nth-child(3) { animation-delay: 0.2s; }
-        .entity-card:nth-child(4) { animation-delay: 0.25s; }
-        .entity-card:nth-child(5) { animation-delay: 0.3s; }
-
-        /* Detail modal slide-in animation */
-        .detail-entrance {
-            animation: slideInUp 0.4s ease-out forwards;
-        }
-
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Entity-colored header accent */
-        .entity-header-accent {
-            background: linear-gradient(135deg, var(--entity-color, #1e293b) 0%, color-mix(in srgb, var(--entity-color, #1e293b) 70%, black) 100%);
-        }
-
-        /* Transaction Fee Simulator Widget */
-        .fee-simulator {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            width: 320px;
-            z-index: 40; /* Below navbar (50) but above content */
-        }
-
-        .simulator-container {
-            max-height: 600px;
-            overflow-y: auto;
-        }
-
-        .simulator-header {
-            cursor: pointer;
-            user-select: none; /* Prevent text selection when clicking */
-        }
-
-        /* Collapsed state */
-        .fee-simulator.collapsed .simulator-body {
-            display: none;
-        }
-
-        /* Mobile responsive */
-        @media (max-width: 768px) {
-            .fee-simulator {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                width: 100%;
-                border-radius: 12px 12px 0 0 !important;
-            }
-
-            .fee-simulator .simulator-container {
-                border-radius: 12px 12px 0 0 !important;
-                max-height: 70vh;
-            }
-
-            /* Mobile backdrop overlay */
-            .fee-simulator::before {
-                content: '';
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(0, 0, 0, 0.3);
-                z-index: -1;
-                opacity: 0;
-                transition: opacity 0.3s;
-                pointer-events: none;
-            }
-
-            .fee-simulator:not(.collapsed)::before {
-                opacity: 1;
-            }
-        }
-
-        /* Fix #5a: Browser-compatible scroll lock (replaces :has() selector) */
-        body.simulator-expanded {
-            overflow: hidden;
-        }
-
-        /* Smooth height transitions for collapse/expand */
-        .simulator-body {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* Input number spin buttons (remove) */
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        input[type="number"] {
-            -moz-appearance: textfield;
-        }
-
-        /* Visual feedback for calculation update */
-        @keyframes resultUpdate {
-            0% { background-color: #fee2e2; }
-            100% { background-color: transparent; }
-        }
-
-        .result-updated {
-            animation: resultUpdate 0.5s ease-out;
-            border-radius: 0.5rem;
-            padding: 0.25rem;
-            margin: -0.25rem;
-        }
-
-        /* Official Brand Colors */
-        .bg-bna-primary { background-color: #057EA3; }  /* Official BNA teal */
-        .text-bna-primary { color: #057EA3; }
-        .border-bna-primary { border-color: #057EA3; }
-
-        .bg-bapro-primary { background-color: #FFFFFF; }
-        .text-bapro-primary { color: #FFFFFF; }
-        .border-bapro-primary { border-color: #FFFFFF; }
-
-        .bg-bapro-dark { background-color: #2E7D32; }
-        .text-bapro-dark { color: #2E7D32; }
-
-        .bg-mercadopago-primary { background-color: #00bcff; }
-        .text-mercadopago-primary { color: #00bcff; }
-        .border-mercadopago-primary { border-color: #00bcff; }
-
-        .bg-mercadopago-dark { background-color: #0a0080; }
-        .text-mercadopago-dark { color: #0a0080; }
-
-        .bg-uala-primary { background-color: #022A9A; }
-        .text-uala-primary { color: #022A9A; }
-        .border-uala-primary { border-color: #022A9A; }
-
-        /* Hover variants */
-        .hover\:bg-bna-primary:hover { background-color: #057EA3; }
-        .hover\:bg-bapro-primary:hover { background-color: #FFFFFF; }
-        .hover\:bg-bapro-dark:hover { background-color: #2E7D32; }
-        .hover\:bg-mercadopago-primary:hover { background-color: #00bcff; }
-        .hover\:bg-uala-primary:hover { background-color: #022A9A; }
-
-        /* Opacity variants for overlays */
-        .bg-bna-primary\/20 { background-color: rgba(5, 126, 163, 0.2); }  /* Updated RGBA for teal */
-        .bg-bapro-primary\/20 { background-color: rgba(255, 255, 255, 0.2); }
-        .bg-bapro-dark\/20 { background-color: rgba(46, 125, 50, 0.2); }
-        .bg-mercadopago-primary\/20 { background-color: rgba(0, 188, 255, 0.2); }
-        .bg-uala-primary\/20 { background-color: rgba(2, 42, 154, 0.2); }
-
-        /* Ad Container Styles */
-        .ad-container {
-            min-height: 100px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .ad-container ins.adsbygoogle {
-            width: 100%;
-        }
-
-        /* Hide ads on very small screens where they provide poor UX */
-        @media (max-width: 320px) {
-            .ad-container { display: none; }
-        }
-
-        /* Reduce reserved height on mobile */
-        @media (max-width: 768px) {
-            .ad-container { min-height: 60px; }
-        }
-    </style>
     <!-- Chosen Palette: Slate (Backgrounds/Text) + Blue (Primary) + Emerald (Success/Money) -->
     <!-- Application Structure Plan: 
          1. Header: Context and objective.
@@ -352,181 +73,372 @@
 
     <!-- Structured Data -->
     <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
     {
-      "@context": "https://schema.org",
-      "@graph": [
+      "@type": "WebApplication",
+      "@id": "https://cobrocontarjeta.com.ar/#app",
+      "name": "Cobro con Tarjeta Argentina",
+      "alternateName": "Monitor de Comisiones Bancarias",
+      "description": "Comparador de comisiones por cobro con tarjeta de débito y crédito en Argentina",
+      "url": "https://cobrocontarjeta.com.ar/",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "All",
+      "inLanguage": "es-AR",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "ARS"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "jrusco",
+        "url": "https://github.com/jrusco"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
         {
-          "@type": "WebApplication",
-          "@id": "https://cobrocontarjeta.com.ar/#app",
-          "name": "Cobro con Tarjeta Argentina",
-          "alternateName": "Monitor de Comisiones Bancarias",
-          "description": "Comparador de comisiones por cobro con tarjeta de débito y crédito en Argentina",
-          "url": "https://cobrocontarjeta.com.ar/",
-          "applicationCategory": "FinanceApplication",
-          "operatingSystem": "All",
-          "inLanguage": "es-AR",
-          "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "ARS"
-          },
-          "author": {
-            "@type": "Person",
-            "name": "jrusco",
-            "url": "https://github.com/jrusco"
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Inicio",
+          "item": "https://cobrocontarjeta.com.ar/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Comparador de Comisiones"
+        }
+      ]
+    },
+    {
+      "@type": "ItemList",
+      "name": "Procesadores de pago en Argentina",
+      "description": "Comparativa de comisiones de procesadores de pago con tarjeta en Argentina",
+      "numberOfItems": 4,
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "item": {
+            "@type": "PaymentService",
+            "name": "Mercado Pago",
+            "provider": {
+              "@type": "Organization",
+              "name": "Mercado Pago",
+              "url": "https://www.mercadopago.com.ar"
+            },
+            "areaServed": {
+              "@type": "Country",
+              "name": "Argentina"
+            },
+            "feesAndCommissionsSpecification": "https://www.mercadopago.com.ar/ayuda/cuanto-cuesta-recibir-pagos-con-point_2779"
           }
         },
         {
-          "@type": "BreadcrumbList",
-          "itemListElement": [
-            {
-              "@type": "ListItem",
-              "position": 1,
-              "name": "Inicio",
-              "item": "https://cobrocontarjeta.com.ar/"
+          "@type": "ListItem",
+          "position": 2,
+          "item": {
+            "@type": "PaymentService",
+            "name": "Ualá Bis",
+            "provider": {
+              "@type": "Organization",
+              "name": "Ualá",
+              "url": "https://www.uala.com.ar"
             },
-            {
-              "@type": "ListItem",
-              "position": 2,
-              "name": "Comparador de Comisiones"
-            }
-          ]
+            "areaServed": {
+              "@type": "Country",
+              "name": "Argentina"
+            },
+            "feesAndCommissionsSpecification": "https://www.uala.com.ar/bis/costos"
+          }
         },
         {
-          "@type": "ItemList",
-          "name": "Procesadores de pago en Argentina",
-          "description": "Comparativa de comisiones de procesadores de pago con tarjeta en Argentina",
-          "numberOfItems": 4,
-          "itemListElement": [
-            {
-              "@type": "ListItem",
-              "position": 1,
-              "item": {
-                "@type": "PaymentService",
-                "name": "Mercado Pago",
-                "provider": {
-                  "@type": "Organization",
-                  "name": "Mercado Pago",
-                  "url": "https://www.mercadopago.com.ar"
-                },
-                "areaServed": { "@type": "Country", "name": "Argentina" },
-                "feesAndCommissionsSpecification": "https://www.mercadopago.com.ar/ayuda/cuanto-cuesta-recibir-pagos-con-point_2779"
-              }
+          "@type": "ListItem",
+          "position": 3,
+          "item": {
+            "@type": "PaymentService",
+            "name": "Banco de la Nación Argentina",
+            "provider": {
+              "@type": "BankOrCreditUnion",
+              "name": "Banco de la Nación Argentina",
+              "url": "https://www.bna.com.ar"
             },
-            {
-              "@type": "ListItem",
-              "position": 2,
-              "item": {
-                "@type": "PaymentService",
-                "name": "Ualá Bis",
-                "provider": {
-                  "@type": "Organization",
-                  "name": "Ualá",
-                  "url": "https://www.uala.com.ar"
-                },
-                "areaServed": { "@type": "Country", "name": "Argentina" },
-                "feesAndCommissionsSpecification": "https://www.uala.com.ar/bis/costos"
-              }
+            "areaServed": {
+              "@type": "Country",
+              "name": "Argentina"
             },
-            {
-              "@type": "ListItem",
-              "position": 3,
-              "item": {
-                "@type": "PaymentService",
-                "name": "Banco de la Nación Argentina",
-                "provider": {
-                  "@type": "BankOrCreditUnion",
-                  "name": "Banco de la Nación Argentina",
-                  "url": "https://www.bna.com.ar"
-                },
-                "areaServed": { "@type": "Country", "name": "Argentina" },
-                "feesAndCommissionsSpecification": "https://aranceles.fiservargentina.com/"
-              }
-            },
-            {
-              "@type": "ListItem",
-              "position": 4,
-              "item": {
-                "@type": "PaymentService",
-                "name": "Banco Provincia",
-                "provider": {
-                  "@type": "BankOrCreditUnion",
-                  "name": "Banco de la Provincia de Buenos Aires",
-                  "url": "https://www.bancoprovincia.com.ar"
-                },
-                "areaServed": { "@type": "Country", "name": "Argentina" },
-                "feesAndCommissionsSpecification": "https://www.bancoprovincia.com.ar/web/adhesion_comercios"
-              }
-            }
-          ]
+            "feesAndCommissionsSpecification": "https://aranceles.fiservargentina.com/"
+          }
         },
         {
-          "@type": "FAQPage",
-          "mainEntity": [
-            {
-              "@type": "Question",
-              "name": "¿Cuánto cobra Mercado Pago por cobrar con tarjeta de débito?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Mercado Pago cobra 3.25% + IVA por ventas con tarjeta de débito a través de Point, con acreditación en el momento. Para cobros por QR, la comisión varía entre 0.80% y 6.29% + IVA según el medio de pago utilizado por el comprador."
-              }
+          "@type": "ListItem",
+          "position": 4,
+          "item": {
+            "@type": "PaymentService",
+            "name": "Banco Provincia",
+            "provider": {
+              "@type": "BankOrCreditUnion",
+              "name": "Banco de la Provincia de Buenos Aires",
+              "url": "https://www.bancoprovincia.com.ar"
             },
-            {
-              "@type": "Question",
-              "name": "¿Qué conviene más: Mercado Pago o Ualá para cobrar con tarjeta?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Depende de tu volumen y tipo de ventas. Ualá Bis cobra 2.9% + IVA en débito (vs 3.25% de Mercado Pago Point). En crédito, Ualá cobra 4.4% + IVA mientras Mercado Pago cobra 4.39% + IVA con acreditación a 10 días. Ambos acreditan en el momento para débito."
-              }
+            "areaServed": {
+              "@type": "Country",
+              "name": "Argentina"
             },
-            {
-              "@type": "Question",
-              "name": "¿Cuánto me descuentan si cobro con tarjeta de crédito en Argentina?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Los bancos adquirentes (Banco Nación, Banco Provincia) cobran 1.8% + IVA con acreditación en 8-10 días hábiles. Los agregadores fintech (Mercado Pago, Ualá) cobran entre 4.39% y 6.29% + IVA, pero ofrecen acreditación inmediata o en menor plazo."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "¿Cuáles son las comisiones de Banco Nación para comercios?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Banco Nación cobra 0.8% + IVA para débito (acreditación en 24 horas) y 1.8% + IVA para crédito (acreditación en 8-10 días hábiles). El mantenimiento de la terminal POS puede ser bonificado o variable según el acuerdo comercial."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "¿Qué es un agregador de pagos y en qué se diferencia de un banco adquirente?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Un banco adquirente tiene relación directa con las marcas de tarjetas y opera bajo aranceles regulados por el BCRA. Un agregador de pagos funciona como intermediario, fijando sus propias comisiones (generalmente más altas) pero con mayor simplicidad de alta y acreditación más rápida."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "¿Cada cuánto se actualizan las comisiones en este sitio?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Las comisiones se actualizan automáticamente cada semana. Los scrapers consultan las páginas oficiales de cada entidad y actualizan los datos si detectan cambios. Todos los datos provienen de fuentes oficiales verificables."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "¿Cómo se comparan las comisiones de cobro por QR vs Point/POS?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "El cobro por QR generalmente tiene comisiones más bajas que un dispositivo POS/Point. En Mercado Pago, el QR cobra entre 0.80% y 6.29% + IVA según el medio de pago, mientras que el Point cobra 3.25% + IVA en débito. Banco Provincia ofrece QR con saldo en cuenta a 0.8% + IVA."
-              }
-            }
-          ]
+            "feesAndCommissionsSpecification": "https://www.bancoprovincia.com.ar/web/adhesion_comercios"
+          }
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "¿Cuánto cobra Mercado Pago por cobrar con tarjeta de débito?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Mercado Pago cobra 3.25% + IVA por ventas con tarjeta de débito a través de Point, con acreditación en el momento. Para cobros por QR, la comisión varía entre 0.80% y 6.29% + IVA según el medio de pago utilizado por el comprador."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Qué conviene más: Mercado Pago o Ualá para cobrar con tarjeta?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Depende de tu volumen y tipo de ventas. Ualá Bis cobra 2.9% + IVA en débito (vs 3.25% de Mercado Pago Point). En crédito, Ualá cobra 4.4% + IVA mientras Mercado Pago cobra 4.39% + IVA con acreditación a 10 días. Ambos acreditan en el momento para débito."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Cuánto me descuentan si cobro con tarjeta de crédito en Argentina?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Los bancos adquirentes (Banco Nación, Banco Provincia) cobran 1.8% + IVA con acreditación en 8-10 días hábiles. Los agregadores fintech (Mercado Pago, Ualá) cobran entre 4.39% y 6.29% + IVA, pero ofrecen acreditación inmediata o en menor plazo."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Cuáles son las comisiones de Banco Nación para comercios?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Banco Nación cobra 0.8% + IVA para débito (acreditación en 24 horas) y 1.8% + IVA para crédito (acreditación en 8-10 días hábiles). El mantenimiento de la terminal POS puede ser bonificado o variable según el acuerdo comercial."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Qué es un agregador de pagos y en qué se diferencia de un banco adquirente?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Un banco adquirente tiene relación directa con las marcas de tarjetas y opera bajo aranceles regulados por el BCRA. Un agregador de pagos funciona como intermediario, fijando sus propias comisiones (generalmente más altas) pero con mayor simplicidad de alta y acreditación más rápida."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Cada cuánto se actualizan las comisiones en este sitio?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Las comisiones se actualizan automáticamente cada semana. Los scrapers consultan las páginas oficiales de cada entidad y actualizan los datos si detectan cambios. Todos los datos provienen de fuentes oficiales verificables."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Cómo se comparan las comisiones de cobro por QR vs Point/POS?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "El cobro por QR generalmente tiene comisiones más bajas que un dispositivo POS/Point. En Mercado Pago, el QR cobra entre 0.80% y 6.29% + IVA según el medio de pago, mientras que el Point cobra 3.25% + IVA en débito. Banco Provincia ofrece QR con saldo en cuenta a 0.8% + IVA."
+          }
         }
       ]
     }
+  ]
+}
     </script>
 </head>
 
 <body class="text-slate-800">
+<noscript>
+    <div style="max-width: 1280px; margin: 2rem auto; padding: 0 1rem;">
+        <div style="background: white; border-radius: 12px; padding: 1.5rem; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; color: #1e293b;">Comparación de Comisiones por Cobro con Tarjeta</h2>
+            <p style="color: #64748b; margin-bottom: 1.5rem; font-size: 0.875rem;">Esta tabla muestra las comisiones actualizadas de cada procesador. Para ver la versión interactiva, habilite JavaScript.</p>
+
+            
+            <div style="margin-bottom: 2rem; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+                <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; padding: 1rem; font-weight: bold; font-size: 1.125rem;">
+                    Banco Nación
+                </div>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f1f5f9; border-bottom: 1px solid #e2e8f0;">
+                            <th style="padding: 0.75rem; text-align: left; font-size: 0.875rem; color: #475569;">Tipo de pago</th>
+                            <th style="padding: 0.75rem; text-align: left; font-size: 0.875rem; color: #475569;">Cuándo cobrás</th>
+                            <th style="padding: 0.75rem; text-align: right; font-size: 0.875rem; color: #475569;">Comisión</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">Débito</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">24 hs</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">0.8% + IVA</td>
+                        </tr>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">Crédito</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">8-10 días hábiles</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">1.8% + IVA</td>
+                        </tr>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">Mantenimiento Terminal</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">Mensual</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">Bonificado o Variable</td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+                <div style="padding: 0.75rem; background: #fef3c7; border-top: 1px solid #fde68a; font-size: 0.75rem; color: #92400e;">
+                    Las tasas no incluyen IVA ni retenciones. Verificá en la <a href="https://aranceles.fiservargentina.com/" style="color: #1d4ed8; text-decoration: underline;" target="_blank" rel="noopener">fuente oficial</a>.
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 2rem; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+                <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; padding: 1rem; font-weight: bold; font-size: 1.125rem;">
+                    Banco Provincia
+                </div>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f1f5f9; border-bottom: 1px solid #e2e8f0;">
+                            <th style="padding: 0.75rem; text-align: left; font-size: 0.875rem; color: #475569;">Tipo de pago</th>
+                            <th style="padding: 0.75rem; text-align: left; font-size: 0.875rem; color: #475569;">Cuándo cobrás</th>
+                            <th style="padding: 0.75rem; text-align: right; font-size: 0.875rem; color: #475569;">Comisión</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">Débito</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">48 hs</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">0.8% + IVA</td>
+                        </tr>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">Crédito</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">8-10 días hábiles</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">1.8% + IVA</td>
+                        </tr>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">Clave DNI (Token)</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">Inmediato</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">0.6% + IVA</td>
+                        </tr>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">QR (Saldo en Cuenta)</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">Inmediato</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">0.8% + IVA</td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+                <div style="padding: 0.75rem; background: #fef3c7; border-top: 1px solid #fde68a; font-size: 0.75rem; color: #92400e;">
+                    Las tasas no incluyen IVA ni retenciones. Verificá en la <a href="https://www.bancoprovincia.com.ar/web/adhesion_comercios" style="color: #1d4ed8; text-decoration: underline;" target="_blank" rel="noopener">fuente oficial</a>.
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 2rem; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+                <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; padding: 1rem; font-weight: bold; font-size: 1.125rem;">
+                    Mercado Pago
+                </div>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f1f5f9; border-bottom: 1px solid #e2e8f0;">
+                            <th style="padding: 0.75rem; text-align: left; font-size: 0.875rem; color: #475569;">Tipo de pago</th>
+                            <th style="padding: 0.75rem; text-align: left; font-size: 0.875rem; color: #475569;">Cuándo cobrás</th>
+                            <th style="padding: 0.75rem; text-align: right; font-size: 0.875rem; color: #475569;">Comisión</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">Point - Débito</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">En el momento</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">3.25% + IVA</td>
+                        </tr>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">Point - Crédito</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">En el momento</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">6.29% + IVA</td>
+                        </tr>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">Point - Crédito</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">10 días</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">4.39% + IVA</td>
+                        </tr>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">QR</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">En el momento</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">0.80% - 6.29% + IVA (según medio)</td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+                <div style="padding: 0.75rem; background: #fef3c7; border-top: 1px solid #fde68a; font-size: 0.75rem; color: #92400e;">
+                    Las tasas no incluyen IVA ni retenciones. Verificá en la <a href="https://www.mercadopago.com.ar/ayuda/2779#tabla1" style="color: #1d4ed8; text-decoration: underline;" target="_blank" rel="noopener">fuente oficial</a>.
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 2rem; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+                <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; padding: 1rem; font-weight: bold; font-size: 1.125rem;">
+                    Ualá (Bis)
+                </div>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f1f5f9; border-bottom: 1px solid #e2e8f0;">
+                            <th style="padding: 0.75rem; text-align: left; font-size: 0.875rem; color: #475569;">Tipo de pago</th>
+                            <th style="padding: 0.75rem; text-align: left; font-size: 0.875rem; color: #475569;">Cuándo cobrás</th>
+                            <th style="padding: 0.75rem; text-align: right; font-size: 0.875rem; color: #475569;">Comisión</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">mPOS - Débito</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">En el momento</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">2.9% + IVA</td>
+                        </tr>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">mPOS - Crédito</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">En el momento</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">4.4% + IVA</td>
+                        </tr>
+                        
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #334155;">Link de Pago</td>
+                            <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">En el momento</td>
+                            <td style="padding: 0.75rem; text-align: right; font-family: monospace; font-weight: bold; font-size: 0.875rem; color: #1e293b;">4.4% + IVA</td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+                <div style="padding: 0.75rem; background: #fef3c7; border-top: 1px solid #fde68a; font-size: 0.75rem; color: #92400e;">
+                    Las tasas no incluyen IVA ni retenciones. Verificá en la <a href="https://mpos.ualabis.com.ar/productos/mpos/" style="color: #1d4ed8; text-decoration: underline;" target="_blank" rel="noopener">fuente oficial</a>.
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</noscript>
+
 
     <!-- Navbar -->
     <nav class="bg-slate-900 border-b border-slate-700 sticky top-0 z-50">
@@ -558,11 +470,11 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
                 <div class="bg-white/15 backdrop-blur-sm rounded-lg p-4 border border-white/20">
                     <p class="text-blue-100 text-sm font-medium mb-1">Menor comisión Débito</p>
-                    <p id="heroMinDebit" class="text-2xl font-bold">Cargando...</p>
+                    <p id="heroMinDebit" class="text-2xl font-bold">0.8% <span class="text-sm font-normal text-blue-200">(Banco Nación)</span></p>
                 </div>
                 <div class="bg-white/15 backdrop-blur-sm rounded-lg p-4 border border-white/20">
                     <p class="text-blue-100 text-sm font-medium mb-1">Menor comisión Crédito</p>
-                    <p id="heroMinCredit" class="text-2xl font-bold">Cargando...</p>
+                    <p id="heroMinCredit" class="text-2xl font-bold">1.8% <span class="text-sm font-normal text-blue-200">(Banco Nación)</span></p>
                 </div>
             </div>
         </section>
@@ -588,6 +500,9 @@
             <!-- Chart Container -->
             <div class="chart-container">
                 <canvas id="feesChart"></canvas>
+                <p id="chartPlaceholder" class="text-center text-sm text-slate-400 py-12">
+                    Cargando grafico comparativo...
+                </p>
             </div>
         </section>
 
@@ -1287,9 +1202,31 @@
 
         // --- Core Functions ---
 
+        function lazyLoadChart(entities) {
+            const chartSection = document.querySelector('.chart-container');
+            if (!chartSection) return;
+
+            const observer = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) {
+                    observer.disconnect();
+                    const chartScript = document.createElement('script');
+                    chartScript.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+                    chartScript.onload = () => {
+                        const pluginScript = document.createElement('script');
+                        pluginScript.src = 'https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2';
+                        pluginScript.onload = () => renderChart(entities);
+                        document.head.appendChild(pluginScript);
+                    };
+                    document.head.appendChild(chartScript);
+                }
+            }, { rootMargin: '300px' });
+
+            observer.observe(chartSection);
+        }
+
         async function initApp() {
             try {
-                const response = await fetch('data.json?t=' + new Date().getTime());
+                const response = await fetch('data.json');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -1300,7 +1237,7 @@
 
                 renderLastUpdated(entities);  // Update navbar timestamp
                 renderHeroMetrics(entities);  // Must run first to set min rates
-                renderChart(entities);
+                lazyLoadChart(entities);
                 renderEntityGrid(entities);
                 initSimulator(entities);  // Initialize fee simulator
 
@@ -1343,7 +1280,8 @@
                     <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider px-1">${groupName}</h3>
                     <div class="space-y-3">
                         ${groupEntities.map(entity => `
-                            <button onclick="showEntityDetail('${entity.id}')"
+                            <button id="${entity.id}"
+                                    onclick="showEntityDetail('${entity.id}')"
                                     class="entity-card card-hover animate-entrance opacity-0 w-full bg-white rounded-xl border border-slate-200 p-4 flex items-center gap-4 transition-all group text-left relative"
                                     style="--entity-color: ${getColorHex(entity.color)}">
                                 ${hasLowestFee(entity) ? '<span class="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">Menor costo</span>' : ''}
@@ -1494,6 +1432,8 @@
 
         // --- Visualization Logic ---
         function renderChart(entities) {
+            const placeholder = document.getElementById('chartPlaceholder');
+            if (placeholder) placeholder.remove();
             const ctx = document.getElementById('feesChart').getContext('2d');
 
             // Helper to find a specific fee rate, returns null if not found
