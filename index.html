@@ -53,6 +53,16 @@
     <link rel="dns-prefetch" href="//pagead2.googlesyndication.com">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9911542239640489"
          crossorigin="anonymous"></script>
+
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX');
+    </script>
+
     <!-- Chosen Palette: Slate (Backgrounds/Text) + Blue (Primary) + Emerald (Success/Money) -->
     <!-- Application Structure Plan: 
          1. Header: Context and objective.
@@ -1180,6 +1190,14 @@
             void resultEl.offsetWidth; // Force reflow
             resultEl.classList.add('result-updated');
 
+            clearTimeout(window._simTrackTimer);
+            window._simTrackTimer = setTimeout(() => {
+                trackSimulatorUse(
+                    simulatorState.selectedEntity?.name,
+                    simulatorState.amount
+                );
+            }, 800);
+
             // Show breakdown with warning for ranges
             const ivaText = simulatorState.includeIVA ? ' + IVA' : '';
             const amountText = formatCurrency(simulatorState.amount);
@@ -1364,6 +1382,9 @@
             const entity = entities.find(e => e.id === id);
             if (!entity) return;
 
+            trackEntityClick(id);
+            document.getElementById('detailSection').setAttribute('data-entity-id', id);
+
             // Update Header with entity color and logo
             const detailHeader = document.getElementById('detailHeader');
             detailHeader.style.setProperty('--entity-color', getColorHex(entity.color));
@@ -1545,6 +1566,45 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', initApp);
+
+        // ── Google Analytics 4 Custom Event Tracking ───────
+        function trackSimulatorUse(entityName, amount) {
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'simulator_use', {
+                    entity: entityName,
+                    amount: amount,
+                });
+            }
+        }
+
+        function trackEntityClick(entityId) {
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'entity_view', {
+                    entity_id: entityId,
+                });
+            }
+        }
+
+        document.querySelectorAll('details').forEach(d => {
+            if (!d.querySelector('summary h3')) return;
+            d.addEventListener('toggle', () => {
+                if (d.open && typeof gtag !== 'undefined') {
+                    const question = d.querySelector('h3')?.textContent?.substring(0, 50);
+                    gtag('event', 'faq_open', { question });
+                }
+            });
+        });
+
+        document.querySelectorAll('a[target="_blank"]').forEach(a => {
+            a.addEventListener('click', () => {
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'outbound_click', {
+                        url: a.href,
+                        entity: a.closest('[data-entity-id]')?.dataset.entityId || 'unknown',
+                    });
+                }
+            });
+        });
 
         // ── Deferred Ad Loading (below-the-fold) ───────────
         (function() {
