@@ -1,6 +1,6 @@
 # Sprint 4: Infrastructure & Growth
 
-**Goal:** Establish the monitoring, analytics, and growth infrastructure needed to measure progress, iterate on SEO strategy, and begin building external authority through link building and instant indexing.
+**Goal:** Establish the monitoring, analytics, and growth infrastructure needed to measure progress, iterate on SEO strategy, and begin building external authority through link building.
 
 **Depends on:** Sprints 1–3 complete (domain configured, content ready, pre-rendering working).
 
@@ -9,8 +9,6 @@
 ## Task 4.1 — Google Analytics 4 Setup
 
 **File:** `index.html` — `<head>` section
-
-### Option A: Google Analytics 4 (full-featured)
 
 Add after the AdSense script, before `</head>`:
 
@@ -33,25 +31,11 @@ Add after the AdSense script, before `</head>`:
 5. Replace the placeholder in the code above
 6. Enable Enhanced Measurement (scrolls, outbound clicks, site search)
 
-### Option B: Plausible Analytics (privacy-friendly, lighter)
-
-```html
-    <!-- Plausible Analytics -->
-    <script defer data-domain="cobrocontarjeta.com.ar"
-            src="https://plausible.io/js/script.js"></script>
-```
-
-**Advantages over GA4:**
-- No cookie consent banner needed (GDPR compliant by design)
-- ~1KB script vs ~30KB for GA4
-- No impact on Core Web Vitals
-- Dashboard is simpler and action-oriented
-
-**Cost:** Plausible starts at $9/month. Free alternative: [Umami](https://umami.is/) (self-hosted).
-
-### Custom event tracking (either option)
+### Custom event tracking
 
 Track key user interactions to understand engagement:
+
+Add to `index.html` at the bottom of `<body>`, after the existing script initialization block (after the `DOMContentLoaded` listener or after `renderEntityGrid()` is called).
 
 ```javascript
 // Track fee simulator usage
@@ -89,12 +73,15 @@ document.querySelectorAll('a[target="_blank"]').forEach(a => {
         if (typeof gtag !== 'undefined') {
             gtag('event', 'outbound_click', {
                 url: a.href,
+                // Requires data-entity-id="${entity.id}" on the entity detail wrapper element
                 entity: a.closest('[data-entity-id]')?.dataset.entityId || 'unknown',
             });
         }
     });
 });
 ```
+
+**Implementation note:** For the `outbound_click` entity tracking to work, add `data-entity-id="${entity.id}"` to the entity detail modal or container element when implementing. Entity cards currently use `id="${entity.id}"` only.
 
 ### Link GA4 to Search Console
 
@@ -107,13 +94,13 @@ document.querySelectorAll('a[target="_blank"]').forEach(a => {
 - [ ] Analytics script loads on the page (verify in DevTools Network tab)
 - [ ] Real-time view shows your own visit
 - [ ] Custom events fire when interacting with simulator, FAQ, entity cards
-- [ ] Search Console linked (if using GA4)
+- [ ] Search Console linked to GA4 property
 
 ---
 
-## Task 4.2 — Submit to Search Console + Bing Webmaster Tools
+## Task 4.2 — Submit to Google Search Console
 
-**Note:** Google Search Console registration was initiated in Sprint 1 (Task 1.10). This task covers verification, sitemap submission, and Bing setup.
+**Note:** Google Search Console registration was initiated in Sprint 1 (Task 1.10). This task covers verification and sitemap submission.
 
 ### Google Search Console post-verification steps
 
@@ -141,92 +128,17 @@ document.querySelectorAll('a[target="_blank"]').forEach(a => {
    - Legacy tools → International Targeting → Country tab
    - Select "Argentina"
 
-### Bing Webmaster Tools
-
-1. Go to https://www.bing.com/webmasters/
-2. Sign in with Microsoft account
-3. Add site: `https://cobrocontarjeta.com.ar`
-4. Verify via DNS:
-   ```
-   CNAME  _bingverify  verify.bing.com.
-   ```
-5. Submit sitemap: `https://cobrocontarjeta.com.ar/sitemap.xml`
-6. In Settings → Configure IndexNow → note the API key for Task 4.3
-
 ### Acceptance criteria
 
 - [ ] Google Search Console: Sitemap shows "Success"
 - [ ] Google Search Console: URL Inspection shows "URL is on Google" (may take days)
 - [ ] Google Search Console: JavaScript-rendered screenshot shows full content
-- [ ] Bing Webmaster: Property verified
-- [ ] Bing Webmaster: Sitemap submitted
 
 ---
 
-## Task 4.3 — IndexNow Integration in CI/CD
+## Task 4.3 — Build Automated Changelog (Fee Change Detection)
 
-**Files:** `.github/workflows/update-fees.yml`, `indexnow-key.txt` (new)
-
-### Setup IndexNow key
-
-1. Generate a key (any UUID-like string): e.g., `a1b2c3d4e5f6g7h8`
-2. Create a verification file at the domain root:
-
-**File:** `a1b2c3d4e5f6g7h8.txt` (name must match the key)
-
-```
-a1b2c3d4e5f6g7h8
-```
-
-3. Add the key as a GitHub Actions secret:
-   - Repository → Settings → Secrets and variables → Actions
-   - New secret: `INDEXNOW_KEY` = `a1b2c3d4e5f6g7h8`
-
-### Add to CI/CD workflow
-
-Add this step **after** the commit-and-push step in `.github/workflows/update-fees.yml`:
-
-```yaml
-      - name: Notify search engines via IndexNow
-        if: success()
-        run: |
-          # Check if there were actual changes committed
-          if git diff --name-only HEAD~1 HEAD 2>/dev/null | grep -q 'data.json\|index.html'; then
-            echo "Changes detected, notifying IndexNow..."
-            curl -s -X POST "https://api.indexnow.org/indexnow" \
-              -H "Content-Type: application/json" \
-              -d '{
-                "host": "cobrocontarjeta.com.ar",
-                "key": "${{ secrets.INDEXNOW_KEY }}",
-                "keyLocation": "https://cobrocontarjeta.com.ar/${{ secrets.INDEXNOW_KEY }}.txt",
-                "urlList": [
-                  "https://cobrocontarjeta.com.ar/"
-                ]
-              }'
-            echo "IndexNow notification sent."
-          else
-            echo "No content changes, skipping IndexNow."
-          fi
-```
-
-### Implementation notes
-
-- IndexNow is supported by Bing, Yandex, and other search engines. Google has its own Indexing API (not covered here — requires more complex OAuth setup).
-- The notification is only sent when `data.json` or `index.html` actually changed.
-- The key file must be accessible at `https://cobrocontarjeta.com.ar/{key}.txt` for verification.
-- IndexNow API is free and unlimited.
-
-### Acceptance criteria
-
-- [ ] Key file accessible at `https://cobrocontarjeta.com.ar/{key}.txt`
-- [ ] After a fee change, CI/CD logs show "IndexNow notification sent"
-- [ ] Bing Webmaster Tools → IndexNow section shows submissions
-
----
-
-## Task 4.4 — Build Automated Changelog (Fee Change Detection)
-
-**Files:** `scripts/changelog.js` (new), `changelog.json` (new), CI/CD workflow
+**Files:** `scripts/detect-changes.js` (new), `changelog.json` (new), CI/CD workflow
 
 ### Goal
 
@@ -235,7 +147,7 @@ When scrapers detect a fee change, record the change with before/after values an
 - Future blog posts about fee trends
 - Historical tracking for trend charts (nice-to-have from strategy)
 
-### 4.4.1 Changelog data structure
+### 4.3.1 Changelog data structure
 
 **File:** `changelog.json` (new, project root)
 
@@ -263,7 +175,7 @@ Initial empty array. Entries will be appended by the script:
 ]
 ```
 
-### 4.4.2 Change detection script
+### 4.3.2 Change detection script
 
 **File:** `scripts/detect-changes.js` (new)
 
@@ -272,8 +184,7 @@ Initial empty array. Entries will be appended by the script:
 
 /**
  * Detects changes between old and new data.json versions.
- * Run BEFORE scrapers update data.json (pass old data as argument)
- * or use git diff to extract changes.
+ * Run AFTER scrapers update data.json, BEFORE git commit.
  *
  * Usage: node scripts/detect-changes.js
  * Compares data.json in working tree vs last committed version.
@@ -382,7 +293,9 @@ function main() {
 main();
 ```
 
-### 4.4.3 Add to CI/CD workflow
+### 4.3.3 Add to CI/CD workflow
+
+**Note:** Node.js 20 is already available in the workflow via the existing `actions/setup-node@v4` step used by `scripts/prerender.js`. No new setup step is needed.
 
 Add **after** scrapers run but **before** commit:
 
@@ -410,7 +323,7 @@ Add **after** scrapers run but **before** commit:
 
 ---
 
-## Task 4.5 — Community Outreach and Link Building
+## Task 4.4 — Community Outreach and Link Building
 
 This is an ongoing, non-code task. Document the strategy and track progress.
 
@@ -454,12 +367,10 @@ Saludos,
 
 ### Track outreach results
 
-Create a simple tracking table in the repo (or use a spreadsheet):
+_Create this file as `docs/outreach-log.md`. Replace the example rows with your own tracking data as outreach progresses._
 
 | Date | Target | Contact | Status | Link Acquired | Notes |
 |------|--------|---------|--------|---------------|-------|
-| 2026-02-15 | r/argentina | Post | Submitted | N/A | 150 upvotes |
-| 2026-02-16 | iProup | editor@iproup.com | Sent | Pending | ... |
 
 ### Acceptance criteria
 
@@ -480,14 +391,7 @@ git commit -m "feat: add Google Analytics 4 with custom event tracking
 Track simulator usage, entity clicks, FAQ interactions, and outbound
 link clicks for SEO performance monitoring."
 
-# Commit 2: IndexNow
-git add .github/workflows/update-fees.yml *.txt
-git commit -m "feat(seo): add IndexNow integration for instant indexing
-
-Notify Bing/Yandex when fee data changes. Only triggers when
-data.json or index.html are modified."
-
-# Commit 3: Changelog system
+# Commit 2: Changelog system
 git add scripts/detect-changes.js changelog.json .github/workflows/update-fees.yml
 git commit -m "feat: add automated fee change detection and changelog
 
@@ -505,9 +409,7 @@ before/after values and timestamps. Capped at 100 entries."
 | Custom events firing | GA4 → Events | simulator_use, entity_view, faq_open events |
 | Search Console sitemap | GSC → Sitemaps | Status: "Success" |
 | Search Console rendering | GSC → URL Inspection → Screenshot | Full content visible |
-| Bing sitemap | Bing Webmaster → Sitemaps | Submitted and processed |
-| IndexNow key file | `curl https://cobrocontarjeta.com.ar/{key}.txt` | 200 OK with key |
-| Changelog after manual data change | Modify data.json, run script | changelog.json updated |
+| Changelog after manual data change | Modify `data.json`, run `node scripts/detect-changes.js` | `changelog.json` updated |
 
 ---
 
