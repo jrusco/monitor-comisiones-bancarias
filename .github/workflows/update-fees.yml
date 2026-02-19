@@ -48,6 +48,23 @@ jobs:
           chmod +x tailwindcss-linux-x64
           ./tailwindcss-linux-x64 -i input.css -o tailwind.min.css --minify
 
+      - name: Validate Tailwind CSS build
+        run: |
+          SIZE=$(wc -c < tailwind.min.css)
+          echo "tailwind.min.css size: ${SIZE} bytes"
+          if [ "$SIZE" -lt 30000 ]; then
+            echo "ERROR: tailwind.min.css is too small (${SIZE} bytes, expected >30KB)"
+            echo "This likely means a Tailwind version/config mismatch. Check @import vs @tailwind directives."
+            exit 1
+          fi
+          for class in "bg-blue-600" "text-white" "rounded-xl" "px-4" "font-bold"; do
+            if ! grep -q "$class" tailwind.min.css; then
+              echo "ERROR: Missing critical Tailwind utility class: $class"
+              exit 1
+            fi
+          done
+          echo "Tailwind CSS build validation passed (${SIZE} bytes, all critical classes present)"
+
       - name: Pre-render content into HTML
         run: node scripts/prerender.js
 
