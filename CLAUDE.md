@@ -7,15 +7,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Static single-page web application that monitors and compares credit card transaction fees from Argentine financial entities. Hosted on GitHub Pages at <https://jrusco.github.io/monitor-comisiones-bancarias/>
 
 **Built with:**
-- HTML + Tailwind CSS + Chart.js (all via CDN)
+- HTML + Tailwind CSS (locally built) + Chart.js (via CDN jsDelivr)
 - Vanilla JavaScript
-- Go 1.24+ scrapers using [goquery](https://github.com/PuerkitoBio/goquery)
+- Go 1.18+ scrapers using [goquery](https://github.com/PuerkitoBio/goquery)
 
 ## Architecture
 
 ```
 ├── index.html           # SPA - reads data.json, renders UI
 ├── data.json            # Central data store for all entities
+├── input.css            # Tailwind CSS source file
+├── tailwind.min.css     # Generated CSS (committed, built by CLI binary)
+├── tailwindcss-linux-x64 # Tailwind CLI binary for local builds
+├── assets/
+│   └── logos/           # Entity logo SVGs and PNGs
+├── docs/                # Project documentation and SEO strategy
+├── scripts/
+│   └── prerender.js     # Node.js pre-renderer (runs in CI/CD)
 ├── cmd/
 │   ├── update-mercadopago/  # Mercado Pago scraper
 │   ├── update-bna/          # Banco Nación scraper
@@ -60,15 +68,21 @@ for cmd in cmd/update-*; do go run ./$cmd; done
 Example pattern from existing scrapers:
 ```go
 // Load existing data
-entities, err := common.LoadData("data.json")
+data, err := common.LoadData()
 
 // Scrape and parse fees
-doc, err := common.FetchDocument(feeURL)
+html, err := common.FetchPage(feeURL)
+doc, err := goquery.NewDocumentFromString(html)
 // ... parse with goquery ...
 
-// Update only if changed
-if common.UpdateEntityFees(entities, entityID, newFees) {
-    common.SaveData("data.json", entities)
+// Find entity and update individual fees
+entity := common.FindEntityByID(data, entityID)
+fee := common.FindFee(entity.Fees, concept, term)
+changed := common.UpdateFee(fee, newRate)
+
+// Save only if changed
+if changed {
+    common.SaveData(data)
 }
 ```
 
@@ -77,7 +91,7 @@ if common.UpdateEntityFees(entities, entityID, newFees) {
 - **Workflow:** `.github/workflows/update-fees.yml`
 - **Schedule:** Sundays 3 AM UTC
 - **Manual trigger:** Available via GitHub Actions UI ("Run workflow")
-- **Behavior:** Runs all scrapers, validates JSON, auto-commits if fees changed
+- **Behavior:** Sets up Node.js 20, runs all scrapers, regenerates Tailwind CSS via `tailwindcss-linux-x64` CLI, runs `scripts/prerender.js` pre-renderer, validates JSON-LD structured data, checks Tailwind build size, auto-commits if fees changed
 
 ## Data Conventions
 
@@ -94,11 +108,13 @@ if common.UpdateEntityFees(entities, entityID, newFees) {
   "type": "Banco (Adquirente) | Agregador (Fintech) | Procesador / Adquirente",
   "color": "Tailwind bg-color class",
   "textColor": "Tailwind text-color class",
-  "logo": "Two-letter abbreviation",
+  "logo": "Short abbreviation (2-3 characters)",
+  "logoUrl": "Path to SVG/PNG logo asset (e.g. 'assets/logos/bna.svg')",
   "feeUrl": "Official fee information URL",
   "apiUrl": "API endpoint or N/A",
   "apiDocs": "Developer documentation URL (optional)",
   "hasApi": boolean,
+  "lastUpdated": "ISO 8601 timestamp (e.g. '2026-02-14T12:00:00Z')",
   "fees": [
     {
       "concept": "Fee category (e.g., 'Point - Débito')",
@@ -153,7 +169,7 @@ The website uses a consistent color palette based on **Slate neutrals** with **B
 | Fee emphasis (Red 600) | `#dc2626` | RGB(220, 38, 38) |
 | Warnings (Amber 400) | `#fbbf24` | RGB(251, 191, 36) |
 
-**Note:** When adding new entities, choose brand colors that maintain visual distinction while complementing the existing palette. Define custom color classes in the `<style>` section of `index.html` and add mappings to the `tailwindColors` JavaScript object.
+**Note:** When adding new entities, choose brand colors that maintain visual distinction while complementing the existing palette. Define custom color classes in `input.css` (the Tailwind source file), then rebuild `tailwind.min.css` using the `tailwindcss-linux-x64` CLI binary. Also add hex mappings to the `tailwindColors` JavaScript object in `index.html` (used by chart and entity card rendering).
 
 ## Modifying Data
 
