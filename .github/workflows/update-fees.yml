@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 concurrency:
   group: update-fees
@@ -81,10 +82,23 @@ jobs:
             console.log('JSON-LD valid. Types:', data['@graph'].map(i => i['@type']).join(', '));
           "
 
-      - name: Commit and push if changed
+      - name: Create pull request if changed
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data.json index.html sitemap.xml tailwind.min.css changelog.json
-          git diff --staged --quiet || git commit -m "chore: update fees [automated]"
-          git push
+          if git diff --staged --quiet; then
+            echo "No changes detected, skipping PR creation"
+            exit 0
+          fi
+          BRANCH="automated/update-fees-$(date +%Y-%m-%d-%H%M%S)"
+          git checkout -b "$BRANCH"
+          git commit -m "chore: update fees [automated]"
+          git push -u origin "$BRANCH"
+          gh pr create \
+            --title "chore: update fees $(date +%Y-%m-%d)" \
+            --body "Automated fee update from scheduled scraper run on $(date -u +%Y-%m-%dT%H:%M:%SZ)." \
+            --base main \
+            --head "$BRANCH"
