@@ -3,7 +3,7 @@
 **Audiencia:** Comercios minoristas argentinos (kioscos, almacenes, ferreterías, pequeños negocios)
 **Fecha de elaboración:** Febrero 2026
 **Fuente base:** Investigación oficial + adaptación de informe técnico interno (enero–febrero 2026)
-**Versión:** 1.1
+**Versión:** 1.2
 
 ---
 
@@ -129,7 +129,7 @@ Costo inflación = Monto de ventas a crédito × (Inflación_mensual / 30) × D�
 | Retención SIRCREB             | ARCA/Provincias   | Aplica sobre liquidaciones de todas las redes, incluidas billeteras |
 | Coeficiente de cuotas         | Todos los bancos  | Ej.: coeficiente 1.5441 para 12 cuotas (nov. 2025 — verificar actualización) |
 
-> 📌 Las retenciones de IIBB y SIRCREB se listan aquí como costo operativo. Para el análisis fiscal completo (incluyendo Impuesto al Cheque e impacto por categoría fiscal), ver **§2.5**.
+> 📌 Las retenciones de IIBB y SIRCREB se listan aquí como costo operativo. Para el análisis fiscal completo (incluyendo Impuesto al Cheque e impacto por categoría fiscal), ver **§2.5**. Para el proceso de contracargos, ver **§2.6**. Para el análisis de coeficientes de cuotas, ver **§2.7**.
 
 ---
 
@@ -195,6 +195,93 @@ Costo efectivo total sobre una venta de $100.000 en crédito, incluyendo todos l
 | Monotributista, Mercado Pago 18 días (sin banco) | 3,39% | +0,712% (no rec.) | +0,5% | +0,5% | 0% | **~5,10%** |
 
 > ⚠️ Nota: estos valores son aproximaciones de orden de magnitud. Las tasas exactas de SIRCREB e IIBB varían por actividad y provincia. El punto clave es que el costo fiscal puede representar **1%–2% adicional** no visible en las tablas de comisiones.
+
+---
+
+### 2.6 Costos de Disputas y Contracargos
+
+Un contracargo (chargeback) ocurre cuando el titular de una tarjeta disputa una transacción ante su banco emisor. Para el comercio, el impacto va más allá del monto disputado.
+
+#### 2.6.1 Cómo funciona el proceso
+
+1. El cliente disputa la transacción ante su banco emisor (el banco que emitió la tarjeta, no el del comercio)
+2. El banco emisor notifica a Visa/Mastercard
+3. Visa/Mastercard notifica al adquirente o agregador del comercio
+4. El adquirente/agregador **retiene o debita el monto disputado** de la cuenta del comercio
+5. El comercio tiene un plazo para presentar evidencia (comprobante de venta, firma, entrega, etc.)
+6. Si no la presenta en tiempo, pierde el monto automáticamente
+
+#### 2.6.2 La diferencia crítica: agregador vs. adquirente directo
+
+Esta distinción impacta fuertemente al comercio:
+
+| Aspecto | Banco adquirente (BNA, BAPRO, Getnet) | Agregador fintech (Ualá, Mercado Pago) |
+|---------|--------------------------------------|----------------------------------------|
+| Quién retiene el dinero | El banco, dentro del sistema Visa/MC | El agregador, directamente de tu saldo en la plataforma |
+| Cuándo se retiene | Generalmente al inicio del proceso formal | **Inmediatamente al recibir la disputa** — antes de resolución |
+| A quién le reclamás | Al banco + proceso formal Visa/MC | Al agregador (no tenés acceso directo a Visa/MC) |
+| Plazo para presentar evidencia | Regulado por Visa/MC (tipicamente 7–30 días hábiles) | Definido por el agregador en sus propios términos de servicio |
+| Resolución si perdés el chargeback | Débito en cuenta bancaria | Débito de tu saldo en la plataforma |
+
+> ⚠️ En fintechs agregadoras, un chargeback puede congelar fondos de tu saldo operativo sin previo aviso, afectando tu liquidez diaria.
+
+🔴 **Confianza:** El proceso general es estándar de la industria (Visa/MC Operating Regulations). Los plazos y mecanismos específicos de Ualá y Mercado Pago no están publicados en sus portales de ayuda para comercios en términos claros. Verificar en los Términos y Condiciones de cada plataforma.
+
+#### 2.6.3 Exposición estimada por volumen
+
+Tasa de chargeback típica para comercio minorista: **0,1%–0,5% de las transacciones** (referencia industria; varía por rubro).
+
+| Volumen mensual | Tasa 0,1% | Tasa 0,5% | Riesgo anual (0,3% promedio) |
+|----------------|-----------|-----------|------------------------------|
+| $500.000 | $500/mes | $2.500/mes | ~$18.000 |
+| $1.500.000 | $1.500/mes | $7.500/mes | ~$54.000 |
+| $4.000.000 | $4.000/mes | $20.000/mes | ~$144.000 |
+
+> 📌 Para ferreterías y negocios que venden a crédito en cuotas, la tasa de chargeback tiende a ser mayor. Un cliente que no reconoce una cuota específica puede disputarla individualmente.
+
+#### 2.6.4 Cómo mitigar el riesgo
+
+- **Siempre imprimir o conservar el comprobante firmado** — es la principal defensa ante un chargeback
+- **Verificar la descripción del comercio** que aparece en el resumen de tarjeta del cliente (el "descriptor") — nombres confusos generan disputas evitables
+- **Para fintechs:** revisar el saldo disponible antes de disponer de fondos si tenés transacciones de alto valor recientes — pueden estar bajo revisión
+- **Preguntar al proveedor por el proceso de disputa antes de adherirse** — no todos lo publican claramente
+
+---
+
+### 2.7 Coeficientes de Cuotas — El Financiamiento Silencioso
+
+Cuando un comercio ofrece "cuotas sin interés", alguien paga el interés. Ese alguien es el comercio — a través del coeficiente que aplica el adquirente.
+
+#### 2.7.1 Cómo funciona el coeficiente
+
+- El cliente paga $100.000 en 12 cuotas "sin interés"
+- El adquirente (Fiserv/Prisma) liquida al comercio: $100.000 ÷ 1.5441 = **$64.766**
+- El comercio absorbió **$35.234 de costo financiero** (~35%) por ofrecer cuotas
+
+La única fuente oficial actualizada para coeficientes vigentes es: **aranceles.fiservargentina.com** (requiere acceso periódico — se actualiza cada 1–2 meses).
+
+#### 2.7.2 Programas de cuotas activos en Argentina
+
+| Programa | Quién financia | Quién decide el coeficiente | Actualización |
+|----------|---------------|-----------------------------|---------------|
+| Ahora 12 / Ahora 18 | Estado (subsidia parte del costo) | BCRA + Fiserv | Frecuente — cada 1–3 meses |
+| Cuota a Cuota | El comercio absorbe todo | Fiserv/Prisma | Frecuente |
+| MiPyME | Estado + banco | BCRA + banco | Frecuente |
+| Cencosud | Cencosud (tarjeta propia) | Cencosud | Independiente |
+
+> ⚠️ Los coeficientes cambiaron en agosto 2025 (ver §3.10). No hay obligación legal de notificar al comercio — el comercio debe revisar el portal antes de cada período promocional.
+
+#### 2.7.3 Referencia de coeficientes (noviembre 2025 — verificar actualización)
+
+El único valor confirmado en el momento de elaboración de esta guía:
+
+| Plan | Cuotas | Coeficiente | Costo implícito para el comercio |
+|------|--------|-------------|----------------------------------|
+| Cuota a Cuota / Ahora | 12 cuotas | **1,5441** | El comercio recibe $64,77 por cada $100 vendidos |
+
+> 📌 La tabla completa (3, 6, 9, 12, 18, 24 cuotas × todos los programas) requiere acceso a aranceles.fiservargentina.com. Se recomienda consultarla antes de lanzar cualquier promoción de cuotas. Ver §9.2 para la descripción completa de lo que debería contener un análisis exhaustivo.
+
+🟡 **Confianza:** Coeficiente de 12 cuotas confirmado (aranceles.fiservargentina.com, noviembre 2025). Valores para otras cantidades de cuotas y programas requieren verificación actualizada.
 
 ---
 
@@ -510,6 +597,20 @@ PayWay es el brazo comercial de la red Prisma (Fiserv) para la venta directa a c
 | Inactiva | $50.399 + IVA | ~$60.983/mes |
 
 > ⚠️ **El castigo por inactividad** ($8.400/mes extra) es una penalización que afecta a comercios con temporada baja o cierre temporal. Es una "trampa" contractual frecuente.
+
+#### Criterio de inactividad — lo que no está publicado
+
+PayWay no publica en su portal público la definición exacta de qué hace que una terminal sea clasificada como "inactiva". Lo que se sabe y lo que no:
+
+| Aspecto | Estado |
+|---------|--------|
+| Costo de terminal inactiva ($50.399/mes) | 🟢 Confirmado (portal PayWay) |
+| Definición de "inactividad" (umbral de transacciones) | 🔴 **No publicado** — requiere consulta directa a PayWay |
+| Período de gracia antes de aplicar el cargo mayor | 🔴 **No confirmado** |
+| Posibilidad de pausar el contrato temporalmente | 🔴 **No confirmado** |
+| Penalización por devolver terminal antes de fin de contrato | 🔴 **No confirmado** — presumiblemente sin penalización, pero verificar |
+
+> ⚠️ **Antes de firmar con PayWay:** Preguntar explícitamente: "¿Cuántas transacciones mínimas necesito por mes para que la terminal se considere activa?" y obtenerlo por escrito. Esto es especialmente crítico para comercios con temporada baja (turismo, kioscos escolares, eventos).
 
 #### Actualización importante (agosto 2025)
 A partir del 13 de agosto de 2025, cambiaron las tasas y coeficientes para cuotas MiPyME, Cencosud y Cuotas PayWay. Los comercios que ofrecen planes de cuotas deben **actualizar periódicamente los coeficientes** en sus sistemas de caja.
@@ -928,11 +1029,7 @@ Temas excluidos del alcance actual de esta guía, pero de alto valor para versio
 
 ### 9.2 Análisis de cuotas en profundidad
 
-El único coeficiente documentado hasta ahora (§3.5, ejemplo: 12 cuotas = 1,5441) cubre solo un caso. Un análisis completo requiere:
-- Tabla de coeficientes por cantidad de cuotas (3, 6, 9, 12, 18, 24)
-- Cobertura de todos los programas: "Ahora 12/18", "Cuota a Cuota", "MiPyME", "Cencosud"
-- Frecuencia de actualización verificada (actualmente: cada 1–2 meses)
-- Fuente primaria: aranceles.fiservargentina.com + payway.com.ar/planes-precios
+El análisis completo de coeficientes fue incorporado en **§2.7**. Pendiente: tabla exhaustiva de todos los programas (3/6/9/12/18/24 cuotas × Ahora/Cuota a Cuota/MiPyME/Cencosud) con valores actualizados desde aranceles.fiservargentina.com.
 
 ### 9.3 Contrafactual: efectivo vs. tarjeta
 
