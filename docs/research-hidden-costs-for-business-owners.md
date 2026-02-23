@@ -3,7 +3,7 @@
 **Audiencia:** Comercios minoristas argentinos (kioscos, almacenes, ferreterías, pequeños negocios)
 **Fecha de elaboración:** Febrero 2026
 **Fuente base:** Investigación oficial + adaptación de informe técnico interno (enero–febrero 2026)
-**Versión:** 1.2
+**Versión:** 1.3
 
 ---
 
@@ -157,7 +157,7 @@ El SIRCREB es una retención automática aplicada por ARCA (ex-AFIP) y las provi
 
 - **Cómo funciona:** La retención se aplica sobre el monto bruto acreditado, no sobre la comisión.
 - **Tasas:** Varían según el código de actividad AFIP del comercio. Rango típico: **0,5%–3%** sobre el bruto acreditado.
-- **Recupero:** Utilizable como crédito contra Ganancias o IVA, pero requiere declaración. Puede generar saldo a favor que demora meses en recuperarse.
+- **Recupero:** El SIRCREB es técnicamente un **adelanto del Impuesto a los Ingresos Brutos** — no un impuesto adicional. Lo que el banco retiene ya lo tendrías que pagar como IIBB; el sistema lo recauda anticipadamente antes de que llegue la declaración mensual. Esto significa que no pagás doble, pero sí adelantás el dinero antes de necesitarlo. Se computa como crédito en tu liquidación de IIBB. Si el monto retenido supera tu obligación de IIBB del período, generás saldo a favor — recuperarlo requiere declaración ante la agencia provincial y puede demorar meses.
 - **Fintechs:** Mercado Pago y Ualá exponen `tax_details` en sus reportes de liquidación, lo que facilita el uso de lo retenido como crédito fiscal.
 
 🟡 **Confianza:** Tasas generales verificadas. Tasas específicas por actividad requieren consulta a ARCA o contador impositivo.
@@ -170,6 +170,8 @@ El Impuesto a los Ingresos Brutos tiene regímenes de retención diferentes por 
 - **CABA (AGIP):** Régimen propio, aplicable a comercios radicados en Ciudad de Buenos Aires. Tasa diferente a PBA.
 - **Otras provincias:** Córdoba, Santa Fe, Mendoza tienen sus propios regímenes; no están centralizados ni son comparables.
 
+> 🔔 **Propuesta de Impuesto de Sellos CABA (verificar vigencia):** FECOBA y CAME manifestaron "fuerte rechazo" a la aplicación de un Impuesto de Sellos del **1,2% sobre operaciones con tarjeta de crédito** en CABA. Para comercios radicados en Ciudad de Buenos Aires, verificar el estado actual de esta medida en AGIP (agip.gob.ar) o con asesor impositivo, ya que representa un costo adicional de ~1,2% sobre comisiones de crédito si fue promulgado.
+
 ⚠️ **Limitación importante:** Los valores en las tablas de comparación de esta guía **NO incluyen IIBB**. El costo real para comercios inscriptos es mayor.
 
 🟡 **Confianza:** Dato verificado para PBA. 🔴 Para otras provincias requiere investigación provincial específica.
@@ -179,6 +181,7 @@ El Impuesto a los Ingresos Brutos tiene regímenes de retención diferentes por 
 - **Qué es:** 0,6% sobre cada acreditación en cuenta bancaria (cuentas corrientes y cajas de ahorro).
 - **A quién aplica:** Comercios con cuenta bancaria donde reciben liquidaciones de adquirentes.
 - **Recupero parcial:** Monotributistas y RI pueden acreditar el 34% contra su impuesto a las ganancias. El **66% restante es costo puro**.
+- **Mecanismo adicional para microempresas (RG ARCA 5632/2024):** Las microempresas pueden imputar el **30% del Impuesto al Débito y Crédito Bancario** como pago a cuenta del **15% de las contribuciones patronales al SIPA** (aportes de empleadores). El 70% restante sigue siendo computable contra Ganancias (mecanismo tradicional del 34%). Este canal de recupero adicional es relevante para negocios con empleados en relación de dependencia. Vigencia original hasta diciembre 2025 — verificar renovación con contador o en arca.gob.ar.
 - **Asimetría fintech vs. banco:** Este impuesto **no aplica** si el dinero queda en una billetera fintech (Mercado Pago, Ualá) sin transferir a banco. Esto crea un incentivo fiscal para mantener saldos en fintechs, aparentemente contradictorio con el análisis de tasas — pero que puede ser relevante para comercios con baja demanda de liquidez bancaria.
 
 🟢 **Confianza:** Regulado por Ley 25.413, permanece vigente.
@@ -195,6 +198,42 @@ Costo efectivo total sobre una venta de $100.000 en crédito, incluyendo todos l
 | Monotributista, Mercado Pago 18 días (sin banco) | 3,39% | +0,712% (no rec.) | +0,5% | +0,5% | 0% | **~5,10%** |
 
 > ⚠️ Nota: estos valores son aproximaciones de orden de magnitud. Las tasas exactas de SIRCREB e IIBB varían por actividad y provincia. El punto clave es que el costo fiscal puede representar **1%–2% adicional** no visible en las tablas de comisiones.
+
+#### 2.5.6 Programas de Incentivo para la Adopción de Pagos Electrónicos
+
+El Estado Nacional implementó programas de incentivo fiscal para comercios que adoptan terminales POS. Estos beneficios reducen el costo neto efectivo de aceptar pagos electrónicos y son frecuentemente ignorados al calcular el costo total real.
+
+**Para Monotributistas:**
+- Sin comisión en débito: los monotributistas adheridos al programa reciben acreditación de operaciones con tarjeta de débito **sin cargo de comisión** (0% de comisión sobre débito)
+- **Terminal gratuita** durante **2 años** (sin costo de alquiler mensual)
+
+**Para Responsables Inscriptos:**
+- **Terminal subsidiada o gratuita:** descuento del 50% en el costo de terminal por 6 meses, o terminal gratuita por 2 años (según el programa vigente)
+- **Reducción en retenciones sobre débito:** rebaja del 50% en las retenciones de IVA e Impuesto a las Ganancias sobre operaciones con tarjeta de débito
+
+> ⚠️ **Cómo acceder:** Estos beneficios se gestionan a través del banco adquirente o Fiserv/Prisma. Las condiciones exactas varían por programa y período fiscal. Consultar directamente con el banco o en ARCA (arca.gob.ar) para verificar la vigencia actual.
+
+> 📌 Fuente: Guía de Pagos Electrónicos FECOBA. Para comercios CABA, FECOBA (fecoba.com.ar) ofrece asistencia en la gestión de estos beneficios.
+
+🟡 **Confianza:** Documentado por FECOBA como beneficio vigente. Montos y condiciones exactas requieren verificación con contador o banco adquirente, ya que pueden variar por período fiscal.
+
+#### 2.5.7 SIRTAC (Sistema de Recaudación sobre Tarjetas de Crédito y Compra)
+
+El SIRTAC es un **tercer nivel de retención provincial** sobre operaciones con tarjeta, distinto del SIRCREB y del IIBB. Fue implementado por varias provincias y representa un costo adicional que no aparece en las tablas de comisiones de ningún proveedor.
+
+**Cómo se diferencia del SIRCREB:**
+
+| Característica | SIRCREB | SIRTAC |
+|---------------|---------|--------|
+| Qué grava | Acreditaciones bancarias en general | Específicamente operaciones con tarjetas de crédito y compra |
+| Quién lo recauda | ARCA + provincias adheridas al SIRCREB | Provincias que crearon su propio sistema |
+| Marco legal | Sistema nacional coordinado | Regímenes provinciales independientes |
+
+**Impacto reportado:** CAME calificó el SIRTAC como "un nuevo golpe para las pymes", señalando que se suma a la ya alta carga de retenciones sobre operaciones con tarjeta.
+
+**Qué hacer:** Consultar con contador impositivo o con ARCA si la provincia donde opera el comercio tiene SIRTAC vigente y cuál es la tasa aplicable a su actividad.
+
+🔴 **Confianza:** Existencia del mecanismo confirmada (CAME vía Ámbito Financiero). Tasas específicas por provincia y actividad requieren verificación provincial.
 
 ---
 
@@ -282,6 +321,24 @@ El único valor confirmado en el momento de elaboración de esta guía:
 > 📌 La tabla completa (3, 6, 9, 12, 18, 24 cuotas × todos los programas) requiere acceso a aranceles.fiservargentina.com. Se recomienda consultarla antes de lanzar cualquier promoción de cuotas. Ver §9.2 para la descripción completa de lo que debería contener un análisis exhaustivo.
 
 🟡 **Confianza:** Coeficiente de 12 cuotas confirmado (aranceles.fiservargentina.com, noviembre 2025). Valores para otras cantidades de cuotas y programas requieren verificación actualizada.
+
+#### 2.7.4 Tasas de Descuento Negociadas CAME para Programas Ahora
+
+CAME (Confederación Argentina de la Mediana Empresa) documenta las tasas de descuento que recibe el comercio bajo los programas Ahora con financiamiento estatal parcial. Estas son **significativamente mejores** que el "Cuota a Cuota" sin subsidio:
+
+| Programa | Cuotas | Descuento aplicado al comercio | El comercio recibe (por c/ $100 vendidos) |
+|----------|--------|-------------------------------|------------------------------------------|
+| Ahora 12 | 12 cuotas | **18,18%** (liquidación a 10 días hábiles) | **$81,82** |
+| Ahora 18 | 18 cuotas | **28,84%** | **$71,16** |
+| Ahora 24 | 24 cuotas | **35,83%** | **$64,17** |
+
+> 📌 **Diferencia clave con §2.7.3:** El coeficiente 1.5441 (→ comercio recibe $64,77 por $100) aplica al "Cuota a Cuota" **sin subsidio estatal**, donde el comercio financia el 100% del costo financiero. Los descuentos CAME del cuadro de arriba aplican a los programas Ahora donde el Estado subsidia parte del costo. Para ventas en cuotas, siempre conviene verificar si la transacción cae bajo un programa Ahora vigente antes de asumir el peor escenario.
+
+> 📌 **Herramienta gratuita:** CAME ofrece una calculadora que incorpora IIBB, impuestos municipales e IVA al precio de venta en cuotas: **redcame.org.ar/novedades/13344**
+
+> 📌 Desde julio de 2025, el programa **Cuotas MiPyME** reemplazó a Cuota Simple como el esquema principal de cuotas con tasa negociada para pymes. Ver redcame.org.ar/novedades/12205 para condiciones vigentes.
+
+🟡 **Confianza:** Tasas documentadas por CAME para programas Ahora (redcame.org.ar). Verificar vigencia ya que los coeficientes se actualizan periódicamente junto con la política monetaria del BCRA.
 
 ---
 
@@ -1051,8 +1108,8 @@ Esta guía está sesgada hacia GBA/PBA. Para una versión nacional:
 ### 9.5 Fuentes no oficiales de alto valor
 
 Para complementar la investigación oficial:
-- **CAME (Confederación Argentina de la Mediana Empresa):** Publica informes periódicos sobre costos del comercio minorista
-- **FECOBA (Federación de Comercio e Industria de la Ciudad de Buenos Aires):** Guías prácticas para comercios de CABA
+- **CAME (Confederación Argentina de la Mediana Empresa):** Publica informes periódicos sobre costos del comercio minorista. Herramientas destacadas: **calculadora de costos en cuotas** (redcame.org.ar/novedades/13344) que incorpora IIBB, tasas municipales e IVA; información sobre **Cuotas MiPyME** (reemplazó a Cuota Simple desde julio 2025) con tasas negociadas para pymes (redcame.org.ar/novedades/12205)
+- **FECOBA (Federación de Comercio e Industria de la Ciudad de Buenos Aires):** Guías prácticas para comercios de CABA, incluyendo guía de pagos electrónicos con detalle de beneficios fiscales por categoría (monotributistas y responsables inscriptos) y asistencia en la gestión de programas de incentivo para la adopción de terminales (fecoba.com.ar)
 - **BCRA Régimen de Transparencia** (bcra.gob.ar): Herramienta de comparación oficial entre entidades financieras — fuente primaria subutilizada en esta investigación
 - **iProfesional / Cronista:** Para verificación secundaria de cambios regulatorios (no usar como fuente primaria)
 
