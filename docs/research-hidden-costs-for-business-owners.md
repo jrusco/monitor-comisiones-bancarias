@@ -3,7 +3,7 @@
 **Audiencia:** Comercios minoristas argentinos (kioscos, almacenes, ferreterías, pequeños negocios)
 **Fecha de elaboración:** Febrero 2026
 **Fuente base:** Investigación oficial + adaptación de informe técnico interno (enero–febrero 2026)
-**Versión:** 1.3
+**Versión:** 1.4
 
 ---
 
@@ -170,7 +170,7 @@ El Impuesto a los Ingresos Brutos tiene regímenes de retención diferentes por 
 - **CABA (AGIP):** Régimen propio, aplicable a comercios radicados en Ciudad de Buenos Aires. Tasa diferente a PBA.
 - **Otras provincias:** Córdoba, Santa Fe, Mendoza tienen sus propios regímenes; no están centralizados ni son comparables.
 
-> 🔔 **Propuesta de Impuesto de Sellos CABA (verificar vigencia):** FECOBA y CAME manifestaron "fuerte rechazo" a la aplicación de un Impuesto de Sellos del **1,2% sobre operaciones con tarjeta de crédito** en CABA. Para comercios radicados en Ciudad de Buenos Aires, verificar el estado actual de esta medida en AGIP (agip.gob.ar) o con asesor impositivo, ya que representa un costo adicional de ~1,2% sobre comisiones de crédito si fue promulgado.
+> ~~🔔 **Impuesto de Sellos CABA (derogado en marzo 2023):**~~ FECOBA y CAME rechazaron en su momento la aplicación de un Impuesto de Sellos del **1,2% sobre operaciones con tarjeta de crédito** en CABA. El impuesto fue sancionado y luego **derogado por la Legislatura CABA en marzo de 2023** — no está vigente. No representa un costo adicional para comercios en CABA.
 
 ⚠️ **Limitación importante:** Los valores en las tablas de comparación de esta guía **NO incluyen IIBB**. El costo real para comercios inscriptos es mayor.
 
@@ -181,7 +181,7 @@ El Impuesto a los Ingresos Brutos tiene regímenes de retención diferentes por 
 - **Qué es:** 0,6% sobre cada acreditación en cuenta bancaria (cuentas corrientes y cajas de ahorro).
 - **A quién aplica:** Comercios con cuenta bancaria donde reciben liquidaciones de adquirentes.
 - **Recupero parcial:** Monotributistas y RI pueden acreditar el 34% contra su impuesto a las ganancias. El **66% restante es costo puro**.
-- **Mecanismo adicional para microempresas (RG ARCA 5632/2024):** Las microempresas pueden imputar el **30% del Impuesto al Débito y Crédito Bancario** como pago a cuenta del **15% de las contribuciones patronales al SIPA** (aportes de empleadores). El 70% restante sigue siendo computable contra Ganancias (mecanismo tradicional del 34%). Este canal de recupero adicional es relevante para negocios con empleados en relación de dependencia. Vigencia original hasta diciembre 2025 — verificar renovación con contador o en arca.gob.ar.
+- **Mecanismo adicional para microempresas (RG ARCA 5632/2024):** Las microempresas pueden imputar el **30% del Impuesto al Débito y Crédito Bancario** como pago a cuenta del **15% de las contribuciones patronales al SIPA** (aportes de empleadores). El 70% restante sigue siendo computable contra Ganancias (mecanismo tradicional del 34%). Este canal de recupero adicional es relevante para negocios con empleados en relación de dependencia. Prorrogado hasta diciembre 2026 vía **RG ARCA 5817/2026** (enero 2026).
 - **Asimetría fintech vs. banco:** Este impuesto **no aplica** si el dinero queda en una billetera fintech (Mercado Pago, Ualá) sin transferir a banco. Esto crea un incentivo fiscal para mantener saldos en fintechs, aparentemente contradictorio con el análisis de tasas — pero que puede ser relevante para comercios con baja demanda de liquidez bancaria.
 
 🟢 **Confianza:** Regulado por Ley 25.413, permanece vigente.
@@ -303,7 +303,7 @@ La única fuente oficial actualizada para coeficientes vigentes es: **aranceles.
 
 | Programa | Quién financia | Quién decide el coeficiente | Actualización |
 |----------|---------------|-----------------------------|---------------|
-| Ahora 12 / Ahora 18 | Estado (subsidia parte del costo) | BCRA + Fiserv | Frecuente — cada 1–3 meses |
+| ~~Ahora 12 / Ahora 18~~ → **Cuotas MiPyME** (desde jul. 2025) | Estado + mercado (tasa negociada) | BCRA + Fiserv/Payway | Frecuente |
 | Cuota a Cuota | El comercio absorbe todo | Fiserv/Prisma | Frecuente |
 | MiPyME | Estado + banco | BCRA + banco | Frecuente |
 | Cencosud | Cencosud (tarjeta propia) | Cencosud | Independiente |
@@ -322,23 +322,34 @@ El único valor confirmado en el momento de elaboración de esta guía:
 
 🟡 **Confianza:** Coeficiente de 12 cuotas confirmado (aranceles.fiservargentina.com, noviembre 2025). Valores para otras cantidades de cuotas y programas requieren verificación actualizada.
 
-#### 2.7.4 Tasas de Descuento Negociadas CAME para Programas Ahora
+#### 2.7.4 Programa de Cuotas con Subsidio — Historial y Estado Actual
 
-CAME (Confederación Argentina de la Mediana Empresa) documenta las tasas de descuento que recibe el comercio bajo los programas Ahora con financiamiento estatal parcial. Estas son **significativamente mejores** que el "Cuota a Cuota" sin subsidio:
+**Programa vigente (desde julio 2025): Cuotas MiPyME**
 
-| Programa | Cuotas | Descuento aplicado al comercio | El comercio recibe (por c/ $100 vendidos) |
-|----------|--------|-------------------------------|------------------------------------------|
-| Ahora 12 | 12 cuotas | **18,18%** (liquidación a 10 días hábiles) | **$81,82** |
-| Ahora 18 | 18 cuotas | **28,84%** | **$71,16** |
-| Ahora 24 | 24 cuotas | **35,83%** | **$64,17** |
+El Estado reemplazó los programas "Ahora" (discontinuados en enero 2024) con "Cuota Simple" (feb. 2024 – jun. 2025) y finalmente con **Cuotas MiPyME** (julio 2025–presente). Requisito: certificado MiPyME vigente (Sepyme).
 
-> 📌 **Diferencia clave con §2.7.3:** El coeficiente 1.5441 (→ comercio recibe $64,77 por $100) aplica al "Cuota a Cuota" **sin subsidio estatal**, donde el comercio financia el 100% del costo financiero. Los descuentos CAME del cuadro de arriba aplican a los programas Ahora donde el Estado subsidia parte del costo. Para ventas en cuotas, siempre conviene verificar si la transacción cae bajo un programa Ahora vigente antes de asumir el peor escenario.
+| Programa | Cuotas | Tasa al comercio | El comercio recibe (por c/ $100 vendidos) |
+|----------|--------|------------------|------------------------------------------|
+| **Cuotas MiPyME** (vigente) | 3 cuotas | 5,93% + IVA | ~$94,07 |
+| **Cuotas MiPyME** (vigente) | 6 cuotas | 11,24% + IVA | ~$88,76 |
+
+> 📌 **Diferencia clave con §2.7.3:** El coeficiente 1.5441 (→ comercio recibe $64,77 por $100) aplica al "Cuota a Cuota" **sin subsidio estatal**. Cuotas MiPyME tiene tasa negociada con subsidio parcial del Estado — significativamente más favorable para el comercio. Verificar condiciones en **redcame.org.ar/novedades/12205**.
 
 > 📌 **Herramienta gratuita:** CAME ofrece una calculadora que incorpora IIBB, impuestos municipales e IVA al precio de venta en cuotas: **redcame.org.ar/novedades/13344**
 
-> 📌 Desde julio de 2025, el programa **Cuotas MiPyME** reemplazó a Cuota Simple como el esquema principal de cuotas con tasa negociada para pymes. Ver redcame.org.ar/novedades/12205 para condiciones vigentes.
+---
 
-🟡 **Confianza:** Tasas documentadas por CAME para programas Ahora (redcame.org.ar). Verificar vigencia ya que los coeficientes se actualizan periódicamente junto con la política monetaria del BCRA.
+**Datos históricos de referencia (programas discontinuados)**
+
+Los programas "Ahora 12 / 18 / 24" rigieron hasta enero 2024 con las siguientes tasas de descuento (CAME, ene. 2024 — ya no vigentes):
+
+| Programa | Cuotas | Descuento histórico | El comercio recibía (por c/ $100) |
+|----------|--------|---------------------|----------------------------------|
+| ~~Ahora 12~~ | 12 cuotas | 18,18% | $81,82 |
+| ~~Ahora 18~~ | 18 cuotas | 28,84% | $71,16 |
+| ~~Ahora 24~~ | 24 cuotas | 35,83% | $64,17 |
+
+🟡 **Confianza:** Tasas históricas documentadas por CAME para programas Ahora (redcame.org.ar). Tasas de Cuotas MiPyME requieren verificación actualizada en redcame.org.ar/novedades/12205.
 
 ---
 
