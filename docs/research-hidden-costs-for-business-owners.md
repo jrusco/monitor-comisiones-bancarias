@@ -3,7 +3,7 @@
 **Audiencia:** Comercios minoristas argentinos (kioscos, almacenes, ferreterías, pequeños negocios)
 **Fecha de elaboración:** Febrero 2026
 **Fuente base:** Investigación oficial + adaptación de informe técnico interno (enero–febrero 2026)
-**Versión:** 1.4
+**Versión:** 1.5
 
 ---
 
@@ -353,6 +353,49 @@ Los programas "Ahora 12 / 18 / 24" rigieron hasta enero 2024 con las siguientes 
 
 ---
 
+### 2.8 Opacidad en la Estructura de Tasas: Lo que no Dice la Tarifa Publicada
+
+Este es uno de los aspectos menos documentados del sistema de pagos argentino. Las tasas que publica cualquier proveedor ("0,80% + IVA", "1,80% + IVA") son **tasas compuestas** — suman internamente al menos dos centros de costo distintos, pero el comercio solo ve un número.
+
+#### 2.8.1 La anatomía real de una tasa de comisión
+
+Toda transacción procesada involucra al menos dos actores:
+
+| Componente | Quién lo cobra | ¿Aparece en el contrato? | ¿Es negociable? |
+|------------|---------------|--------------------------|-----------------|
+| **Margen propio del banco/fintech** | El banco/fintech directamente | Solo el total | Parcialmente |
+| **Fee de red / infraestructura** | Tercero (Red Link, Fiserv, red Visa/MC) | No | No |
+
+El banco o fintech cobra la tasa total, retiene su margen, y **remite el resto al operador de red** que procesó la transacción. Este desglose no figura en ninguna tabla de tarifas publicada.
+
+#### 2.8.2 "Comisión Cuenta y Orden de Terceros": el cargo invisible
+
+En el sistema argentino, cuando un banco cobra una comisión "por cuenta y orden de terceros" (abreviado en los recibos como "CTA Y ORD TERCE"), está actuando como agente recaudador de otro operador. El banco **no retiene ese dinero** — lo recauda y lo transfiere.
+
+**Para pagos QR / Transferencias 3.0:** el tercero típico es **Red Link**, la red interbancaria que opera la infraestructura de QR interoperable en Argentina (de la que son co-propietarios los propios bancos). Red Link cobra un fee de red por cada transacción enrutada; el banco lo pasa al comercio como línea separada en el comprobante.
+
+**Para pagos con tarjeta (débito/crédito):** el tercero equivalente son las redes Fiserv/Prisma o Visa/MC. El mecanismo es el mismo — el adquirente retiene su margen y transfiere el resto a la red — pero en los comprobantes de tarjeta esta separación no siempre se presenta con igual claridad.
+
+#### 2.8.3 Implicancias concretas para el comercio
+
+**1. Solo el margen del banco es negociable.**
+El fee de red es un costo fijo de infraestructura que el banco no puede negociar en nombre del comercio. Cuando intentás conseguir una tasa mejor, el banco tiene margen de maniobra únicamente sobre su propio componente. Si la tasa publicada es 0,80% y el fee de red es 0,20%, el banco solo puede trabajar el 0,60% restante.
+
+**2. El IVA aplica a ambos componentes por separado.**
+Matemáticamente el resultado total es el mismo (21% sobre 0,80% = 21% sobre 0,60% + 21% sobre 0,20%), pero el Responsable Inscripto que quiera usar el IVA como crédito fiscal debe asegurarse de que ambas líneas figuren en el comprobante de forma legible para la declaración.
+
+**3. La tarifa publicada es un techo, no un margen íntegro.**
+Un banco que publica "0,80% + IVA" no está diciendo que su rentabilidad es 0,80%. Parte de ese porcentaje son costos de red que el banco también paga. Esto es relevante al evaluar el poder real de negociación y al comparar proveedores cuya infraestructura es propia vs. arrendada.
+
+**4. Las fintechs puras operan de forma distinta.**
+Mercado Pago y Ualá tienen infraestructura de red propia (CVU, wallets, procesamiento interno). Sus tasas publicadas pueden ser genuinamente "todo incluido" sin un tercero de red separado, o pueden tener pass-throughs absorbidos internamente. Esta distinción requiere verificación por recibo — pendiente para futura sesión.
+
+> 🔍 **Fuente de esta sección:** Comprobante real de POS BNA (Venta 2 - POS 26432, 23/02/2026). Ver §3.1 para el análisis completo del comprobante.
+
+🟡 **Confianza:** Estructura verificada para BNA QR/Transferencia (feb. 2026). El principio general aplica al sector pero la distribución exacta entre componentes varía por procesador y tipo de transacción. Verificación por recibo pendiente para otros proveedores.
+
+---
+
 ## 3. Análisis por Entidad
 
 > **Niveles de confianza usados en esta sección:**
@@ -381,6 +424,31 @@ Los programas "Ahora 12 / 18 / 24" rigieron hasta enero 2024 con las siguientes 
 - La bonificación de terminal requiere adhesión formal a través del portal BNA Conecta (validación CUIT/UIF/PEP).
 - La solución **+Pagos Nación** permite cobrar con QR y Link de Pago sin terminal física — opción sin costo fijo, viable para kioscos y comercios pequeños.
 - Los aranceles se alinean estrictamente con los topes regulatorios del BCRA.
+
+#### Desglose real de tarifas (comprobante POS, 23/02/2026)
+
+El comprobante de movimiento de un POS BNA real (QR dinámico / Transferencia) revela la estructura interna de la comisión del 0,80% publicada:
+
+| Línea en el comprobante | Monto | % sobre venta | Quién recibe |
+|------------------------|-------|---------------|-------------|
+| Cobro (venta bruta) | $17.577,50 | 100% | — |
+| COMISION | $105,46 | **0,60%** | BNA (margen propio) |
+| COMISION IVA GENE 21,00% | $22,15 | 21% s/ $105,46 | ARCA |
+| COMISION CTA Y ORD TERCE | $35,16 | **0,20%** | Tercero de red (Red Link) |
+| COMISION CTA Y ORD TERCE IVA GENE 21,00% | $7,38 | 21% s/ $35,16 | ARCA |
+| **Total acreditado** | **$17.407,35** | neto: 98,98% | Comercio |
+
+**Lectura del comprobante:**
+- La tarifa publicada es **0,80% + IVA** — pero BNA solo retiene **0,60%**. El **0,20% restante es un fee de red** que BNA recauda y transfiere a Red Link (la red interbancaria que procesa los QR de Transferencias 3.0).
+- El descriptor "COMISION CTA Y ORD TERCE" significa "comisión cobrada por cuenta y orden de terceros" — BNA actúa como agente intermediario, no como beneficiario final de esa porción.
+- **La tabla de tarifas de BNA no desglosa este componente.** Solo es visible en el comprobante real de cada transacción.
+
+**Implicancias para el comercio:**
+- Al negociar con BNA, el margen de reducción real está sobre el **0,60%** (margen BNA), no sobre el 0,80% total.
+- El cargo de Red Link (0,20%) es un costo de infraestructura fijo — no negociable a nivel del comercio individual.
+- Ver §2.8 para el análisis del patrón general en todos los procesadores.
+
+🟢 **Confianza:** Datos obtenidos de comprobante de POS real (BNA +Pagos, 23/02/2026).
 
 #### Evaluación por perfil de volumen
 | Perfil | Recomendación |
