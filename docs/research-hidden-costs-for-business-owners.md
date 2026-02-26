@@ -18,6 +18,7 @@
 7. [Preguntas Abiertas e Investigación Pendiente](#7-preguntas-abiertas-e-investigación-pendiente)
 8. [Notas para el Desarrollo de Producto](#8-notas-para-el-desarrollo-de-producto)
 9. [Desarrollo Futuro (Nice-to-Haves)](#9-desarrollo-futuro-nice-to-haves)
+10. [Dependencias del PRD y Compuerta de Decisión](#10-dependencias-del-prd-y-compuerta-de-decisión)
 
 ---
 
@@ -862,6 +863,9 @@ Con 40% de ventas en crédito: $846.000 / 40% = $2.115.000 ARS/mes en ventas tot
 | $2,1M – $3M | Terminal conviene vs. MP; evaluar vs. Ualá | ✅ Terminal conviene |
 | Más de $3M | ✅ Terminal conviene en todos los casos | ✅ Claramente conviene |
 
+> 📌 **Nota de desambiguación — dos umbrales, dos preguntas distintas:**
+> El umbral de **$800.000/mes** (usado como referencia en el árbol de decisión de §8.2) y los umbrales de **$2,1M–$3,06M/mes** calculados en esta sección miden cosas diferentes, y ambos son correctos. $800K es el **punto de selección de proveedor**: el volumen a partir del cual vale la pena buscar acceso a bonificación bancaria, porque el diferencial de comisiones ya justifica el esfuerzo de cambio aunque la terminal todavía esté bonificada. Los valores de $2,1M y $3,06M son los **puntos de equilibrio de costo total de hardware**: el volumen a partir del cual el ahorro en comisiones cubre el alquiler mensual de la terminal *sin bonificación*. Un comercio con $1,5M/mes en ventas puede estar por encima del umbral de selección de proveedor ($800K → conviene buscar bonificación bancaria) pero por debajo del umbral de hardware ($2,1M → no conviene pagar la terminal si no está bonificada). La recomendación para ese comercio no es "banco o fintech": es *conseguir la bonificación*.
+
 ### 4.4 El Ciclo de Vida de la Bonificación — Qué Pasa en el Mes 13
 
 #### 4.4.1 El problema documentado: nadie avisa
@@ -946,6 +950,32 @@ Si los pagos QR (tasa 0,6%) crecen como proporción del total de ventas:
 ---
 
 ## 5. Escenarios de Impacto
+
+### 5.0 Autoidentificación del Comerciante
+
+Antes de leer los escenarios, respondé estas cuatro preguntas para identificar qué perfil se aproxima más al tuyo:
+
+| # | Pregunta | Opciones |
+|---|---------|---------|
+| 1 | Volumen mensual estimado de ventas con tarjeta | `< $800K` / `$800K–$2M` / `> $2M` |
+| 2 | ¿Tenés actualmente una terminal POS con contrato vigente? | `Sí` / `No` |
+| 3 | ¿Tus clientes compran en cuotas con frecuencia? | `Rara vez (< 10% de las ventas)` / `Frecuentemente (> 20% de las ventas)` |
+| 4 | Provincia principal de operación | `PBA / GBA` / `Córdoba` / `Otra` |
+
+**Tabla de correspondencia:**
+
+| Volumen | ¿Terminal activa? | ¿Cuotas frecuentes? | Provincia | → Perfil |
+|---------|------------------|---------------------|-----------|----------|
+| < $800K | No | No | Cualquiera | **Perfil A** — kiosco/pequeño comercio: evaluar fintech o banco sin terminal |
+| < $800K | No | No | PBA/GBA | **Perfil A + BAPRO** — explorar Clave DNI si la base de clientes lo permite |
+| $800K–$2M | Sí o No | No | Cualquiera | **Perfil B** — comercio mediano: gestionar bonificación bancaria es la acción prioritaria |
+| $800K–$2M | No | Sí | Cualquiera | **Perfil B cuotas** — requiere procesador Fiserv para Cuotas MiPyME (BNA, BAPRO o Getnet; Ualá/MP no son elegibles) |
+| > $2M | Sí | Sí | Cualquiera | **Perfil C** — ferretería/comercio grande: banco con terminal siempre conviene; revisar costos de cuotas |
+| Cualquiera | Sí o No | No | Córdoba | Añadir **Naranja X** al análisis: base de usuarios propia relevante en esa provincia |
+
+> 💡 Si tu perfil no encaja claramente en ninguna fila, el árbol de decisión en §8.2 ofrece una lógica más granular que cubre también situaciones de transición (terminal con bonificación próxima a vencer, cambio de volumen reciente, etc.).
+
+---
 
 ### Perfil A: Don Norberto, kiosco de barrio
 
@@ -1116,25 +1146,65 @@ Guía para priorizar qué datos scrapeary con qué frecuencia actualizar:
 ¿Cuánto facturás por mes con tarjeta?
 │
 ├── Menos de $800.000/mes
-│   └── ¿Tenés acceso a bonificación bancaria? (nuevo cliente banco)
-│       ├── SÍ → Ir a banco con bonificación (ahorrás $30K–$50K/mes vs. fintech)
-│       └── NO → ¿Necesitás el dinero hoy?
-│           ├── SÍ → Ualá (mejor tasa inmediata)
-│           └── NO → Mercado Pago 18 días (equilibrio tasa-liquidez)
+│   └── ¿Tenés terminal con contrato activo?
+│       ├── SÍ → ¿En qué mes de la bonificación estás?
+│       │   ├── Mes 1–9 → Continuar. Programar revisión en mes 10.
+│       │   ├── Mes 10–11 → Iniciar negociación de renovación con el banco.
+│       │   │   └── Si el banco no renueva → Abrir en banco alternativo (nueva bonif. 12 meses)
+│       │   └── Mes 12+ sin bonificación → ¿Podés devolver la terminal?
+│       │       ├── SÍ → Devolver terminal. Evaluar QR + mPOS (Ualá o BNA +Pagos)
+│       │       └── NO → Calcular si el costo de terminal se justifica (ver §4.3)
+│       └── NO → ¿Tenés acceso a bonificación bancaria? (nuevo cliente banco)
+│           ├── SÍ → Ir a banco con bonificación (ahorrás $30K–$50K/mes vs. fintech en este rango)
+│           └── NO → ¿Tus clientes compran en cuotas?
+│               ├── SÍ (>10%) → Requiere banco/adquirente Fiserv para Cuotas MiPyME
+│               │   └── BNA, BAPRO o Getnet son los operadores mínimos (Ualá/MP no son elegibles)
+│               └── NO → ¿Sos monotributista?
+│                   ├── SÍ → IVA no recuperable → tasa efectiva de Ualá (4,9%) puede superar MP 18 días
+│                   │   └── Comparar: Ualá sin IVA recuperable vs. MP 18 días sin IVA recuperable (ver §2.5.5)
+│                   └── NO → ¿Necesitás el dinero hoy?
+│                       ├── SÍ → Ualá (mejor tasa inmediata: 4,9% vs. MP 6,29%)
+│                       └── NO → ¿En PBA y clientes usan Cuenta DNI?
+│                           ├── SÍ → BAPRO Clave DNI (opción más barata: ~$5.678/mes en Perfil A)
+│                           └── NO → Mercado Pago 18 días (equilibrio tasa-liquidez)
 │
 ├── $800.000 – $3.000.000/mes
-│   └── ¿Estás en Provincia de Buenos Aires?
-│       ├── SÍ → ¿Tus clientes usan Cuenta DNI?
-│       │   ├── SÍ (>30%) → BAPRO Clave DNI es la mejor opción
-│       │   └── NO → BNA o Getnet/Santander con bonificación
-│       └── NO → BNA o banco con presencia regional + bonificación
+│   └── ¿Tenés terminal con contrato activo?
+│       ├── SÍ → ¿Cuándo vence la bonificación?
+│       │   ├── Quedan > 3 meses → Continuar. Programar revisión.
+│       │   └── Quedan ≤ 3 meses → Calcular switching payoff:
+│       │       • Ahorro con nueva bonificación: ~$46K/mes de terminal recuperada
+│       │       • Costo de migrar: 2–4 semanas operativas + tiempo administrativo
+│       │       └── Si ahorro > costo → Iniciar adhesión en banco alternativo AHORA
+│       └── NO → ¿Estás en Provincia de Buenos Aires?
+│           ├── SÍ → ¿Tus clientes usan Cuenta DNI (> 30% de ventas)?
+│           │   ├── SÍ → BAPRO Clave DNI (tasa 0,6% + acreditación inmediata — mejor opción PBA)
+│           │   └── NO → BNA o Getnet/Santander con bonificación
+│           └── NO → ¿En Córdoba?
+│               ├── SÍ → BNA o banco regional con bonificación. Evaluar añadir Naranja X.
+│               └── NO (interior NOA/NEA/Cuyo) → Banco Macro o banco regional con bonificación
 │
 └── Más de $3.000.000/mes
-    └── Banco con terminal (bonificada o no — igual conviene)
-        └── Considerar devolver terminal inactiva si hay estacionalidad
+    └── Banco con terminal (bonificada o no — siempre conviene a este volumen)
+        ├── ¿Tenés terminal inactiva o subutilizada?
+        │   └── SÍ → Devolver la terminal inactiva (ahorro $8.400–$10.164/mes inmediato, sin otro cambio)
+        ├── ¿Ofrecés cuotas en > 20% de las ventas?
+        │   └── SÍ → Revisar coeficientes en aranceles.fiservargentina.com antes de cada promoción
+        │           └── Coeficiente 1.54 en 12 cuotas = comercio financia 54% al cliente. Verificar siempre.
+        └── ¿Cuándo vence la bonificación de terminal?
+            └── Programar renovación o migración 2 meses antes de que venza (ver §4.4.4)
 ```
 
-> ⚠️ Nota: el umbral de $800.000/mes es una referencia de perfil de volumen, no el punto de equilibrio calculado en §4.3 ($2,1M vs. MP / $3,06M vs. Ualá). La variable decisiva en todos los casos es el **acceso a bonificación bancaria**, no el volumen absoluto.
+**Caminos de fallback si no se consigue bonificación:**
+
+| Situación | Siguiente mejor opción | Costo mensual estimado (Perfil B: $1,5M/mes) |
+|-----------|----------------------|----------------------------------------------|
+| No hay bonificación bancaria disponible | Ualá inmediato | ~$67.185 |
+| No hay bonificación; en PBA con base Cuenta DNI | BAPRO Clave DNI (sin terminal) | ~$17.034 |
+| No hay bonificación; necesita cuotas | BNA/Getnet sin bonif. (evaluar si el volumen de cuotas lo justifica) | ~$74.735 |
+| Bonificación vencida, sin alternativa inmediata | Devolver terminal + QR/mPOS Ualá | Variable según mix de pagos con QR |
+
+> ⚠️ **Nota metodológica:** El umbral de $800.000/mes es un punto de *selección de proveedor* — el volumen a partir del cual vale la pena buscar acceso a bonificación bancaria. Los umbrales de $2,1M y $3,06M son los *puntos de equilibrio de costo total de hardware* — cuando la terminal se paga sola frente a cada fintech sin bonificación (ver §4.3 para el cálculo detallado y la nota de desambiguación completa). Estos valores no se contradicen: miden preguntas distintas del mismo problema.
 
 ### 8.3 Preguntas Pendientes Priorizadas para el PRD
 
@@ -1147,6 +1217,25 @@ Preguntas abiertas ordenadas por impacto en el producto:
 | P3 | ¿Cuáles son las tasas de IIBB para comercio minorista en Córdoba, Santa Fe, Mendoza? | Necesario para versión nacional de la herramienta | Consulta AGIP, ARBA, DGR Córdoba |
 | P4 | ¿Tiene Naranja X tasa de débito y costo de Cobro Tap publicados? | Completa el análisis de entidades | Consulta naranjax.com con registro |
 | P5 | ¿Cuáles son las condiciones contractuales de terminación anticipada de terminal? | Permite modelar switching costs reales | Revisión de contratos tipo de cada banco |
+
+### 8.4 Derivaciones de Funcionalidad (Puente Investigación → PRD)
+
+La tabla a continuación mapea hallazgos de investigación a funcionalidades concretas. Es el insumo directo para la lista de features del PRD: cada fila representa una funcionalidad cuya justificación puede trazarse a evidencia ya documentada en este informe.
+
+| Hallazgo | Funcionalidad | Prioridad | Condición de activación | Bloqueado en |
+|---------|--------------|-----------|------------------------|--------------|
+| "Mes 13 trap": bonificación termina sin aviso y el costo de terminal reaparece automáticamente (§4.4) | **Alerta proactiva de vencimiento de bonificación** — notificar al comercio en mes 10–11 para que negocie renovación o migre | v1 | Usuario tiene bonificación activa → calcular fecha de mes 13 | Entrevistas: si <3/8 comercios saben cuándo vence su bonificación, confirma que es un problema de información pura y justifica v1 |
+| Umbral $800K (selección de proveedor) y $2,1M–$3,06M (equilibrio de hardware) con lógica distinta (§4.3, §8.2) | **Motor de recomendación basado en volumen** — usuario ingresa ventas mensuales → herramienta recomienda perfil de proveedor óptimo | v1 | Usuario ingresa volumen mensual de ventas | — |
+| Opacidad de tarifas: tabla publicada vs. costo real que incluye IVA, SIRCREB, IIBB no visibles (§2.8, §2.5) | **Vista de costo real** — mostrar desglose tabla publicada vs. costo efectivo real (incluyendo impuestos invisibles) | v1 | Siempre visible; no requiere configuración | — |
+| Penalización PayWay por inactividad: $8.400/mes extra para terminal no usada (§2.4, §3.10) | **Alerta de riesgo por inactividad** — detectar terminal activa con volumen bajo y notificar antes de que aplique la tarifa mayor | v1 | Usuario tiene terminal activa + volumen mensual bajo detectado | — |
+| IIBB y SIRCREB no aparecen en ninguna tabla de ningún proveedor pero impactan 1%–2% adicional (§2.5) | **Calculadora de costo ajustado por impuestos** — usuario selecciona provincia y categoría fiscal → herramienta ajusta el costo efectivo mostrado | v1 | Usuario configura provincia + categoría fiscal (monotributista / RI) | — |
+| El período de cuotas sin subsidio tiene coeficiente 1.5441 = comercio absorbe el 35% del valor (§2.7) | **Visualización del costo de cuotas por plan** — mostrar cuánto recibe el comercio por cada $100 vendidos según programa y cantidad de cuotas | v1 | Usuario vende en cuotas | — |
+| Variabilidad geográfica: PBA, Córdoba, interior tienen proveedores y tasas distintas (§3.2, §3.9, §9.4) | **Ajuste de recomendaciones por provincia** — recalcular alternativas óptimas según provincia del comercio | v2 | Usuario configura provincia | Entrevistas: ¿la ubicación geográfica afecta la intención de cambio de proveedor? |
+| El contador es intermediario habitual en decisiones comerciales (hipótesis a validar; ver §8.3 P1) | **Exportar resumen para contador** — vista resumida del análisis de costo, exportable como PDF o tabla compartible | v2 | — | Entrevistas: si >5/8 comercios toman decisiones a través del contador → sube a v1 |
+| Alta volatilidad de coeficientes de cuotas (cambian cada 1–2 meses sin aviso garantizado) (§8.1, §2.7) | **Alerta de cambio de coeficiente** — notificar cuando el coeficiente de cuotas cambia >5% respecto al valor anterior monitoreado | v2 | Usuario opera con cuotas + coeficiente disponible en datos scrapeados | — |
+| Los cálculos de §4.2 son sensibles a la hipótesis de inflación mensual (§4.5.1) | **Toggle de escenario inflacionario** — permitir al usuario comparar costos con distintas hipótesis (1% / 2,5% / 4% mensual) | v2 | — | — |
+
+> 📌 Las funcionalidades marcadas como "Bloqueado en: entrevistas" no deben entrar en el backlog de v1 hasta tener los resultados de las 5–8 entrevistas planificadas. El resto puede incluirse en el PRD con la evidencia ya documentada como justificación.
 
 ---
 
@@ -1191,6 +1280,36 @@ Para complementar la investigación oficial:
 - **FECOBA (Federación de Comercio e Industria de la Ciudad de Buenos Aires):** Guías prácticas para comercios de CABA, incluyendo guía de pagos electrónicos con detalle de beneficios fiscales por categoría (monotributistas y responsables inscriptos) y asistencia en la gestión de programas de incentivo para la adopción de terminales (fecoba.com.ar)
 - **BCRA Régimen de Transparencia** (bcra.gob.ar): Herramienta de comparación oficial entre entidades financieras — fuente primaria subutilizada en esta investigación
 - **iProfesional / Cronista:** Para verificación secundaria de cambios regulatorios (no usar como fuente primaria)
+
+---
+
+## 10. Dependencias del PRD y Compuerta de Decisión
+
+Esta sección define explícitamente qué decisiones de producto pueden tomarse a partir de este documento y cuáles requieren los resultados de las entrevistas con comerciantes (Tier 1 Blocker pendiente de `docs/things-to-improve.md §2`).
+
+| Decisión del PRD | ¿Proceder ahora? | Bloqueado en | Implicancia si se omite |
+|-----------------|-----------------|--------------|------------------------|
+| Feature central de v1: ¿alerta de vencimiento de bonificación o calculadora de costo total? | ❌ No | Datos de entrevistas — conteo de awareness: si <3/8 comercios saben cuándo vence la bonificación, la alerta es v1 core; si >5/8 ya lo saben, el producto debe ir más allá | Riesgo de construir la feature principal equivocada y subutilizada |
+| Alcance geográfico: PBA/GBA en v1, nacional en v2 | ✅ Sí | — (decisión tomada; ver `docs/things-to-improve.md §3`) | Usar PBA/GBA para todos los cálculos y proveedores de v1 |
+| Umbral canónico de volumen: $800K o $2,1M como referencia en la UI | ✅ Sí | — (ambos son válidos; miden preguntas distintas; ver §4.3) | $800K para selección de proveedor; $2,1M/$3,06M para equilibrio de hardware. Mostrar ambos con etiquetas distintas. |
+| Métrica de éxito de v1 | ❌ No | Alineación con stakeholders/liderazgo | El PRD carece de criterio de aceptación; las features no tienen objetivo de validación |
+| UX del contador (¿interfaz o exportación separada?) | ❌ No | Entrevistas: si >5/8 comercios deciden a través del contador → diseñar exportación en v1 | Podría malgastar scope de v1 en un canal no validado |
+| Umbrales de alerta (¿qué anticipación en meses activa la alerta de bonificación? ¿qué delta activa la alerta de coeficiente?) | ✅ Sí (preliminar) | Refinable con datos de uso post-lanzamiento | Usar valores derivados de investigación: mes 10 para bonificación (ver §4.4.4); delta >5% para coeficientes. Revisar tras 90 días de uso. |
+| Categorías fiscales a soportar en calculadora | ✅ Sí | — (documentadas en §2.5) | Priorizar monotributista en v1 — es el perfil con mayor impacto de IVA no recuperable y el más frecuente en comercios pequeños |
+| Proveedores en scope del scraper v1 | ✅ Sí | — (BNA, BAPRO, Getnet, Ualá, Mercado Pago, PayWay ya en data.json) | BBVA, Macro, Naranja X para v2 junto con expansión geográfica |
+
+### 10.1 Árbol de Compuerta de Entrevistas
+
+Las siguientes preguntas de las entrevistas de comerciantes (ver `docs/merchant-interview-questions.md`) tienen implicancias directas en decisiones de product scope:
+
+| Pregunta de entrevista | Si la mayoría responde A | Implicancia A | Si la mayoría responde B | Implicancia B |
+|-----------------------|--------------------------|---------------|--------------------------|---------------|
+| ¿Sabés cuándo vence la bonificación de tu terminal? | <3/8 saben — awareness bajo | **Alerta de vencimiento es v1 core** (problema de información pura) | >5/8 saben — awareness moderado | El producto debe ir más allá de alertas — necesita workflows de acción y comparación activa |
+| ¿Cómo tomaste la decisión de tu proveedor actual? | Inercia / no lo decidió activamente | Producto debe crear trigger externo (alerta, ahorro visible) | Decisión deliberada — consultó, comparó | Producto puede ser más técnico y ofrecer más detalle analítico |
+| ¿Tomás decisiones de proveedores junto con tu contador? | >5/8 responden sí | Exportar resumen para contador **sube a v1** | <3/8 | Exportar resumen para contador es v2 o se elimina del scope |
+| Si encontrás $20K/mes de ahorro, ¿en cuánto tiempo actuarías? | Más de 2 semanas — acción lenta | Producto debe incluir un paso de "iniciar trámite" o guía de primeros pasos | Menos de 1 semana — acción rápida | La información sola es suficiente; el valor del producto es el insight, no el workflow |
+
+> 📌 Esta sección debe actualizarse una vez completadas las 5–8 entrevistas planificadas. Las filas marcadas con ❌ en la tabla de decisiones no pueden resolverse con investigación secundaria — requieren evidencia directa de comerciantes para evitar diseñar en el vacío.
 
 ---
 

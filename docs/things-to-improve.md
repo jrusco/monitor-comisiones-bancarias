@@ -46,16 +46,13 @@ This is not a nice-to-have deferral — it determines:
 ## Tier 2: Fix Before PRD Draft Review
 *Not blockers, but create contradictions that will confuse requirements writing.*
 
-### 4. Reconcile the $800K vs. $2.1M threshold contradiction
-The decision tree (§8.2) and the break-even calculation (§4.3) give different answers to the same question:
-- Decision tree uses $800K as the bank-fintech inflection point
-- Break-even calculation shows $2.1M–$3.06M depending on comparison scenario
+### 4. ✅ Reconcile the $800K vs. $2.1M threshold contradiction — RESOLVED
 
-**Why it matters:** When writing requirements (e.g., "show user whether to use bank or fintech"), you need a single source of truth. Currently, a PM writing from this doc would get inconsistent user flows.
+**Resolution (February 2026):** Both thresholds are correct — they measure different things and are not in conflict. A disambiguation note was added to §4.3, and the §8.2 decision tree was expanded with a methodological note making both explicit:
+- $800K = **provider selection point**: volume at which seeking bank bonification is worth the switching effort
+- $2.1M / $3.06M = **hardware TCO breakeven**: volume at which paying terminal rental (without bonification) is cheaper than each fintech
 
-**Action:** Pick one methodology as canonical. Update the other to match. The document already flags this mismatch in a footnote (§8.2) — just resolve it.
-
-**Effort:** 30 minutes. Re-run the break-even math or adjust the decision tree logic to align.
+A merchant at $1.5M/month sits above the selection threshold but below the hardware breakeven — the correct recommendation is neither "use bank" nor "use fintech" but "get the bonification."
 
 ### 5. Define one success metric for v1
 Not a full metrics framework — just answer: **What user behavior would make this product a success in 6 months?**
@@ -107,7 +104,8 @@ Examples of different answers (each changes the product scope):
   ☐ Have you switched? What triggered it?
   ☐ If you found $20K/month savings, how long to act?
   → Interview guide ready: docs/merchant-interview-questions.md
-☐ Reconcile the $800K vs. $2.1M threshold
+☑ Reconcile the $800K vs. $2.1M threshold
+    → Both are valid; they measure different questions. See §4.3 disambiguation note.
 ☐ Write one sentence: "We'll know v1 succeeded when ___"
 ```
 
