@@ -54,17 +54,17 @@ This is not a nice-to-have deferral — it determines:
 
 A merchant at $1.5M/month sits above the selection threshold but below the hardware breakeven — the correct recommendation is neither "use bank" nor "use fintech" but "get the bonification."
 
-### 5. Define one success metric for v1
-Not a full metrics framework — just answer: **What user behavior would make this product a success in 6 months?**
+### 5. ✅ Define one success metric for v1 — RESOLVED
 
-Examples of different answers (each changes the product scope):
-- "A merchant switched providers after using the tool" → product needs decision-support and switching workflows
-- "1,000 monthly active users" → product needs SEO + content strategy
-- "Merchants reduce payment processing costs by 20% on average" → product needs integration with their actual systems
+**Decision (March 2026):** *"We'll know v1 succeeded when the site receives 400+ monthly sessions from non-branded organic search."*
 
-**Why it matters:** This forces scope discipline. A PRD without a success metric will expand to include everything.
+- Measured via Google Search Console → Performance → filter out branded queries → read clicks
+- Baseline to be established March 2026 (first full month after custom domain propagation)
+- Non-branded = real merchants finding the tool via search, not existing awareness
 
-**Effort:** 1–2 hours in a working session with leadership/design.
+Rationale: v1 is a distribution problem. Organic reach is the bottleneck; engagement (simulator use, entity views) is a Tier 2 metric once distribution is proven.
+
+See full decision record: `docs/plans/2026-03-02-v1-success-metric.md`
 
 ---
 
@@ -106,7 +106,8 @@ Examples of different answers (each changes the product scope):
   → Interview guide ready: docs/merchant-interview-questions.md
 ☑ Reconcile the $800K vs. $2.1M threshold
     → Both are valid; they measure different questions. See §4.3 disambiguation note.
-☐ Write one sentence: "We'll know v1 succeeded when ___"
+☑ Write one sentence: "We'll know v1 succeeded when ___"
+    → 400+ monthly sessions from non-branded organic search (GSC)
 ```
 
 Everything else in the research document is solid enough to write from. The analytical quality is strong — the pre-work needed is strategic, not analytical.
