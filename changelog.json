@@ -283,5 +283,24 @@
         "to": "10 días"
       }
     ]
+  },
+  {
+    "date": "2026-05-31T04:28:48.339Z",
+    "entity": "mercadopago",
+    "entityName": "Mercado Pago",
+    "changes": [
+      {
+        "concept": "Point - Crédito",
+        "field": "rate",
+        "from": "6.29% + IVA",
+        "to": "4.39% + IVA"
+      },
+      {
+        "concept": "Point - Crédito",
+        "field": "term",
+        "from": "En el momento",
+        "to": "10 días"
+      }
+    ]
   }
 ]
