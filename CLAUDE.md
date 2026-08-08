@@ -96,7 +96,7 @@ if changed {
 ## Data Conventions
 
 - **Format:** International dot format (`3.25%` not `3,25%`)
-- **Sources:** All rates must come from verifiable authoritative sources
+- **Sources:** All rates must come from verifiable authoritative sources. Verify information date before incorporating it as a source to make sure the data is (still) relevant and useful.
 - **No hardcoding:** If scraping fails, report the error - don't use fallback values
 
 ## Data Structure

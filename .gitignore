@@ -8,7 +8,11 @@ update-*
 
 # Playwright MCP testing
 .playwright-mcp/
+*.png
 
 # Tailwind CLI binary
 tailwindcss-linux-x64
+
+# Claude Code local config
+.claude/
 
