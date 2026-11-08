@@ -46,16 +46,23 @@ function detectChanges(oldEntities, newEntities) {
 
         const feeChanges = [];
         for (const newFee of newEntity.fees) {
-            const oldFee = oldEntity.fees.find(f => f.concept === newFee.concept);
+            // Fees are unique by (concept, term) — matching on concept alone
+            // false-positives when an entity has multiple rows for the same concept
+            // (e.g. Mercado Pago Point - Crédito at "En el momento" and "10 días").
+            const oldFee = oldEntity.fees.find(
+                f => f.concept === newFee.concept && f.term === newFee.term
+            );
             if (!oldFee) {
-                feeChanges.push({ concept: newFee.concept, field: 'fee', from: null, to: newFee.rate });
+                feeChanges.push({
+                    concept: newFee.concept,
+                    field: 'fee',
+                    from: null,
+                    to: `${newFee.rate} (${newFee.term})`,
+                });
                 continue;
             }
             if (oldFee.rate !== newFee.rate) {
                 feeChanges.push({ concept: newFee.concept, field: 'rate', from: oldFee.rate, to: newFee.rate });
-            }
-            if (oldFee.term !== newFee.term) {
-                feeChanges.push({ concept: newFee.concept, field: 'term', from: oldFee.term, to: newFee.term });
             }
         }
 
