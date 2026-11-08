@@ -47,18 +47,11 @@ jobs:
 
       - name: Build Tailwind CSS
         run: |
-          curl --fail --retry 5 --retry-delay 5 --retry-all-errors -sL \
-            -o tailwindcss-linux-x64 \
-            https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64
-          # Reject HTML error pages (e.g. GitHub 504) that curl -O would otherwise save as the binary
-          if ! file tailwindcss-linux-x64 | grep -q 'ELF'; then
-            echo "ERROR: Tailwind CLI download did not produce an ELF binary:"
-            file tailwindcss-linux-x64
-            head -c 200 tailwindcss-linux-x64
-            exit 1
-          fi
-          chmod +x tailwindcss-linux-x64
-          ./tailwindcss-linux-x64 -i input.css -o tailwind.min.css --minify
+          # Install via npm — GitHub Releases for the standalone binary has been
+          # returning intermittent 504s, which previously left an HTML error page
+          # in place of the CLI and broke this step.
+          npm install --no-save --no-package-lock tailwindcss@4.3.5 @tailwindcss/cli@4.3.5
+          npx @tailwindcss/cli -i input.css -o tailwind.min.css --minify
 
       - name: Validate Tailwind CSS build
         run: |
