@@ -12,3 +12,6 @@ update-*
 # Tailwind CLI binary
 tailwindcss-linux-x64
 
+
+# npm (CI installs Tailwind transiently)
+node_modules/
