@@ -38,7 +38,7 @@
         "feeUrl": "https://www.bancoprovincia.com.ar/web/adhesion_comercios",
         "apiUrl": "N/A - Integración vía Procesadores",
         "hasApi": false,
-        "lastUpdated": "2026-11-08T11:49:01Z",
+        "lastUpdated": "2026-11-15T10:07:42Z",
         "fees": [
             {
                 "concept": "Débito",
